@@ -16,8 +16,19 @@ class Board(val map : MarsMap) {
     && area.neighbors().none { tileOn(it) == TileType.CITY }
 
   fun display() {
+    print(" ".repeat(36))
+    for (col in 1 .. 9) {
+      print(padded("C" + col))
+      print(padded(""))
+    }
+    println()
+    println()
+    println()
     for (row in 1 .. 9) {
       print(" ".repeat(3 * (9 - row)))
+      print(padded("R" + row))
+      print(padded(""))
+      print(padded(""))
       for (col in 1..9) {
         val area = map[row, col]
         if (area == null) {

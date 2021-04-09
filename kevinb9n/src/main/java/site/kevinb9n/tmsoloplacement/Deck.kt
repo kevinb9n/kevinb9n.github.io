@@ -2,8 +2,9 @@ package site.kevinb9n.tmsoloplacement
 
 import com.google.common.collect.ImmutableMultiset
 import com.google.common.collect.Multiset
+import kotlin.random.Random
 
-object Deck {
+data class Deck(val seed: Long = System.currentTimeMillis()) {
   var shuffledCards = shuffle()
   val cardsDrawn = mutableListOf<Int>()
 
@@ -29,7 +30,7 @@ object Deck {
       .build()
 
     val list = cards.toMutableList()
-    list.shuffle()
+    list.shuffle(Random(seed))
     return list.iterator()
   }
 

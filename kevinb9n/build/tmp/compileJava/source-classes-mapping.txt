@@ -1,3 +1,0 @@
-site/kevinb9n/tmsoloplacement/MarsMap.java
- site.kevinb9n.tmsoloplacement.MarsMap
- site.kevinb9n.tmsoloplacement.MarsMap$HexArea
