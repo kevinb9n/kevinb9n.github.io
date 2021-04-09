@@ -11,46 +11,46 @@ enum class ZeroPolicy {
   },
   CYCLE {
     override fun adjust(cost: Int, numCandidates: Int) =
-      if (cost != 0) cost else numCandidates
+        if (cost != 0) cost else numCandidates
   },
   SATURATE {
     override fun adjust(cost: Int, numCandidates: Int) = max(cost, 1)
   },
   REDRAW {
-    override fun acceptCardFromDeck(card : Int) = card > 0
+    override fun acceptCardFromDeck(card: Int) = card > 0
     override fun adjust(cost: Int, numCandidates: Int) = cost
   };
 
   /** Turns a card cost into a 1-referenced index, handling the zero case. */
   abstract fun adjust(cost: Int, numCandidates: Int): Int
-  open fun acceptCardFromDeck(card : Int) = true
+  open fun acceptCardFromDeck(card: Int) = true
 }
 
 enum class OverflowPolicy {
   CYCLE {
     override fun adjust(index: Int, numCandidates: Int) =
-      if (index > numCandidates) index - numCandidates else index
+        if (index > numCandidates) index - numCandidates else index
   },
   SATURATE {
     override fun adjust(index: Int, numCandidates: Int) = min(index, numCandidates)
   },
   REDRAW {
-    override fun acceptCardFromDeck(card : Int, numCandidates: Int) = card < numCandidates // acl
+    override fun acceptCardFromDeck(card: Int, numCandidates: Int) = card < numCandidates // acl
     override fun adjust(index: Int, numCandidates: Int) = index
   },
   ;
 
   /** Turns a 1-ref index that might overflow to one that mightn't */
-  abstract fun adjust(index : Int, numCandidates : Int): Int
-  open fun acceptCardFromDeck(card : Int, numCandidates : Int) = true
+  abstract fun adjust(index: Int, numCandidates: Int): Int
+  open fun acceptCardFromDeck(card: Int, numCandidates: Int) = true
 }
 
 enum class SkipPolicy { SKIP_ALL_UNAVAIL, ADVANCE_IF_NEEDED }
 
 class NeutralTilePlacer(
-  val zeroPolicy: ZeroPolicy,
-  val overflowPolicy: OverflowPolicy,
-  val skipPolicy: SkipPolicy) {
+    val zeroPolicy: ZeroPolicy,
+    val overflowPolicy: OverflowPolicy,
+    val skipPolicy: SkipPolicy) {
 
   fun placeTiles(board: Board, deck: Deck) {
     val candidates1 = board.map.allAreas().filter { !it.isReserved() }
@@ -69,10 +69,10 @@ class NeutralTilePlacer(
     val card2 = draw(deck, candidates2.size)
 
     var index2 = zeroPolicy.adjust(card2, candidates2.size)
-    index2 = overflowPolicy.adjust(card2, candidates2.size)
+    index2 = overflowPolicy.adjust(index2, candidates2.size)
 
     // advance to legal space - if not using that policy this won't do anything
-    var city2 : HexArea
+    var city2: HexArea
     do {
       city2 = candidates2[index2++]
     } while (!board.isAvailableForCity(city2)) // I think we can't hit the edge
@@ -92,15 +92,16 @@ class NeutralTilePlacer(
   private fun draw(deck: Deck, candidates: Int): Int {
     return deck.draw {
       zeroPolicy.acceptCardFromDeck(it)
-        && overflowPolicy.acceptCardFromDeck(it, candidates)
+          && overflowPolicy.acceptCardFromDeck(it, candidates)
     }
   }
 
-  private fun drawCyclic(deck: Deck, candidates: Int): Int {
+  private fun drawCyclic(deck: Deck): Int {
     return deck.draw {
       zeroPolicy.acceptCardFromDeck(it)
     }
   }
-    private fun <E> getCyclic(list: List<E>, index: Int) =
+
+  private fun <E> getCyclic(list: List<E>, index: Int) =
       list.get(mod(index, list.size))
 }

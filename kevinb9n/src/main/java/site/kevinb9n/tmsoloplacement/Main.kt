@@ -1,18 +1,18 @@
 package site.kevinb9n.tmsoloplacement
 
-import com.google.common.math.IntMath.gcd
-import kotlin.math.abs
-import kotlin.math.round
-import kotlin.math.roundToInt
-import kotlin.math.sqrt
-
 fun main() {
   val map = listOf(THARSIS, HELLAS, ELYSIUM).random()
   val board = Board(map)
-  placeTiles(board, Deck)
+  val deck = Deck()
+
+  val placer = NeutralTilePlacer(
+      ZeroPolicy.COUNT_FROM_ZERO,
+      OverflowPolicy.REDRAW,
+      SkipPolicy.SKIP_ALL_UNAVAIL)
+  placer.placeTiles(board, deck)
 
   println("Map chosen: ${map.name}")
-  println("Cards drawn: ${Deck.cardsDrawn}")
+  println("Cards drawn: ${deck.cardsDrawn}")
   println()
   board.display()
 }

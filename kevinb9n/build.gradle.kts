@@ -7,5 +7,5 @@ dependencies {
 
   testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.4.30")
   testImplementation("com.google.truth:truth:1.0")
-    implementation(kotlin("reflect"))
+  implementation(kotlin("reflect"))
 }

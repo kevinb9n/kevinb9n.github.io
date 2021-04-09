@@ -25,10 +25,10 @@ class MarsMap(val name: String, vararg textRows: String) {
   }
 
   operator fun get(row: Int, col: Int) = grid[row][col]
-  
+
   fun allAreas() = allAreas.toList()
 
-  enum class AreaType(val c : Char, val isReserved : Boolean) {
+  enum class AreaType(val c: Char, val isReserved: Boolean) {
     WATER('W', true),
     LAND('L', false),
     VOLCANIC('V', false),
@@ -36,8 +36,8 @@ class MarsMap(val name: String, vararg textRows: String) {
     ;
 
     companion object {
-      fun forChar(c : Char) : AreaType {
-        for (type in AreaType.values())
+      fun forChar(c: Char): AreaType {
+        for (type in values())
           if (type.c == c) return type
         throw IllegalArgumentException()
       }
@@ -45,13 +45,13 @@ class MarsMap(val name: String, vararg textRows: String) {
   }
 
   data class HexArea(
-    val map: MarsMap, val row: Int, val col: Int,
-    val type: AreaType, val asText: String) {
+      val map: MarsMap, val row: Int, val col: Int,
+      val type: AreaType, val asText: String) {
 
     fun isReserved() = type.isReserved
     override fun toString() = "($row, $col) [$asText]"
 
-    fun isNeighbor(area: HexArea) : Boolean {
+    fun isNeighbor(area: HexArea): Boolean {
       require(area.map == map)
       val rowDist = row - area.row
       val colDist = col - area.col
@@ -60,11 +60,11 @@ class MarsMap(val name: String, vararg textRows: String) {
 
     // returns neighboring hex areas that actually exist, clockwise from top-left
     fun neighbors(): List<HexArea> = listOf(
-      map[row - 1, col - 1],
-      map[row - 1, col + 0],
-      map[row + 0, col + 1],
-      map[row + 1, col + 1],
-      map[row + 1, col + 0],
-      map[row + 0, col - 1]).filterNotNull()
+        map[row - 1, col - 1],
+        map[row - 1, col + 0],
+        map[row + 0, col + 1],
+        map[row + 1, col + 1],
+        map[row + 1, col + 0],
+        map[row + 0, col - 1]).filterNotNull()
   }
 }
