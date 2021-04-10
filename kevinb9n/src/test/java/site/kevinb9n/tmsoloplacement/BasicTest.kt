@@ -21,9 +21,9 @@ class BasicTest {
 
     placer.placeAllTiles()
 
-    println(board.tiles)
     assertThat(board.tileAt(3, 4)).isEqualTo(TileType.CITY)
     assertThat(board.tileAt(8, 6)).isEqualTo(TileType.CITY)
-
+    assertThat(board.tileAt(4, 5)).isEqualTo(TileType.GREENERY)
+    assertThat(board.tileAt(8, 5)).isEqualTo(TileType.GREENERY)
   }
 }
