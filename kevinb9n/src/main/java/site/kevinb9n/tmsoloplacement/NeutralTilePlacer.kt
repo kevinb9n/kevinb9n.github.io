@@ -36,8 +36,8 @@ class NeutralTilePlacer(val board: Board, val deck: Deck,
     // advance to legal space - if not using that policy, this won't loop anyway
     var city2: HexArea
     do {
-      city2 = candidates2[index2++]
-    } while (!board.isAvailableForCity(city2)) // I think we can't hit the edge
+      city2 = getCyclic(candidates2, index2++)
+    } while (!board.isAvailableForCity(city2)) // I think we can't hit the edge... but we did?
 
     board.place(TileType.CITY, city2)
     return city2

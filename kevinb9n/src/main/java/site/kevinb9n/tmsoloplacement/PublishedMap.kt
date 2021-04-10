@@ -1,6 +1,6 @@
 package site.kevinb9n.tmsoloplacement
 
-enum class PublishedMaps(val map: MarsMap) {
+enum class PublishedMap(val map: MarsMap) {
   // @formatter:off
   THARSIS(
                              "  LSS   WSS    L    WC     W ",

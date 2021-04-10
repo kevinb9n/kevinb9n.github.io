@@ -15,7 +15,7 @@ class BasicTest {
 
   @Test
   fun `simple common case`() {
-    val board = Board(PublishedMaps.THARSIS.map)
+    val board = Board(PublishedMap.THARSIS.map)
     val deck = FakeDeck(11, 8, 10, 12)
     val placer = NeutralTilePlacer(board, deck) // redraw/redraw/skip-all
 

@@ -1,17 +1,38 @@
 package site.kevinb9n.tmsoloplacement
 
+import com.google.common.collect.HashMultiset
+
 fun main() {
-  val map = PublishedMaps.values().random()
-  val board = Board(map.map)
-  val deck = AllExpansionsDeck()
+  for (pm in PublishedMap.values()) {
+    for (sp in SkipPolicy.values().reversed()) {
+      for (zp in ZeroPolicy.values()) {
+        for (op in OverflowPolicy.values()) {
+          val cityLocations = HashMultiset.create<MarsMap.HexArea>()
+          val greeneryLocations = HashMultiset.create<MarsMap.HexArea>()
+          for (i in 1..100000) {
+            val board = Board(pm.map)
+            val deck = AllExpansionsDeck()
 
-  val placer = NeutralTilePlacer(board, deck,
-      ZeroPolicy.COUNT_FROM_ZERO, OverflowPolicy.REDRAW, SkipPolicy.SKIP_ALL_UNAVAIL)
+            val placer = NeutralTilePlacer(board, deck, zp, op, sp)
+            try {
+              placer.placeAllTiles()
+            } catch (e: Exception) {
+              e.printStackTrace()
+              println("$zp $op $sp $pm ${deck.cardsDrawn}")
+              continue
+            }
 
-  placer.placeAllTiles()
-
-  println("Map chosen: $map")
-  println("Cards drawn: ${deck.cardsDrawn}")
-  println()
-  board.display()
+            cityLocations.addAll(board.tiles.filterValues { it == TileType.CITY }.keys)
+            greeneryLocations.addAll(board.tiles.filterValues { it == TileType.GREENERY }.keys)
+          }
+          val maxCity : Int = cityLocations.entrySet().map { it.count }.maxOrNull()!!
+          val popularCitySpot = cityLocations.entrySet().filter { it.count == maxCity }.first().element
+          val maxGreenery : Int = greeneryLocations.entrySet().map { it.count }.maxOrNull()!!
+          val popularGreenerySpot = greeneryLocations.entrySet().filter { it.count ==
+              maxGreenery }.first().element
+          println("$zp $op $sp $pm $popularCitySpot $maxCity $popularGreenerySpot $maxGreenery")
+        }
+      }
+    }
+  }
 }
