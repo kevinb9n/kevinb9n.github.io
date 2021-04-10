@@ -2,17 +2,18 @@ package site.kevinb9n.tmsoloplacement
 
 import com.google.common.base.Splitter
 
-class MarsMap(val name: String, vararg textRows: String) {
-  // pad!
-  private val grid = Array(11) { arrayOfNulls<HexArea?>(11) }
-  private val allAreas = mutableListOf<HexArea>()
+class MarsMap(textRows: Array<out String>) {
+  private val grid : Array<Array<HexArea?>>
+  private val allAreas : List<HexArea>
 
   init {
+    grid = Array(11) { arrayOfNulls<HexArea?>(11) }
+    allAreas = mutableListOf()
     var row = 0
     for (line in textRows) {
       row++ // pad!
-      var col = 0
       val splitter = Splitter.fixedLength(6).trimResults()
+      var col = 0
       for (code in splitter.split(line)) {
         col++ // pad!
         if (code.isNotEmpty()) {

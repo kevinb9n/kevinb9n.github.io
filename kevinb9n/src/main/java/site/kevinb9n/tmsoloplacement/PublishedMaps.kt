@@ -1,68 +1,66 @@
 package site.kevinb9n.tmsoloplacement
 
-// could be an enum
+enum class PublishedMaps(val map: MarsMap) {
+  // @formatter:off
+  THARSIS(
+                             "  LSS   WSS    L    WC     W ",
 
-// @formatter:off
-// for obvious reasons
-val THARSIS = MarsMap("Tharsis",
+                          "   L    VS     L     L     L    WCC",
 
-                           "  LSS   WSS    L    WC     W ",
+                       "  VC     L     L     L     L     L     L ",
 
-                        "   L    VS     L     L     L    WCC",
+                    "  VPT   LP    LP    LP    LPP   LP    LP    WPP",
 
-                     "  VC     L     L     L     L     L     L ",
+                 "  VPP   LPP   NPP   WPP   WPP   WPP   LPP   LPP   LPP",
 
-                  "  VPT   LP    LP    LP    LPP   LP    LP    WPP",
+              "        LP    LPP   LP    LP    LP    WP    WP    WP ",
 
-               "  VPP   LPP   NPP   WPP   WPP   WPP   LPP   LPP   LPP",
+           "               L     L     L     L     L    LP     L ",
 
-            "        LP    LPP   LP    LP    LP    WP    WP    WP ",
+        "                    LSS    L    LC    LC     L    LT ",
 
-         "               L     L     L     L     L    LP     L ",
+     "                          LSS   LSS    L     L    WTT"
+  ),
 
-      "                    LSS    L    LC    LC     L    LT ",
+  HELLAS(
+                             "  WPP   LPP   LPP   LPS   LP ",
 
-   "                          LSS   LSS    L     L    WTT"
-)
+                          "  WPP   LPP   LP    LPS   LP    LP ",
 
-val HELLAS = MarsMap("Hellas",
+                       "  WP    LP    LS    LS     L    LPP   LPC",
 
-                           "WPP   LPP   LPP   LPS   LP ",
+                    "  WP    LP    LS    LSS   LS    WP    WP    LP ",
 
-                        "WPP   LPP   LP    LPS   LP    LP ",
+                 "  LC     L     L    LSS    L    WC    W3H    W    LP ",
 
-                     "WP    LP    LS    LS     L    LPP   LPC",
+              "        LT     L    LS     L     L     W    WS     L ",
 
-                  "WP    LP    LS    LSS   LS    WP    WP    LP ",
+           "              WTT    L     L    LC     L     L    LT ",
 
-               "LC     L     L    LSS    L    WC    W3H    W    LP ",
+        "                    LS    LC    LHH   LHH   LT    LT ",
 
-            "      LT     L    LS     L     L     W    WS     L ",
+     "                           L    LHH   LO6   LHH    L "
+  ),
 
-         "            WTT    L     L    LC     L     L    LT ",
+  ELYSIUM(
+                             "   W    WT    WC    WS    LC ",
 
-      "                  LS    LC    LHH   LHH   LT    LT ",
+                          "  VT     L     L     W     W    LSS",
 
-   "                         L    LHH   LO6   LHH    L "
-)
+                       "  VTT    L    LC     L    WP     W    V3C",
 
-var ELYSIUM = MarsMap("Elysium",
+                    "  LP    LP    LP    WPP   LP    WP    WP    LSP",
 
-                           " W    WT    WC    WS    LC ",
+                 "  LPP   LPP   LPP   WPP   LPP   L3P   LPP   LPP   VPT",
 
-                        "VT     L     L     W     W    LSS",
+              "        LS    LP    LP    LP    LP    LP    LP     L ",
 
-                     "VTT    L    LC     L    WP     W    V3C",
+           "              LT    LS     L     L    LS     L     L ",
 
-                  "LP    LP    LP    WPP   LP    WP    WP    LSP",
+        "                    LSS    L     L     L    LSS    L ",
 
-               "LPP   LPP   LPP   WPP   LPP   L3P   LPP   LPP   VPT",
+     "                          LS     L    LC    LC    LSS",
+  );
 
-            "      LS    LP    LP    LP    LP    LP    LP     L ",
-
-         "            LT    LS     L     L    LS     L     L ",
-
-      "                  LSS    L     L     L    LSS    L ",
-
-   "                        LS     L    LC    LC    LSS"
-)
+  constructor(vararg rows: String) : this(MarsMap(rows))
+}

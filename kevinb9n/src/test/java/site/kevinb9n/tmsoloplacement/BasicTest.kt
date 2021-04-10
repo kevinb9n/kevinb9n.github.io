@@ -2,17 +2,28 @@ package site.kevinb9n.tmsoloplacement
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
-import site.kevinb9n.tmsoloplacement.MarsMap.HexArea
 
 class BasicTest {
+  class FakeDeck(vararg val cardsInOrder: Int) : Deck {
+    private var iterator: MutableIterator<Int> = cardsInOrder.toMutableList().iterator()
+    override fun draw(): Int {
+      val next = iterator.next()
+      iterator.remove()
+      return next
+    }
+  }
+
   @Test
-  fun `try some shit`() {
-    val noctis: HexArea = THARSIS.get(5, 3)!!
-    val neighbors = noctis.neighbors()
-    assertThat(neighbors).hasSize(6)
-    // fails with (non-equal instance of same class with same string representation)
-    assertThat(neighbors.filter { it.isReserved() }).containsExactly(
-        HexArea(THARSIS, 5, 4, MarsMap.AreaType.NOCTIS, "WPP"))
+  fun `simple common case`() {
+    val board = Board(PublishedMaps.THARSIS.map)
+    val deck = FakeDeck(11, 8, 10, 12)
+    val placer = NeutralTilePlacer(board, deck) // redraw/redraw/skip-all
+
+    placer.placeAllTiles()
+
+    println(board.tiles)
+    assertThat(board.tileAt(3, 4)).isEqualTo(TileType.CITY)
+    assertThat(board.tileAt(8, 6)).isEqualTo(TileType.CITY)
 
   }
 }

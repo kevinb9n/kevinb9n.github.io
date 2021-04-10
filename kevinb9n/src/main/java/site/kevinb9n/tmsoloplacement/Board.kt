@@ -8,8 +8,22 @@ class Board(val map: MarsMap) {
   val tiles = mutableMapOf<HexArea, TileType>()
 
   fun place(tile: TileType, area: HexArea) = check(tiles.put(area, tile) == null)
+
   fun tileOn(area: HexArea) = tiles[area]
+
+  fun tileAt(row: Int, col: Int) : TileType? {
+    val area = map[row, col]
+    if (area == null) return null
+    return tiles[area]
+  }
+
   fun hasTile(area: HexArea) = tiles[area] != null
+
+  fun hasTile(row: Int, col: Int): Boolean {
+    val area = map[row, col]
+    return area != null && hasTile(area)
+  }
+
   fun isAvailable(area: HexArea) = !(area.isReserved() || hasTile(area))
 
   fun isAvailableForCity(area: HexArea) = isAvailable(area)
