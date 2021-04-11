@@ -3,16 +3,16 @@ package site.kevinb9n.tmsoloplacement
 import com.google.common.base.Splitter
 
 class MarsMap(textRows: Array<out String>) {
-  private val grid : Array<Array<HexArea?>>
-  private val allAreas : List<HexArea>
+  private val grid: Array<Array<HexArea?>>
+  private val allAreas: List<HexArea>
 
   init {
+    val splitter = Splitter.fixedLength(6).trimResults()
     grid = Array(11) { arrayOfNulls<HexArea?>(11) }
     allAreas = mutableListOf()
     var row = 0
     for (line in textRows) {
       row++ // pad!
-      val splitter = Splitter.fixedLength(6).trimResults()
       var col = 0
       for (code in splitter.split(line)) {
         col++ // pad!
@@ -38,16 +38,18 @@ class MarsMap(textRows: Array<out String>) {
 
     companion object {
       fun forChar(c: Char): AreaType {
-        for (type in values())
-          if (type.c == c) return type
-        throw IllegalArgumentException()
+        return values().firstOrNull { it.c == c } ?: throw IllegalArgumentException()
       }
     }
   }
 
   data class HexArea(
-      val map: MarsMap, val row: Int, val col: Int,
-      val type: AreaType, val asText: String) {
+    val map: MarsMap,
+    val row: Int,
+    val col: Int,
+    val type: AreaType,
+    val asText: String
+  ) {
 
     fun isReserved() = type.isReserved
     override fun toString() = "($row, $col) [$asText]"
@@ -60,12 +62,13 @@ class MarsMap(textRows: Array<out String>) {
     }
 
     // returns neighboring hex areas that actually exist, clockwise from top-left
-    fun neighbors(): List<HexArea> = listOf(
-        map[row - 1, col - 1],
-        map[row - 1, col + 0],
-        map[row + 0, col + 1],
-        map[row + 1, col + 1],
-        map[row + 1, col + 0],
-        map[row + 0, col - 1]).filterNotNull()
+    fun neighbors(): List<HexArea> = listOfNotNull(
+      map[row - 1, col - 1],
+      map[row - 1, col + 0],
+      map[row + 0, col + 1],
+      map[row + 1, col + 1],
+      map[row + 1, col + 0],
+      map[row + 0, col - 1]
+    )
   }
 }

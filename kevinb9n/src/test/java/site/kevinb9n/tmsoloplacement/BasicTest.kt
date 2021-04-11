@@ -1,10 +1,10 @@
 package site.kevinb9n.tmsoloplacement
 
 import com.google.common.truth.Truth.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class BasicTest {
-  class FakeDeck(vararg val cardsInOrder: Int) : Deck {
+  class FakeDeck(vararg cardsInOrder: Int) : Deck {
     private var iterator: MutableIterator<Int> = cardsInOrder.toMutableList().iterator()
     override fun draw(): Int {
       val next = iterator.next()

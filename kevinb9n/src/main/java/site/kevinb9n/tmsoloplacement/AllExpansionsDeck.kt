@@ -1,7 +1,6 @@
 package site.kevinb9n.tmsoloplacement
 
 import com.google.common.collect.ImmutableMultiset
-import com.google.common.collect.Multiset
 import kotlin.random.Random
 
 data class AllExpansionsDeck(val seed: Long = System.currentTimeMillis()) : Deck {
@@ -21,7 +20,7 @@ data class AllExpansionsDeck(val seed: Long = System.currentTimeMillis()) : Deck
         .build()
 
     val list = cards.toMutableList()
-    check(list.size == 365, {"list was size ${list.size}"})
+    check(list.size == 365) { "list was size ${list.size}" }
     list.shuffle(Random(seed))
     return list.iterator()
   }
