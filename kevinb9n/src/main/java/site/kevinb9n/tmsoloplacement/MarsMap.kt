@@ -37,9 +37,7 @@ class MarsMap(textRows: Array<out String>) {
     ;
 
     companion object {
-      fun forChar(c: Char): AreaType {
-        return values().firstOrNull { it.c == c } ?: throw IllegalArgumentException()
-      }
+      fun forChar(c: Char) = values().first { it.c == c }
     }
   }
 

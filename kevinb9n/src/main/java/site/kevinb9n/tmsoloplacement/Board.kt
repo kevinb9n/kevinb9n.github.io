@@ -14,7 +14,7 @@ class Board(val map: MarsMap) {
 
   fun tileOn(area: HexArea) = tiles[area]
 
-  fun tileAt(row: Int, col: Int) : TileType? {
+  fun tileAt(row: Int, col: Int): TileType? {
     val area = map[row, col] ?: return null
     return tiles[area]
   }
@@ -29,7 +29,7 @@ class Board(val map: MarsMap) {
   fun isAvailable(area: HexArea) = !(area.isReserved() || hasTile(area))
 
   fun isAvailableForCity(area: HexArea) = isAvailable(area)
-      && area.neighbors().none { tileOn(it) == TileType.CITY }
+    && area.neighbors().none { tileOn(it) == TileType.CITY }
 
   fun display() {
     print(" ".repeat(38))

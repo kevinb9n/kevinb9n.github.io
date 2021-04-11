@@ -82,12 +82,16 @@ class NeutralTilePlacer(
 }
 
 enum class ZeroPolicy {
-  COUNT_FROM_ZERO { override fun adjust(cost: Int, numCandidates: Int) = cost + 1 },
+  COUNT_FROM_ZERO {
+    override fun adjust(cost: Int, numCandidates: Int) = cost + 1
+  },
   CYCLE {
     override fun adjust(cost: Int, numCandidates: Int) =
       if (cost != 0) cost else numCandidates
   },
-  SATURATE { override fun adjust(cost: Int, numCandidates: Int) = max(cost, 1) },
+  SATURATE {
+    override fun adjust(cost: Int, numCandidates: Int) = max(cost, 1)
+  },
   REDRAW {
     override fun acceptCardFromDeck(card: Int) = card > 0
     override fun adjust(cost: Int, numCandidates: Int) = cost
@@ -103,7 +107,9 @@ enum class OverflowPolicy {
     override fun adjust(index: Int, numCandidates: Int) =
       if (index > numCandidates) index - numCandidates else index
   },
-  SATURATE { override fun adjust(index: Int, numCandidates: Int) = min(index, numCandidates) },
+  SATURATE {
+    override fun adjust(index: Int, numCandidates: Int) = min(index, numCandidates)
+  },
   REDRAW {
     override fun acceptCardFromDeck(card: Int, numCandidates: Int) = card < numCandidates // acl
     override fun adjust(index: Int, numCandidates: Int) = index
@@ -115,8 +121,12 @@ enum class OverflowPolicy {
 }
 
 enum class SkipPolicy {
-  SKIP_ALL_UNAVAIL { override fun isOk(board: Board, area: HexArea) = board.isAvailableForCity(area) },
-  ADVANCE_IF_NEEDED { override fun isOk(board: Board, area: HexArea): Boolean = !area.isReserved() };
+  SKIP_ALL_UNAVAIL {
+    override fun isOk(board: Board, area: HexArea) = board.isAvailableForCity(area)
+  },
+  ADVANCE_IF_NEEDED {
+    override fun isOk(board: Board, area: HexArea): Boolean = !area.isReserved()
+  };
 
   abstract fun isOk(board: Board, area: HexArea): Boolean
 }
