@@ -2,7 +2,10 @@ package site.kevinb9n.tmsoloplacement
 
 import site.kevinb9n.tmsoloplacement.MarsMap.HexArea
 
-enum class TileType(val asText: String) { CITY("[C]"), GREENERY("[G]") }
+enum class TileType(val asText: String) {
+  CITY("[C]"),
+  GREENERY("[G]")
+}
 
 class Board(val map: MarsMap) {
   val tiles = mutableMapOf<HexArea, TileType>()
@@ -12,8 +15,7 @@ class Board(val map: MarsMap) {
   fun tileOn(area: HexArea) = tiles[area]
 
   fun tileAt(row: Int, col: Int) : TileType? {
-    val area = map[row, col]
-    if (area == null) return null
+    val area = map[row, col] ?: return null
     return tiles[area]
   }
 

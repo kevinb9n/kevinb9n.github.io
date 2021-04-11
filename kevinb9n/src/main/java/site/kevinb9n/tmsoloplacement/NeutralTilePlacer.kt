@@ -5,10 +5,13 @@ import site.kevinb9n.tmsoloplacement.MarsMap.HexArea
 import kotlin.math.max
 import kotlin.math.min
 
-class NeutralTilePlacer(val board: Board, val deck: Deck,
-    val zeroPolicy: ZeroPolicy = ZeroPolicy.REDRAW,
-    val overflowPolicy: OverflowPolicy = OverflowPolicy.REDRAW,
-    val skipPolicy: SkipPolicy = SkipPolicy.SKIP_ALL_UNAVAIL) {
+class NeutralTilePlacer(
+  val board: Board,
+  val deck: Deck,
+  val zeroPolicy: ZeroPolicy = ZeroPolicy.REDRAW,
+  val overflowPolicy: OverflowPolicy = OverflowPolicy.REDRAW,
+  val skipPolicy: SkipPolicy = SkipPolicy.SKIP_ALL_UNAVAIL
+) {
 
   fun placeAllTiles() {
     val city1 = placeCityTile1()
@@ -16,7 +19,7 @@ class NeutralTilePlacer(val board: Board, val deck: Deck,
     placeGreeneryTilesBy(city1, city2)
   }
 
-  fun placeCityTile1() : HexArea {
+  fun placeCityTile1(): HexArea {
     val candidates = board.map.allAreas().filter { !it.isReserved() }
 
     // Only have to worry about the zero policy for this
@@ -26,7 +29,7 @@ class NeutralTilePlacer(val board: Board, val deck: Deck,
     return cityLocation
   }
 
-  fun placeCityTile2() : HexArea {
+  fun placeCityTile2(): HexArea {
     val candidates2 = board.map.allAreas().filter { skipPolicy.isOk(board, it) }.reversed()
     val card2 = drawWithBothPolicies(deck, candidates2.size)
 
@@ -75,20 +78,21 @@ class NeutralTilePlacer(val board: Board, val deck: Deck,
     zeroPolicy.acceptCardFromDeck(it) && overflowPolicy.acceptCardFromDeck(it, candidates)
   }
 
-  private fun <E> getCyclic(list: List<E>, index: Int) = list.get(mod(index, list.size))
+  private fun <E> getCyclic(list: List<E>, index: Int) = list[mod(index, list.size)]
 }
 
 enum class ZeroPolicy {
   COUNT_FROM_ZERO { override fun adjust(cost: Int, numCandidates: Int) = cost + 1 },
   CYCLE {
     override fun adjust(cost: Int, numCandidates: Int) =
-        if (cost != 0) cost else numCandidates
+      if (cost != 0) cost else numCandidates
   },
   SATURATE { override fun adjust(cost: Int, numCandidates: Int) = max(cost, 1) },
   REDRAW {
     override fun acceptCardFromDeck(card: Int) = card > 0
     override fun adjust(cost: Int, numCandidates: Int) = cost
   };
+
   /** Turns a card cost into a 1-referenced index, handling the zero case. */
   abstract fun adjust(cost: Int, numCandidates: Int): Int
   open fun acceptCardFromDeck(card: Int) = true
@@ -97,20 +101,22 @@ enum class ZeroPolicy {
 enum class OverflowPolicy {
   CYCLE {
     override fun adjust(index: Int, numCandidates: Int) =
-        if (index > numCandidates) index - numCandidates else index
+      if (index > numCandidates) index - numCandidates else index
   },
   SATURATE { override fun adjust(index: Int, numCandidates: Int) = min(index, numCandidates) },
   REDRAW {
     override fun acceptCardFromDeck(card: Int, numCandidates: Int) = card < numCandidates // acl
     override fun adjust(index: Int, numCandidates: Int) = index
   };
+
   /** Turns a 1-ref index that might overflow to one that mightn't */
   abstract fun adjust(index: Int, numCandidates: Int): Int
   open fun acceptCardFromDeck(card: Int, numCandidates: Int) = true
 }
 
 enum class SkipPolicy {
-  SKIP_ALL_UNAVAIL{ override fun isOk(board: Board, area: HexArea) = board.isAvailableForCity(area) },
-  ADVANCE_IF_NEEDED{ override fun isOk(board: Board, area: HexArea): Boolean = !area.isReserved() };
-  abstract fun isOk(board: Board, area: HexArea) : Boolean
+  SKIP_ALL_UNAVAIL { override fun isOk(board: Board, area: HexArea) = board.isAvailableForCity(area) },
+  ADVANCE_IF_NEEDED { override fun isOk(board: Board, area: HexArea): Boolean = !area.isReserved() };
+
+  abstract fun isOk(board: Board, area: HexArea): Boolean
 }
