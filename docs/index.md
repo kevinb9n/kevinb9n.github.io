@@ -10,8 +10,6 @@ Hi
 
 `![Image](src)`
 
-Testing ![TR icon](tm_icons/TerraformRating.png)
-
 [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/)
 
 [Pages docs](https://docs.github.com/categories/github-pages-basics/)
