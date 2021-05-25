@@ -1,66 +1,71 @@
 package site.kevinb9n.tmsoloplacement
 
 enum class PublishedMap(val map: MarsMap) {
-  // @formatter:off
-  THARSIS(
-                             "  LSS   WSS    L    WC     W ",
+  THARSIS("""
 
-                          "   L    VS     L     L     L    WCC",
+                            /       LSS   WSS    L    WC     W
 
-                       "  VC     L     L     L     L     L     L ",
+                         /        L    VS     L     L     L    WCC
 
-                    "  VPT   LP    LP    LP    LPP   LP    LP    WPP",
+                      /       VC     L     L     L     L     L     L
 
-                 "  VPP   LPP   NPP   WPP   WPP   WPP   LPP   LPP   LPP",
+                   /       VPT   LP    LP    LP    LPP   LP    LP    WPP
 
-              "        LP    LPP   LP    LP    LP    WP    WP    WP ",
+                /       VPP   LPP   NPP   WPP   WPP   WPP   LPP   LPP   LPP
 
-           "               L     L     L     L     L    LP     L ",
+             /             LP    LPP   LP    LP    LP    WP    WP    WP
 
-        "                    LSS    L    LC    LC     L    LT ",
+          /                    L     L     L     L     L    LP     L
 
-     "                          LSS   LSS    L     L    WTT"
-  ),
+       /                         LSS    L    LC    LC     L    LT
 
-  HELLAS(
-                             "  WPP   LPP   LPP   LPS   LP ",
+    /                               LSS   LSS    L     L    WTT
 
-                          "  WPP   LPP   LP    LPS   LP    LP ",
+  """),
 
-                       "  WP    LP    LS    LS     L    LPP   LPC",
+  HELLAS("""
 
-                    "  WP    LP    LS    LSS   LS    WP    WP    LP ",
+                            /       WPP   LPP   LPP   LPS   LP
 
-                 "  LC     L     L    LSS    L    WC    W3H    W    LP ",
+                         /       WPP   LPP   LP    LPS   LP    LP
 
-              "        LT     L    LS     L     L     W    WS     L ",
+                      /       WP    LP    LS    LS     L    LPP   LPC
 
-           "              WTT    L     L    LC     L     L    LT ",
+                   /       WP    LP    LS    LSS   LS    WP    WP    LP
 
-        "                    LS    LC    LHH   LHH   LT    LT ",
+                /       LC     L     L    LSS    L    WC    W3H    W    LP
 
-     "                           L    LHH   LO6   LHH    L "
-  ),
+             /             LT     L    LS     L     L     W    WS     L
 
-  ELYSIUM(
-                             "   W    WT    WC    WS    LC ",
+          /                   WTT    L     L    LC     L     L    LT
 
-                          "  VT     L     L     W     W    LSS",
+       /                         LS    LC    LHH   LHH   LT    LT
 
-                       "  VTT    L    LC     L    WP     W    V3C",
+    /                                L    LHH   LO6   LHH    L
 
-                    "  LP    LP    LP    WPP   LP    WP    WP    LSP",
+  """),
 
-                 "  LPP   LPP   LPP   WPP   LPP   L3P   LPP   LPP   VPT",
+  ELYSIUM("""
 
-              "        LS    LP    LP    LP    LP    LP    LP     L ",
+                            /        W    WT    WC    WS    LC
 
-           "              LT    LS     L     L    LS     L     L ",
+                         /       VT     L     L     W     W    LSS
 
-        "                    LSS    L     L     L    LSS    L ",
+                      /       VTT    L    LC     L    WP     W    V3C
 
-     "                          LS     L    LC    LC    LSS",
-  );
+                   /       LP    LP    LP    WPP   LP    WP    WP    LSP
 
-  constructor(vararg rows: String) : this(MarsMap(rows))
+                /       LPP   LPP   LPP   WPP   LPP   L3P   LPP   LPP   VPT
+
+             /             LS    LP    LP    LP    LP    LP    LP     L
+
+          /                   LT    LS     L     L    LS     L     L
+
+       /                         LSS    L     L     L    LSS    L
+
+    /                               LS     L    LC    LC    LSS
+
+  """);
+
+  constructor(text: String) : this(MarsMap(text))
 }

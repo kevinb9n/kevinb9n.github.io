@@ -2,25 +2,27 @@ package site.kevinb9n.tmsoloplacement
 
 import com.google.common.base.Splitter
 
-class MarsMap(textRows: Array<out String>) {
+class MarsMap(text: String) {
   private val grid: Array<Array<HexArea?>>
   private val allAreas: List<HexArea>
 
   init {
+    val textRows = text.trimMargin("/").split("""\n\s*\n""".toRegex())
     val splitter = Splitter.fixedLength(6).trimResults()
     grid = Array(11) { arrayOfNulls<HexArea?>(11) }
     allAreas = mutableListOf()
     var row = 0
     for (line in textRows) {
-      row++ // pad!
+      row++
       var col = 0
       for (code in splitter.split(line)) {
-        col++ // pad!
         if (code.isNotEmpty()) {
           val hexArea = HexArea(this, row, col, AreaType.forChar(code[0]), code)
           grid[row][col] = hexArea
           allAreas.add(hexArea)
+          //println("putting in $row, $col: $code")
         }
+        col++
       }
     }
   }
