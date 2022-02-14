@@ -31,11 +31,11 @@ I have played *some* part in creating these things, but how much I did varies be
 
 #### Current projects 
 
-[JSpecify](http://jspecify.org)
-[Project Amber](https://openjdk.java.net/projects/amber/)
-[Project Valhalla](https://openjdk.java.net/projects/valhalla/)
+* [JSpecify](http://jspecify.org)
+* [Project Amber](https://openjdk.java.net/projects/amber/)
+* [Project Valhalla](https://openjdk.java.net/projects/valhalla/)
 
-### Other stuff about me, a lot
+### Other stuff about me
 
 * I love my wife, kids, and pupface. A lot.
 * I love music. A lot.
