@@ -4,9 +4,12 @@ Hi I'ma put stuff here
 
 ### Me other places
 
+I'm pretty much just kevinb9n everywhere. In a few hundred years they'll be able to scrape a faithful digital reimplementation of me out of this junk, like on that episode of the Orville.
+
 * [Github](https://github.com/kevinb9n)
 * [Twitter](https://twitter.com/kevinb9n)
 * [Reddit](https://reddit.com/u/kevinb9n)
+* [YouTube](https://www.youtube.com/user/kevinb9n)
 * [BoardGameGeek](https://boardgamegeek.com/user/kevinb9n/contributions)
 * [Ultimate Guitar](https://www.ultimate-guitar.com/contribution/9298032-kevinb9n/tabs?sort=-rating)
 
@@ -40,10 +43,9 @@ I have played *some* part in creating these things, but how much I did varies be
 * I love my wife, kids, and pupface. A lot.
 * I love music. A lot.
 * I love math. A lot.
-* I love science. A lot.
 * I love board/card games. A lot.
 * I love my bike. A lot. I've been [these places](https://docs.google.com/document/d/11RRUVMeUe1ODoTKlT0G28U-WUBjhIV90MXUBAGJR3yg/preview?usp=sharing) and a bit more.
-* I used to love movies.
+* I used to be into movies.
 
 ### Notes to self
 
