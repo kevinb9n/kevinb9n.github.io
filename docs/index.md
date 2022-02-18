@@ -4,26 +4,20 @@ Hi I'ma put stuff here
 
 ### Me other places
 
-I'm pretty much just kevinb9n everywhere. In a few hundred years they'll be able to scrape a faithful digital reimplementation of me out of this junk, like on that episode of the Orville.
-
 * [Github](https://github.com/kevinb9n)
 * [Twitter](https://twitter.com/kevinb9n)
-* [Reddit](https://reddit.com/u/kevinb9n)
-* [YouTube](https://www.youtube.com/user/kevinb9n)
-* [BoardGameGeek](https://boardgamegeek.com/user/kevinb9n/contributions)
-* [Ultimate Guitar](https://www.ultimate-guitar.com/contribution/9298032-kevinb9n/tabs?sort=-rating)
 
 ### Work
 
 I've been at Google since 2004, founded the Java Core Libraries Team in 2007... and that catches us up!
 
-You can learn a bit about what I do from the [start of this video](https://www.youtube.com/watch?v=sPW2Pz2dI9E) until you get bored.
+You could learn a bit about what I do from the [start of this video](https://www.youtube.com/watch?v=sPW2Pz2dI9E) until you get bored.
 
-#### Past things
+#### Things I've done
 
-I have played *some* part in creating these things, but how much I did varies between them
+I have played *some* part in creating these things, but how much I did varies between them. I'm generally still connected to these projects, just not very active.
 
-[Guava](https://github.com/google/guava), [Error Prone](https://errorprone.info/), [AutoValue](https://github.com/google/auto/blob/master/value/userguide/index.md), [google-java-format](https://github.com/google/google-java-format), [Guice](https://github.com/google/guice) 1.0, [Dagger](https://github.com/google/dagger) 2, [Truth](https://github.com/google/truth), [Flogger](https://github.com/google/flogger), [Caliper](https://github.com/google/caliper), [JSR 330](https://jcp.org/en/jsr/detail?id=330), [JSR 335](https://jcp.org/en/jsr/detail?id=335)
+[Guava](https://github.com/google/guava), [Error Prone](https://errorprone.info/), [AutoValue](https://github.com/google/auto/blob/master/value/userguide/index.md), [google-java-format](https://github.com/google/google-java-format), [Guice](https://github.com/google/guice), [Dagger](https://github.com/google/dagger), [Truth](https://github.com/google/truth), [Flogger](https://github.com/google/flogger), [Caliper](https://github.com/google/caliper), [JSR 330](https://jcp.org/en/jsr/detail?id=330), [JSR 335](https://jcp.org/en/jsr/detail?id=335)
 
 #### Things I wrote
 
@@ -34,9 +28,10 @@ I have played *some* part in creating these things, but how much I did varies be
 
 #### Current projects 
 
-* [JSpecify](http://jspecify.org)
-* [Project Amber](https://openjdk.java.net/projects/amber/)
-* [Project Valhalla](https://openjdk.java.net/projects/valhalla/)
+* [JSpecify](http://jspecify.org) working group
+* [Project Amber](https://openjdk.java.net/projects/amber/) working group
+* [Project Valhalla](https://openjdk.java.net/projects/valhalla/) working group
+* I work in groups
 
 ### Other stuff about me
 
@@ -45,7 +40,6 @@ I have played *some* part in creating these things, but how much I did varies be
 * I love math. A lot.
 * I love board/card games. A lot.
 * I love my bike. A lot. I've been [these places](https://docs.google.com/document/d/11RRUVMeUe1ODoTKlT0G28U-WUBjhIV90MXUBAGJR3yg/preview?usp=sharing) and a bit more.
-* I used to be into movies.
 
 ### Notes to self
 
