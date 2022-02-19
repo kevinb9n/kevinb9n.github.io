@@ -9,15 +9,28 @@ Hi I'ma put stuff here
 
 ### Work
 
-I've been at Google since 2004, founded the Java Core Libraries Team in 2007... and that catches us up!
+After a string of failed startups, I started at Google since 2004, and founded the
+Java Core Libraries Team in 2007. And that basically catches us up! Yes, I've been
+on the same team for 15 years. I am truly blessed.
 
-You could learn a bit about what I do from the [start of this video](https://www.youtube.com/watch?v=sPW2Pz2dI9E) until you get bored.
+If you're curious, you could learn a bit about what I do from the
+[start of this video](https://www.youtube.com/watch?v=sPW2Pz2dI9E) until you get bored.
+(The main topic of the video isn't that important.)
 
 #### Things I've done
 
-I have played *some* part in creating these things, but how much I did varies between them. I'm generally still connected to these projects, just not very active.
+I have played *some* part in creating these things. I'm generally still connected to these projects, just not very active.
 
-[Guava](https://github.com/google/guava), [Error Prone](https://errorprone.info/), [AutoValue](https://github.com/google/auto/blob/master/value/userguide/index.md), [google-java-format](https://github.com/google/google-java-format), [Guice](https://github.com/google/guice), [Dagger](https://github.com/google/dagger), [Truth](https://github.com/google/truth), [Flogger](https://github.com/google/flogger), [Caliper](https://github.com/google/caliper), [JSR 330](https://jcp.org/en/jsr/detail?id=330), [JSR 335](https://jcp.org/en/jsr/detail?id=335)
+* [Guava](https://github.com/google/guava) - This was my idea, and I drove it at first, but had immeasurable help from hundreds of others
+* [Error Prone](https://errorprone.info/) - I wrote none of this except some docs, but have been highly 
+* [AutoValue](https://github.com/google/auto/blob/master/value/userguide/index.md) - With Éamonn McManus; he wrote all the code.
+* [google-java-format](https://github.com/google/google-java-format) - By John DeTreville and Liam Miller-Cushon; I product-managed and tech-wroted.
+* [Truth](https://github.com/google/truth) - Christian Gruber, Kurt Kluever, Chris Povirk, and others. I contributed long excruciating design reviews.
+* [Flogger](https://github.com/google/flogger) - all credit to David Beaumont. I helped a little.
+* [Caliper](https://github.com/google/caliper) - Jesse Wilson and I made this together, with help from Jeremy Sharpe and a major rewrite from Greg Kick. It is unloved now.
+* [Guice](https://github.com/google/guice) - Guice 1.0 was crazybob's baby but I was the midwife. Sadly I didn't do much of anything for it since.
+* [Dagger](https://github.com/google/dagger) - Helped a little, but it was all Jesse Wilson and Greg Kick.
+* [JSR 335](https://jcp.org/en/jsr/detail?id=335) - Brian Goetz and many others; I joined in progress and helped various design decisions, including paring some of the API surfaces down
 
 #### Things I wrote
 
@@ -35,11 +48,7 @@ I have played *some* part in creating these things, but how much I did varies be
 
 ### Other stuff about me
 
-* I love my wife, kids, and pupface. A lot.
-* I love music. A lot.
-* I love math. A lot.
-* I love board/card games. A lot.
-* I love my bike. A lot. I've been [these places](https://docs.google.com/document/d/11RRUVMeUe1ODoTKlT0G28U-WUBjhIV90MXUBAGJR3yg/preview?usp=sharing) and a bit more.
+* I love music, math, games, puzzles, cycling, and most of all my family.
 
 ### Notes to self
 
