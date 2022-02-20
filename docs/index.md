@@ -21,16 +21,17 @@ If you're curious, you could learn a bit about what I do from the
 
 I have played *some* part in creating these things. I'm generally still connected to these projects, just not very active.
 
-* [Guava](https://github.com/google/guava) - This was my idea, and I drove it at first, but had immeasurable help from hundreds of others
-* [Error Prone](https://errorprone.info/) - I wrote none of this except some docs, but have been highly 
-* [AutoValue](https://github.com/google/auto/blob/master/value/userguide/index.md) - With Éamonn McManus; he wrote all the code.
-* [google-java-format](https://github.com/google/google-java-format) - By John DeTreville and Liam Miller-Cushon; I product-managed and tech-wroted.
-* [Truth](https://github.com/google/truth) - Christian Gruber, Kurt Kluever, Chris Povirk, and others. I contributed long excruciating design reviews.
-* [Flogger](https://github.com/google/flogger) - all credit to David Beaumont. I helped a little.
-* [Caliper](https://github.com/google/caliper) - Jesse Wilson and I made this together, with help from Jeremy Sharpe and a major rewrite from Greg Kick. It is unloved now.
-* [Guice](https://github.com/google/guice) - Guice 1.0 was crazybob's baby but I was the midwife. Sadly I didn't do much of anything for it since.
-* [Dagger](https://github.com/google/dagger) - Helped a little, but it was all Jesse Wilson and Greg Kick.
-* [JSR 335](https://jcp.org/en/jsr/detail?id=335) - Brian Goetz and many others; I joined in progress and helped various design decisions, including paring some of the API surfaces down
+* [Guava](https://github.com/google/guava)
+* [Error Prone](https://errorprone.info/)
+* [AutoValue](https://github.com/google/auto/blob/master/value/userguide/index.md)
+* [google-java-format](https://github.com/google/google-java-format)
+* [Truth](https://github.com/google/truth)
+* [Flogger](https://github.com/google/flogger)
+* [Caliper](https://github.com/google/caliper)
+* [Guice](https://github.com/google/guice)
+* [Dagger](https://github.com/google/dagger)
+* [JSR 330](https://jcp.org/en/jsr/detail?id=330)
+* [JSR 335](https://jcp.org/en/jsr/detail?id=335)
 
 #### Things I wrote
 
