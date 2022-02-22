@@ -21,17 +21,7 @@ If you're curious, you could learn a bit about what I do from the
 
 I have played *some* part in creating these things. I'm generally still connected to these projects, just not very active.
 
-* [Guava](https://github.com/google/guava)
-* [Error Prone](https://errorprone.info/)
-* [AutoValue](https://github.com/google/auto/blob/master/value/userguide/index.md)
-* [google-java-format](https://github.com/google/google-java-format)
-* [Truth](https://github.com/google/truth)
-* [Flogger](https://github.com/google/flogger)
-* [Caliper](https://github.com/google/caliper)
-* [Guice](https://github.com/google/guice)
-* [Dagger](https://github.com/google/dagger)
-* [JSR 330](https://jcp.org/en/jsr/detail?id=330)
-* [JSR 335](https://jcp.org/en/jsr/detail?id=335)
+[Guava](https://github.com/google/guava), [Error Prone](https://errorprone.info/), [AutoValue](https://github.com/google/auto/blob/master/value/userguide/index.md), [google-java-format](https://github.com/google/google-java-format), [Truth](https://github.com/google/truth), [Flogger](https://github.com/google/flogger), [Caliper](https://github.com/google/caliper), [Guice](https://github.com/google/guice), [Dagger](https://github.com/google/dagger), [JSR 330](https://jcp.org/en/jsr/detail?id=330), [JSR 335](https://jcp.org/en/jsr/detail?id=335)
 
 #### Things I wrote
 
@@ -49,7 +39,7 @@ I have played *some* part in creating these things. I'm generally still connecte
 
 ### Other stuff about me
 
-* I love music, math, games, puzzles, cycling, and most of all my family.
+* I love music, math, games, puzzles, cycling, but mostly my wife and two daughters.
 
 ### Notes to self
 
