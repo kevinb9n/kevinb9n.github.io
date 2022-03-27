@@ -11,7 +11,7 @@ Hi I'ma put stuff here
 
 After a string of failed startups, I started at Google in 2004. I founded the
 Java Core Libraries Team in 2007... and that basically catches us up! Yes, I've been
-on the same team for 15 years, and it's a blessing.
+on the same team for 15 years. I'm very lucky.
 
 If you're curious, you could learn a bit about what I do from the
 [start of this video](https://www.youtube.com/watch?v=sPW2Pz2dI9E) until you get bored.
