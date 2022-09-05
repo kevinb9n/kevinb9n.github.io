@@ -17,8 +17,8 @@ class CollectionExamplesTest {
     assertThat(c.any()).isTrue()
     assertThat(listOf<Int>().any()).isFalse()
 
-    assertThat(c.any { it < 1 }).isTrue();
-    assertThat(c.any { it < 0 }).isFalse();
+    assertThat(c.any { it <= 1 }).isTrue();
+    assertThat(c.any { it <= 0 }).isFalse();
 
     c.apply { forEach(::println) } as List<Int>
     c.asIterable() as Iterable<Int>
@@ -42,7 +42,7 @@ class CollectionExamplesTest {
     c.distinctBy(selector = { it / 2 }) as List<Int>
     c.drop(n = 5) as List<Int>
     c.dropWhile(predicate = { it > 0 }) as List<Int>
-    c.elementAt(index = 5) as Int
+    c.elementAt(index = 2) as Int
     c.elementAtOrElse(index = 5, defaultValue = { it + 0.1 }) as Number
     c.elementAtOrNull(index = 5) as Int?
     c.equals(listOf(1, 2, 4)) as Boolean
