@@ -12,10 +12,11 @@ class HelloFX : Application() {
   override fun start(stage: Stage) {
     val javaVersion = System.getProperty("java.version")
     val javafxVersion = System.getProperty("javafx.version")
-    val l = Label(
-      "Hello, JavaFX $javafxVersion, running on Java $javaVersion.")
-    val scene = Scene(StackPane(l), 640.0, 480.0)
-    stage.scene = scene
+
+    val pane = StackPane()
+    pane.children += Label("Hello, JavaFX $javafxVersion, running on Java $javaVersion.")
+
+    stage.scene = Scene(pane, 640.0, 480.0)
     stage.show()
   }
 }
