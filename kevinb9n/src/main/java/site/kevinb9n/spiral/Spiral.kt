@@ -1,44 +1,60 @@
 package site.kevinb9n.spiral
 
-import java.awt.*
+import java.awt.BasicStroke
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Dimension
+import java.awt.Graphics
+import java.awt.Graphics2D
+import java.awt.Polygon
+import java.awt.RenderingHints
 import java.awt.geom.Line2D
 import java.awt.geom.Point2D
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.roundToInt
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 object Spiral {
+  const val WINDOW_WIDTH = 2400
+  const val WINDOW_HEIGHT = 1350
+  const val POINTS = 150
+  const val INITIAL_LENGTH = 2.0
+  const val INITIAL_THICKNESS = 0.25
+
+  const val SEGMENTS = POINTS - 1
+  const val TRIANGLES = SEGMENTS - 5
+
   // unique real root of cos(pi/18) x^3 + sin(2pi/18) x^2 - cos(3pi/18) x - sin(4pi/18)
   // found with wolfram alpha
-  private const val RATIO = 1.061118264558831
-  private const val ANGLE = 4 * PI / 9 // 2 full rotations = 9 turns
-  private const val POINTS = 200
-  private const val SEGMENTS = POINTS - 1
-  private const val TRIANGLES = SEGMENTS - 5
+  const val RATIO = 1.061118264558831
+  const val TAU = 2 * PI // (since it'll eventually be added to the libraries :-))
+  const val ANGLE = TAU * 2 / 9 // takes 9 segments to make 2 full rotations
 
-  private const val WINDOW_WIDTH = 1300
-  private const val WINDOW_HEIGHT = 1300
-  private const val INITIAL_LENGTH = 2.0
-
-  private val COLORS = arrayOf(
-    Color(255, 93, 93),
-    Color(147, 201, 93),
-    Color(93, 201, 147),
-    Color(93, 93, 255),
-    Color(201, 93, 147),
-    Color(201, 147, 93),
-    Color(93, 255, 93),
-    Color(93, 147, 201),
-    Color(147, 93, 201))
+  private val TRIANGLE_COLORS = arrayOf(
+    Color(227, 52, 47), // 1
+    Color(255, 237, 74), // 3
+    Color(77, 192, 181), // 5
+    Color(101, 116, 205), // 7
+    Color(246, 109, 155), // 9
+    Color(246, 153, 63), // 2
+    Color(56, 193, 114), // 4
+    Color(52, 144, 220), // 6
+    Color(149, 97, 226), // 8
+  )
+  private val SPIRAL_COLOR = Color.BLACK
 
   object Canvas : JComponent() {
     override fun paintComponent(g: Graphics) {
       require(g is Graphics2D)
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
       g.translate(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
-      g.scale(1.0, -1.0) // y+ goes UP, dammit
+//    g.scale(1.0, -1.0) // usually want +y to go *up* but this doesn't matter
 
       // First calculate the points
       var heading = 0.0
@@ -53,16 +69,20 @@ object Spiral {
       @Suppress("UNCHECKED_CAST")
       val points = pts as Array<Point2D.Double>
 
+      // Fill the center
+      g.paint = SPIRAL_COLOR
+      g.fillPolygon(polygon(points[0], points[1], points[2], points[3], points[4]))
+
       // Now make the colored triangles
       for (i in 0 until TRIANGLES) {
         val triangle = polygon(points[i], points[i + 1], points[i + 5])
-        g.paint = COLORS[i % 9]
+        g.paint = TRIANGLE_COLORS[i % 9]
         g.fillPolygon(triangle)
       }
 
       // Lastly draw the "spiral"
-      g.paint = Color.BLACK
-      var thickness = 0.3
+      g.paint = SPIRAL_COLOR
+      var thickness = INITIAL_THICKNESS
       for (i in 1 until SEGMENTS) {
         g.stroke = BasicStroke(thickness.toFloat(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
         g.draw(Line2D.Double(points[i - 1], points[i]))
@@ -84,7 +104,7 @@ object Spiral {
       point.y + distance * sin(angle))
 }
 
-fun main(args: Array<String>) {
+fun main() {
   SwingUtilities.invokeLater {
     val panel = JPanel(BorderLayout())
     panel.add(Spiral.Canvas, BorderLayout.CENTER)
