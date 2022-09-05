@@ -20,7 +20,7 @@ class RotationExample : Application() {
     rectangle2.setFill(Color.BURLYWOOD)
     rectangle2.setStroke(Color.BLACK)
     rectangle2.transforms += Rotate(20.0, 150.0, 225.0)
-    
+
     val root = StackPane(rectangle1, rectangle2)
     stage.title = "Rotation transformation example"
     stage.scene = Scene(root, 600.0, 300.0)
