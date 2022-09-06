@@ -1,4 +1,4 @@
-package site.kevinb9n.spiral
+package site.kevinb9n.javafx
 
 import javafx.application.Application
 import javafx.embed.swing.SwingFXUtils
@@ -22,7 +22,7 @@ const val HEIGHT = 1350.0
 const val POINTS = 150
 const val INITIAL_LENGTH = 2.0
 const val INITIAL_THICKNESS = 0.2
-val THICKNESS_RATIO = 1.04
+val THICKNESS_RATIO = 1.033
 
 fun main() = Application.launch(Spiral::class.java)
 
