@@ -104,7 +104,10 @@ class Spiral : Application() {
 data class Point(val x: Double, val y: Double) {
   constructor(x: Int, y: Int) : this(x.toDouble(), y.toDouble())
 
-  fun translate(distance: Double, degrees: Double) = Point(
-    x + distance * cos(toRadians(degrees)),
-    y + distance * sin(toRadians(degrees)))
+  fun translate(distance: Double, degrees: Double): Point {
+    val radians = toRadians(degrees)
+    return Point(
+      x + distance * cos(radians),
+      y + distance * sin(radians))
+  }
 }
