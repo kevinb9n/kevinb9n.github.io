@@ -23,7 +23,7 @@ java {
 
 javafx {
   version = "18.0.2"
-  modules = listOf("javafx.controls")
+  modules = listOf("javafx.controls", "javafx.swing")
 }
 
 tasks.withType<Test> {
