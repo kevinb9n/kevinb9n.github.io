@@ -1,21 +1,13 @@
 package site.kevinb9n.javafx
 
 import javafx.application.Application
-import javafx.embed.swing.SwingFXUtils
 import javafx.scene.Scene
 import javafx.scene.SceneAntialiasing
-import javafx.scene.SnapshotParameters
 import javafx.scene.canvas.Canvas
-import javafx.scene.canvas.GraphicsContext
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.StrokeLineCap
 import javafx.stage.Stage
-import java.io.File
-import java.lang.Math.toRadians
-import javax.imageio.ImageIO
-import kotlin.math.cos
-import kotlin.math.sin
 
 const val WIDTH = 2400.0
 const val HEIGHT = 1350.0
@@ -63,51 +55,31 @@ class Spiral : Application() {
     }
 
     val canvas = Canvas(WIDTH, HEIGHT)
-    val graphics = canvas.graphicsContext2D
+    val g = canvas.graphicsContext2D
 
-    graphics.fill = SPIRAL_COLOR
-    fillPolygon(graphics, points.subList(0, 5))
+    g.fill = SPIRAL_COLOR
+    g.drawPolygon(points.subList(0, 5))
 
     // Now make the colored triangles
     for (i in 0 until TRIANGLES) {
-      graphics.fill = TRIANGLE_COLORS[i % 9]
-      fillPolygon(graphics, listOf(points[i], points[i + 1], points[i + 5]))
+      g.fill = TRIANGLE_COLORS[i % 9]
+      g.drawPolygon(listOf(points[i], points[i + 1], points[i + 5]))
     }
 
     // Lastly draw the "spiral"
-    graphics.lineWidth = INITIAL_THICKNESS
-    graphics.lineCap = StrokeLineCap.ROUND
-    graphics.stroke = SPIRAL_COLOR
+    g.lineWidth = INITIAL_THICKNESS
+    g.lineCap = StrokeLineCap.ROUND
+    g.stroke = SPIRAL_COLOR
 
     for (i in 10 until SEGMENTS) { // skip the first 2 times around
-      graphics.strokeLine(points[i-1].x, points[i-1].y, points[i].x, points[i].y)
-      graphics.lineWidth *= THICKNESS_RATIO
+      g.strokeLine(points[i-1].x, points[i-1].y, points[i].x, points[i].y)
+      g.lineWidth *= THICKNESS_RATIO
     }
 
     stage.scene = Scene(Pane(canvas), WIDTH, HEIGHT, false, SceneAntialiasing.BALANCED)
     stage.title = "Fall in love with a spiral, where it leads only heaven knows"
     stage.show()
 
-    val image = canvas.snapshot(SnapshotParameters(), null)
-    val file = File("/Users/kevinb9n/spiral.png")
-    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file)
-  }
-
-  private fun fillPolygon(graphics: GraphicsContext, center: List<Point>) {
-    graphics.fillPolygon(
-      center.map { it.x }.toDoubleArray(),
-      center.map { it.y }.toDoubleArray(),
-      center.size)
-  }
-}
-
-data class Point(val x: Double, val y: Double) {
-  constructor(x: Int, y: Int) : this(x.toDouble(), y.toDouble())
-
-  fun translate(distance: Double, degrees: Double): Point {
-    val radians = toRadians(degrees)
-    return Point(
-      x + distance * cos(radians),
-      y + distance * sin(radians))
+    renderToPngFile(stage.scene, "/Users/kevinb9n/spiral.png")
   }
 }
