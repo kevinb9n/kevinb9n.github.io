@@ -3,18 +3,15 @@ package site.kevinb9n.javafx
 import com.google.common.math.IntMath
 import javafx.application.Application
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.paint.Paint
-import javafx.scene.shape.Rectangle
+import javafx.scene.shape.Polygon
 import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineJoin
 import javafx.stage.Stage
 import java.lang.Math.random
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.RandomAccess
-import kotlin.random.Random
 
 fun main() = Application.launch(Triangles::class.java)
 
@@ -25,11 +22,41 @@ data class Colors(val stroke: Paint, val fill: Paint) {
     node.fill = fill
   }
 }
+
+enum class ShapeType {
+  ISOSCELES {
+    override fun centeredPolygon(base: Double, height: Double) =
+      polygon(
+        Point(-base / 2, -height / 2),
+        Point(base / 2, -height / 2),
+        Point(0, height / 2))
+  },
+  RIGHT {
+    override fun centeredPolygon(base: Double, height: Double) =
+      polygon(
+        Point(-base / 2, -height / 2),
+        Point(base / 2, -height / 2),
+        Point(base / 2, height / 2))
+  },
+  RECTANGLE {
+    override fun centeredPolygon(base: Double, height: Double) =
+      polygon(
+        Point(-base / 2, -height / 2),
+        Point(base / 2, -height / 2),
+        Point(base / 2, height / 2),
+        Point(-base / 2, height / 2))
+  },
+  ;
+
+  abstract fun centeredPolygon(base: Double, height: Double): Polygon
+}
+
 class Triangles : Application() {
   val WIN_WIDTH = 2000.0
   val WIN_HEIGHT = 1200.0
   val MARGIN = 50.0
   val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN))
+
   val REAL_STROKE = 1.0
 
   val COLORSES = listOf(
@@ -38,29 +65,6 @@ class Triangles : Application() {
     Colors("#001155", "#0033aa07"),
     Colors("#29133f", "#53277e08"))
 
-  enum class ShapeType {
-    ISOSCELES {
-      override fun centeredPolygon(base: Double, height: Double) {
-
-      }
-    },
-    RIGHT {
-      override fun centeredPolygon(base: Double, height: Double) {
-        polygon(
-          Point(-base / 2, -height / 2),
-          Point(base / 2, -height / 2),
-          Point(0, height / 2))
-      }
-    },
-    RECTANGLE {
-      override fun centeredPolygon(base: Double, height: Double) {
-        Rectangle(-base / 2, -height / 2, base, height)
-      }
-    },
-    ;
-
-    abstract fun centeredPolygon(base: Double, height: Double)
-  }
   override fun start(stage: Stage) {
     val offsetX = snapRandom(1.333)
     val offsetY = snapRandom(1.333)
@@ -75,16 +79,19 @@ class Triangles : Application() {
     val ydesc = describe(offsetY, altYOffset)
     val rotdesc = describe(rotation, altRotate)
 
-    val path = Path.of("/Users/kevinb9n/triangles.txt")
-    Files.writeString(path, "offset ($xdesc, $ydesc), rotation start $startRot, incr $rotdesc\n")
-
     val colors = COLORSES.random()
+    val shapeType = ShapeType.values().random()
+
+    val path = Path.of("/Users/kevinb9n/triangles.txt")
+    val desc = "$shapeType, offset ($xdesc, $ydesc), rotation start $startRot, incr $rotdesc\n"
+    println(desc)
+    Files.writeString(path, desc)
 
     val triangles = (0..56).map { param ->
       val base = 56.0 - param
       val height = 0.0 + param
 
-
+      val p = shapeType.centeredPolygon(base, height)
       colors.applyTo(p)
       p.strokeLineJoin = StrokeLineJoin.ROUND
       p.strokeWidth = .05 // temporary
