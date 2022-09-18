@@ -56,9 +56,9 @@ fun scaleToFit(bound: Bounds, desired: Bounds): Double {
 fun snapRandom(maxAbs: Number): Double {
   val r = 2 * Math.random() - 1 // works for maxAbs of 1
   return round(maxAbs.toDouble() * when {
-    r > 0.9 -> 1.0
-    abs(r) < 0.1 -> 0.0
-    r < -0.9 -> -1.0
+    r > 0.8 -> 1.0
+    abs(r) < 0.2 -> 0.0
+    r < -0.8 -> -1.0
     else -> r
   })
 }

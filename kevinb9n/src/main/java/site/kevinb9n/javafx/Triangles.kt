@@ -12,11 +12,12 @@ import javafx.stage.Stage
 import java.lang.Math.random
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.math.sqrt
 
 fun main() = Application.launch(Triangles::class.java)
 
 data class Colors(val stroke: Paint, val fill: Paint) {
-  constructor(s: String, f:String) : this(Paint.valueOf(s), Paint.valueOf(f))
+  constructor(stroke: String, fill:String) : this(Paint.valueOf(stroke), Paint.valueOf(fill))
   fun applyTo(node: Shape) {
     node.stroke = stroke
     node.fill = fill
@@ -56,40 +57,41 @@ class Triangles : Application() {
   val WIN_HEIGHT = 1200.0
   val MARGIN = 50.0
   val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN))
+  val SHAPE_COUNT = 56 // there's a reason for using a multiple of 28
+  val REAL_STROKE = 1.25
 
-  val REAL_STROKE = 1.0
-
+  val BACKGROUND = "#d8cab2"
   val COLORSES = listOf(
-    Colors("#550011", "#aa002207"),
-    Colors("#274e13", "#2dc35405"),
-    Colors("#001155", "#0033aa07"),
-    Colors("#29133f", "#53277e08"))
+    Colors(stroke = "#550011", fill = "#aa002207"),
+    Colors(stroke = "#274e13", fill = "#2dc35405"),
+    Colors(stroke = "#001155", fill = "#0033aa07"),
+    Colors(stroke = "#29133f", fill = "#53277e08"))
 
   override fun start(stage: Stage) {
-    val offsetX = snapRandom(1.333)
-    val offsetY = snapRandom(1.333)
-    val rotation = snapRandom(90 / 56.0) // ?
+    val offsetX = snapRandom(1.5)
+    val offsetY = snapRandom(1.5)
+    val rotation = snapRandom(180 / 55.0) // ?
     val startRot = snapRandom(180)
 
-    val altXOffset = random() < 0.25
-    val altYOffset = random() < 0.25
-    val altRotate = random() < 0.25
+    val altXOffset = random() < 0.2
+    val altYOffset = random() < 0.2
+    val altRotate = random() < 0.2
+
+    val colors = COLORSES.random()
+    val shapeType = ShapeType.values().random()
 
     val xdesc = describe(offsetX, altXOffset)
     val ydesc = describe(offsetY, altYOffset)
     val rotdesc = describe(rotation, altRotate)
-
-    val colors = COLORSES.random()
-    val shapeType = ShapeType.values().random()
 
     val path = Path.of("/Users/kevinb9n/triangles.txt")
     val desc = "$shapeType, offset ($xdesc, $ydesc), rotation start $startRot, incr $rotdesc\n"
     println(desc)
     Files.writeString(path, desc)
 
-    val triangles = (0..56).map { param ->
-      val base = 56.0 - param
-      val height = 0.0 + param
+    val triangles = (0 .. SHAPE_COUNT).map { param ->
+      val height = param.toDouble()
+      val base = SHAPE_COUNT - height
 
       val p = shapeType.centeredPolygon(base, height)
       colors.applyTo(p)
@@ -103,7 +105,6 @@ class Triangles : Application() {
     }
     val stack = Group()
     stack.children += triangles
-    printBounds("start", stack)
 
     // Why not just brute force it? And yes it's weird that we're mutating.
     val goodAngle = (0..170 step 10).minByOrNull {
@@ -116,10 +117,8 @@ class Triangles : Application() {
     }!!
 
     stack.rotate = bestAngle.toDouble()
-    printBounds("after rotate by $bestAngle", stack)
     val outer = Group()
     outer.children += stack
-    printBounds("outer", outer)
 
     var scale = scaleToFit(outer.boundsInLocal, USABLE)
     stack.children.filterIsInstance(Shape::class.java).forEach {
@@ -128,14 +127,12 @@ class Triangles : Application() {
     scale = scaleToFit(outer.boundsInLocal, USABLE)
     outer.scaleX = scale
     outer.scaleY = scale
-    printBounds("after scale by ${round(scale)}", outer)
 
     outer.translateX = USABLE.centerX - outer.boundsInParent.centerX
     outer.translateY = USABLE.centerY - outer.boundsInParent.centerY
-    printBounds("after translate by (${round(outer.translateX)}, ${round(outer.translateY)})", outer)
 
     val scene = Scene(outer, WIN_WIDTH, WIN_HEIGHT)
-    scene.fill = Paint.valueOf("#d8cab2")
+    scene.fill = Paint.valueOf(BACKGROUND)
 
     stage.scene = scene
     stage.show()
