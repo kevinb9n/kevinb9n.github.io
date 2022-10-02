@@ -36,7 +36,7 @@ private val TRIANGLE_COLORS = arrayOf(
   Color.rgb(56, 193, 114), // 4
   Color.rgb(52, 144, 220), // 6
   Color.rgb(149, 97, 226), // 8
-)
+).map { c -> c.desaturate() }
 
 private val SPIRAL_COLOR = Color.BLACK
 

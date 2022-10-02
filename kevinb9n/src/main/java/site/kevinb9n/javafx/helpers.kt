@@ -1,16 +1,18 @@
 package site.kevinb9n.javafx
 
+import javafx.collections.ObservableList
 import javafx.embed.swing.SwingFXUtils
 import javafx.geometry.BoundingBox
 import javafx.geometry.Bounds
+import javafx.scene.Cursor
+import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.input.MouseEvent
 import javafx.scene.shape.Polygon
-import javafx.scene.transform.Scale
-import javafx.scene.transform.Transform
-import javafx.scene.transform.Translate
 import java.io.File
+import java.util.Comparator
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.math.cos
@@ -84,4 +86,38 @@ fun renderToPngFile(scene: Scene, filename: String) {
   val snap = scene.snapshot(null)
   val fromFXImage = SwingFXUtils.fromFXImage(snap, null)
   ImageIO.write(fromFXImage, "png", File(filename))
+}
+
+fun moveToBack(list: ObservableList<Node>, node: Node) {
+  list.remove(node)
+  list.add(0, node)
+  // (list as java.util.List<E>).sort(Comparator.comparing { it != node })
+}
+
+// It will modify `node`'s own translateX/Y
+// TODO: I don't know why I can't add the event filters to the node itself, i.e. why the
+// Group is necessary, but it acts super janky otherwise
+class DragToTranslate(val node: Node) : Group(node) {
+  private var drag = TranslatingDrag(0.0, 0.0)
+  init {
+    addEventFilter(MouseEvent.ANY) { it.consume() }
+    addEventFilter(MouseEvent.MOUSE_ENTERED) { scene.cursor = Cursor.HAND }
+    addEventFilter(MouseEvent.MOUSE_EXITED) { scene.cursor = Cursor.DEFAULT }
+    addEventFilter(MouseEvent.MOUSE_PRESSED) {
+      println("press")
+      drag = TranslatingDrag(it, node) }
+    addEventFilter(MouseEvent.MOUSE_DRAGGED) {
+      println("drag")
+      drag.adjust(node, it) }
+  }
+
+  private data class TranslatingDrag(val startX: Double, val startY: Double) {
+    constructor(pressEvent: MouseEvent, node: Node) : this(
+      node.translateX - pressEvent.x,
+      node.translateY - pressEvent.y)
+    fun adjust(node: Node, event: MouseEvent) {
+      node.translateX = event.x + startX
+      node.translateY = event.y + startY
+    }
+  }
 }
