@@ -2,6 +2,7 @@ package site.kevinb9n.javafx
 
 import com.google.common.math.IntMath
 import javafx.application.Application
+import javafx.geometry.Point2D
 import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.paint.Paint
@@ -10,8 +11,11 @@ import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineJoin
 import javafx.stage.Stage
 import java.lang.Math.random
+import java.lang.Math.toRadians
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.sqrt
 
 fun main() = Application.launch(Triangles::class.java)
@@ -39,6 +43,13 @@ enum class ShapeType {
         Point(base / 2, -height / 2),
         Point(base / 2, height / 2))
   },
+  SLANT {
+    override fun centeredPolygon(base: Double, height: Double) =
+      polygon(
+        Point(0, -height / 2),
+        Point(base, -height / 2),
+        Point(base*height/(base+height), height / 2))
+  },
   RECTANGLE {
     override fun centeredPolygon(base: Double, height: Double) =
       polygon(
@@ -47,35 +58,82 @@ enum class ShapeType {
         Point(base / 2, height / 2),
         Point(-base / 2, height / 2))
   },
+  ISOS_TRAP {
+    override fun centeredPolygon(base: Double, height: Double) =
+      polygon(
+        Point(-base / 2, -height / 2),
+        Point(base / 2, -height / 2),
+        Point(base / 4, height / 2),
+        Point(-base / 4, height / 2))
+  },
+  DIAMOND {
+    override fun centeredPolygon(base: Double, height: Double) =
+      polygon(
+        Point(-base / 2, 0),
+        Point(0, -height / 2),
+        Point(base / 2, 0),
+        Point(0, height / 2))
+  },
+  PGRAM {
+    override fun centeredPolygon(base: Double, height: Double) =
+      polygon(
+        Point(0, -height / 2),
+        Point(base / 2, -height / 2),
+        Point(0, height / 2),
+        Point(-base / 2, height / 2))
+  },
+  NOT_SURE {
+    override fun centeredPolygon(base: Double, height: Double) : Polygon {
+      val fraction = base / (base + height)
+      val whaction = fraction * fraction
+      val newbase = whaction * (base + height)
+      val newheight = height
+      return polygon(
+        Point(-newbase / 2, -newheight / 2),
+        Point(newbase / 2, -newheight / 2),
+        Point(0, newheight / 2))
+    }
+  },
   ;
 
   abstract fun centeredPolygon(base: Double, height: Double): Polygon
 }
 
+
+data class ParametricShapeSet(
+  val shapeType: ShapeType,
+
+  val count: Int,
+  val axis: Point2D, // point to rotate around
+)
+
 class Triangles : Application() {
-  val WIN_WIDTH = 2000.0
-  val WIN_HEIGHT = 1200.0
-  val MARGIN = 50.0
+  val WIN_WIDTH = 2800.0
+  val WIN_HEIGHT = 1400.0
+  val MARGIN = 40.0
   val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN))
-  val SHAPE_COUNT = 56 // there's a reason for using a multiple of 28
-  val REAL_STROKE = 1.25
+  val SHAPE_COUNT = 68 // okay so there's really one more shape than this
+  val REAL_STROKE = 0.9
 
   val BACKGROUND = "#d8cab2"
   val COLORSES = listOf(
     Colors(stroke = "#550011", fill = "#aa002207"),
-    Colors(stroke = "#274e13", fill = "#2dc35405"),
+    Colors(stroke = "#274e13", fill = "#2dc35407"),
     Colors(stroke = "#001155", fill = "#0033aa07"),
-    Colors(stroke = "#29133f", fill = "#53277e08"))
+    Colors(stroke = "#29133f", fill = "#53277e07"))
 
   override fun start(stage: Stage) {
-    val offsetX = snapRandom(1.5)
-    val offsetY = snapRandom(1.5)
-    val rotation = snapRandom(180 / 55.0) // ?
-    val startRot = snapRandom(180)
+    val offsetDistance = snapRandom(1.0)
+    val offsetAngle = snapRandom(90.0)
+    val offsetX = round(offsetDistance * cos(toRadians(offsetAngle)))
+    val offsetY = round(offsetDistance * sin(toRadians(offsetAngle)))
 
-    val altXOffset = random() < 0.2
-    val altYOffset = random() < 0.2
-    val altRotate = random() < 0.2
+    // at most, the two zero-width shapes can end up parallel
+    val rotation = round(snapRandom(90.0 / SHAPE_COUNT))
+
+    val altXOffset = random() < 0.0
+    val altYOffset = random() < 0.0
+    val altRotate = random() < 0.0
 
     val colors = COLORSES.random()
     val shapeType = ShapeType.values().random()
@@ -85,7 +143,7 @@ class Triangles : Application() {
     val rotdesc = describe(rotation, altRotate)
 
     val path = Path.of("/Users/kevinb9n/triangles.txt")
-    val desc = "$shapeType, offset ($xdesc, $ydesc), rotation start $startRot, incr $rotdesc\n"
+    val desc = "$shapeType, offset ($xdesc, $ydesc), rotation $rotdesc\n"
     println(desc)
     Files.writeString(path, desc)
 
@@ -100,13 +158,14 @@ class Triangles : Application() {
 
       p.translateX = param * offsetX * sign(altXOffset, param)
       p.translateY = param * offsetY * sign(altYOffset, param)
-      p.rotate = startRot + param * rotation * sign(altRotate, param)
+      p.rotate = param * rotation * sign(altRotate, param)
       p
     }
     val stack = Group()
     stack.children += triangles
 
-    // Why not just brute force it? And yes it's weird that we're mutating.
+    // Maximize width and minimize height by rotating the whole image
+    // Brute force, why not?
     val goodAngle = (0..170 step 10).minByOrNull {
       stack.rotate = it.toDouble()
       stack.boundsInParent.height
@@ -124,7 +183,7 @@ class Triangles : Application() {
     stack.children.filterIsInstance(Shape::class.java).forEach {
       it.strokeWidth = REAL_STROKE / scale
     }
-    scale = scaleToFit(outer.boundsInLocal, USABLE)
+    scale = scaleToFit(outer.boundsInLocal, USABLE) // ok it could maybe have changed a TINY bit
     outer.scaleX = scale
     outer.scaleY = scale
 
