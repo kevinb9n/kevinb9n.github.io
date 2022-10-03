@@ -17,6 +17,7 @@ import javafx.stage.Stage
 import java.lang.Math.toRadians
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -27,30 +28,32 @@ class Triangles : Application() {
   val WIN_HEIGHT = 1200.0
   val MARGIN = 50.0
   val SHAPE_COUNT = 57
-  val REAL_STROKE = 1.0
+  val REAL_STROKE = 0.8
 
   val BACKGROUND = "#d8cab2"
   val COLORS = listOf(
-    "4d0e930b", // purple
-    "d4001c0c", // crimson
-    "00b2300c", // green
-    "2234970f", // indigo
+    "d4001c0b", // crimson
+    "ee84000b", // orange
+    "ecc5000b", // yellow
+    "00b2300b", // green
     "0cbfd90b", // aqua
-    "0089de0a", // other aqua?
-//    "ee630009" // orange!?
+    "0089de0b", // other aqua
+    "1555bb0b", // perfect blue
+    "2234970b", // indigo
+    "4d0e930b", // purple
   )
 
   val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN * 2))
 
   override fun start(stage: Stage) {
-    val offsetDistance = snapRandom(1.5)
+    val offsetDistance = snapRandom(2.0)
     val offsetAngle = snapRandom(90.0)
     val offsetX = round(offsetDistance * cos(toRadians(offsetAngle)))
     val offsetY = round(offsetDistance * sin(toRadians(offsetAngle)))
 
-    val rotation = round(snapRandom(360.0 / (SHAPE_COUNT - 1)))
+    val rotation = round(snapRandom(90.0 / (SHAPE_COUNT - 1)))
 
-    val color = Color.web(COLORS.random())
+    val color = average(Color.web(COLORS.random()), Color.web(COLORS.random()))
     val shapeType = ShapeType.values().random()
 
     val path = Path.of("/Users/kevinb9n/triangles.txt")
@@ -65,7 +68,7 @@ class Triangles : Application() {
       val base = SHAPE_COUNT - 1 - height
       shapeType.centeredPolygon(base, height).apply {
         // max sat and opaq, dim to 30%
-        this.stroke = color.deriveColor(0.0, 10.0, 0.35, 20.0)
+        this.stroke = color.deriveColor(0.0, 10.0, 0.4, 15.0)
         fillProperty().bind(colorPicker.valueProperty())
         strokeLineJoin = StrokeLineJoin.ROUND
         strokeWidth = .05 // temporary
@@ -115,8 +118,20 @@ class Triangles : Application() {
     stage.show()
     renderToPngFile(pretty, "/Users/kevinb9n/triangles.png")
   }
-}
 
+  private fun average(c1: Color, c2: Color): Color {
+    return Color.hsb(
+      averageHues(c1.hue, c2.hue),
+      (c1.saturation + c2.saturation) / 2.0,
+      (c1.brightness + c2.brightness) / 2.0,
+      (c1.opacity + c2.opacity) / 2.0)
+  }
+
+  private fun averageHues(hue1: Double, hue2: Double): Double {
+    val avg = (hue1 + hue2) / 2.0
+    return if (abs(hue1 - hue2) > 180.0) avg + 180.0 else avg
+  }
+}
 data class ParametricShapeSet(
   val shapeType: ShapeType,
   val count: Int,
