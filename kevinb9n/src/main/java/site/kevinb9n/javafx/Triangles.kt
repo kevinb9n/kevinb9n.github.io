@@ -27,20 +27,30 @@ class Triangles : Application() {
   val WIN_WIDTH = 2000.0
   val WIN_HEIGHT = 1200.0
   val MARGIN = 50.0
-  val SHAPE_COUNT = 57
-  val REAL_STROKE = 0.8
+  val SHAPE_COUNT = 42
+  val REAL_STROKE = 0.9
 
   val BACKGROUND = "#d8cab2"
   val COLORS = listOf(
+    "0f191912", // gray
     "d4001c0b", // crimson
+    "692d000b", // brown!
     "ee84000b", // orange
     "ecc5000b", // yellow
-    "00b2300b", // green
+    "1399070b", // green
+    "0cc9050b", // soothing green
     "0cbfd90b", // aqua
     "0089de0b", // other aqua
+    "0ab7ad0b", // vivid aqua
+    "00b1790b", // turquoise?
+    "0e5faf0b", // vivid blue
+    "1185ca0b", // soft blue
+    "0869a30b", // another lovely blue!
+    "0089de0b", // another lovely blue!
     "1555bb0b", // perfect blue
     "2234970b", // indigo
     "4d0e930b", // purple
+    "9e14b50b", // soothing purple
   )
 
   val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN * 2))
