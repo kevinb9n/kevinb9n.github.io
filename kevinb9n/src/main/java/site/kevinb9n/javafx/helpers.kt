@@ -8,6 +8,7 @@ import javafx.scene.Cursor
 import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.Scene
+import javafx.scene.SnapshotParameters
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.input.MouseEvent
 import javafx.scene.shape.Polygon
@@ -82,8 +83,8 @@ fun printBounds(
 
 fun round(d: Double) = Math.round(d * 1000) / 1000.0
 
-fun renderToPngFile(scene: Scene, filename: String) {
-  val snap = scene.snapshot(null)
+fun renderToPngFile(node: Node, filename: String) {
+  val snap = node.snapshot(SnapshotParameters(), null)
   val fromFXImage = SwingFXUtils.fromFXImage(snap, null)
   ImageIO.write(fromFXImage, "png", File(filename))
 }

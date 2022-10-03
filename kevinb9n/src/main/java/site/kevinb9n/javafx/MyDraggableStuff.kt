@@ -40,7 +40,7 @@ class MyDraggableStuff : Application() {
 
     with(stage) {
       scene = Scene(rootPane, 800.0, 450.0)
-      title = "Draggable Shapes"
+      title = "Widgets Shapes"
       show()
 
     }

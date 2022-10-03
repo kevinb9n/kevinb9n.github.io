@@ -1,77 +1,78 @@
 package site.kevinb9n.javafx
 
-import com.google.common.math.IntMath
 import javafx.application.Application
 import javafx.geometry.Point2D
 import javafx.scene.Group
 import javafx.scene.Scene
+import javafx.scene.control.ColorPicker
+import javafx.scene.layout.Background
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.Pane
+import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Polygon
 import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineJoin
 import javafx.stage.Stage
-import java.lang.Math.random
 import java.lang.Math.toRadians
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 fun main() = Application.launch(Triangles::class.java)
 
 class Triangles : Application() {
   val WIN_WIDTH = 2000.0
   val WIN_HEIGHT = 1200.0
-  val MARGIN = 40.0
-  val SHAPE_COUNT = 57 // okay so there's really one more shape than this
+  val MARGIN = 50.0
+  val SHAPE_COUNT = 57
   val REAL_STROKE = 1.0
 
   val BACKGROUND = "#d8cab2"
-  val COLORSES = listOf(
-    Colors(stroke = "#550011", fill = "#aa002207"),
-    Colors(stroke = "#274e13", fill = "#2dc35407"),
-    Colors(stroke = "#001155", fill = "#0033aa07"),
-    Colors(stroke = "#29133f", fill = "#53277e07"))
+  val COLORS = listOf(
+    "4d0e930b", // purple
+    "d4001c0c", // crimson
+    "00b2300c", // green
+    "2234970f", // indigo
+    "0cbfd90b", // aqua
+    "0089de0a", // other aqua?
+//    "ee630009" // orange!?
+  )
 
-  val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN))
+  val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN * 2))
 
   override fun start(stage: Stage) {
-    val offsetDistance = snapRandom(1.0)
+    val offsetDistance = snapRandom(1.5)
     val offsetAngle = snapRandom(90.0)
     val offsetX = round(offsetDistance * cos(toRadians(offsetAngle)))
     val offsetY = round(offsetDistance * sin(toRadians(offsetAngle)))
 
-    // at most, the two zero-width shapes can end up parallel
-    val rotation = round(snapRandom(90.0 / (SHAPE_COUNT - 1)))
+    val rotation = round(snapRandom(360.0 / (SHAPE_COUNT - 1)))
 
-    val altXOffset = random() < 0.0
-    val altYOffset = random() < 0.0
-    val altRotate = random() < 0.0
-
-    val colors = COLORSES.random()
+    val color = Color.web(COLORS.random())
     val shapeType = ShapeType.values().random()
 
-    val xdesc = describe(offsetX, altXOffset)
-    val ydesc = describe(offsetY, altYOffset)
-    val rotdesc = describe(rotation, altRotate)
-
     val path = Path.of("/Users/kevinb9n/triangles.txt")
-    val desc = "$shapeType, offset ($xdesc, $ydesc), rotation $rotdesc\n"
+    val desc = "$shapeType, offset ($offsetX, $offsetY), rotation $rotation\n"
     println(desc)
     Files.writeString(path, desc)
+
+    val colorPicker = ColorPicker(color)
 
     val triangles = (0 until SHAPE_COUNT).map { param ->
       val height = param.toDouble()
       val base = SHAPE_COUNT - 1 - height
       shapeType.centeredPolygon(base, height).apply {
-        colors.applyTo(this)
+        // max sat and opaq, dim to 30%
+        this.stroke = color.deriveColor(0.0, 10.0, 0.35, 20.0)
+        fillProperty().bind(colorPicker.valueProperty())
         strokeLineJoin = StrokeLineJoin.ROUND
         strokeWidth = .05 // temporary
 
-        translateX = param * offsetX * sign(altXOffset, param)
-        translateY = param * offsetY * sign(altYOffset, param)
-        rotate = param * rotation * sign(altRotate, param)
+        translateX = param * offsetX
+        translateY = param * offsetY
+        rotate = param * rotation
       }
     }
     val stack = Group()
@@ -103,25 +104,16 @@ class Triangles : Application() {
     outer.translateX = USABLE.centerX - outer.boundsInParent.centerX
     outer.translateY = USABLE.centerY - outer.boundsInParent.centerY
 
-    val scene = Scene(outer, WIN_WIDTH, WIN_HEIGHT)
-    scene.fill = Paint.valueOf(BACKGROUND)
+    val sceneRoot = BorderPane()
+    val pretty = Pane(outer).apply { background = Background.fill(Paint.valueOf(BACKGROUND)) }
+    sceneRoot.center = pretty
+    sceneRoot.bottom = colorPicker
+
+    val scene = Scene(sceneRoot, WIN_WIDTH, WIN_HEIGHT)
 
     stage.scene = scene
     stage.show()
-    renderToPngFile(scene, "/Users/kevinb9n/triangles.png")
-  }
-
-  private fun sign(alternate: Boolean, param: Int) =
-    if (alternate) IntMath.pow(-1, param) else 1
-
-  fun describe(d: Double, alternate: Boolean) = if (alternate) "$d*" else "$d"
-}
-
-data class Colors(val stroke: Paint, val fill: Paint) {
-  constructor(stroke: String, fill:String) : this(Paint.valueOf(stroke), Paint.valueOf(fill))
-  fun applyTo(node: Shape) {
-    node.stroke = stroke
-    node.fill = fill
+    renderToPngFile(pretty, "/Users/kevinb9n/triangles.png")
   }
 }
 

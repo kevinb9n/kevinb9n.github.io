@@ -76,10 +76,11 @@ class Spiral : Application() {
       g.lineWidth *= THICKNESS_RATIO
     }
 
-    stage.scene = Scene(Pane(canvas), WIDTH, HEIGHT, false, SceneAntialiasing.BALANCED)
+    val pane = Pane(canvas)
+    stage.scene = Scene(pane, WIDTH, HEIGHT, false, SceneAntialiasing.BALANCED)
     stage.title = "Fall in love with a spiral, where it leads only heaven knows"
     stage.show()
 
-    renderToPngFile(stage.scene, "/Users/kevinb9n/spiral.png")
+    // renderToPngFile(pane, "/Users/kevinb9n/spiral.png")
   }
 }
