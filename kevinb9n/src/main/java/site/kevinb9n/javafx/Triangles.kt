@@ -1,12 +1,25 @@
 package site.kevinb9n.javafx
 
 import javafx.application.Application
+import javafx.beans.binding.Binding
+import javafx.beans.binding.Bindings
+import javafx.beans.binding.BooleanBinding
+import javafx.beans.binding.IntegerBinding
+import javafx.beans.property.DoubleProperty
+import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.StringProperty
+import javafx.beans.value.ObservableDoubleValue
+import javafx.collections.FXCollections.singletonObservableList
 import javafx.geometry.Point2D
 import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.control.ColorPicker
+import javafx.scene.control.Label
+import javafx.scene.control.Slider
+import javafx.scene.control.Tooltip
 import javafx.scene.layout.Background
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
@@ -14,77 +27,97 @@ import javafx.scene.shape.Polygon
 import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineJoin
 import javafx.stage.Stage
+import javafx.util.StringConverter
+import javafx.util.converter.DoubleStringConverter
+import javafx.util.converter.IntegerStringConverter
 import java.lang.Math.toRadians
-import java.nio.file.Files
-import java.nio.file.Path
-import kotlin.math.abs
 import kotlin.math.cos
+import kotlin.math.floor
+import kotlin.math.min
 import kotlin.math.sin
 
 fun main() = Application.launch(Triangles::class.java)
 
+val SHAPE_COUNT = 252
+
 class Triangles : Application() {
   val WIN_WIDTH = 2000.0
   val WIN_HEIGHT = 1200.0
-  val MARGIN = 50.0
-  val SHAPE_COUNT = 42
+  val MARGIN = 200.0
   val REAL_STROKE = 0.9
 
   val BACKGROUND = "#d8cab2"
   val COLORS = listOf(
-    "0f191912", // gray
-    "d4001c0b", // crimson
-    "692d000b", // brown!
-    "ee84000b", // orange
-    "ecc5000b", // yellow
-    "1399070b", // green
-    "0cc9050b", // soothing green
-    "0cbfd90b", // aqua
-    "0089de0b", // other aqua
-    "0ab7ad0b", // vivid aqua
-    "00b1790b", // turquoise?
-    "0e5faf0b", // vivid blue
-    "1185ca0b", // soft blue
-    "0869a30b", // another lovely blue!
-    "0089de0b", // another lovely blue!
-    "1555bb0b", // perfect blue
-    "2234970b", // indigo
-    "4d0e930b", // purple
-    "9e14b50b", // soothing purple
-  )
+    "001212", // gray
+    "c01613", // red
+    "692d00", // brown
+    "ee8400", // orange
+    "ecc500", // yellow
+    "b2ce00", // yellow-green, bleh
+    "139907", // green
+    "0da73d", // kelly green
+    "00b179", // turquoise
+    "0ab7ad", // aqua
+    "0869a3", // cool soft aqueous
+    "0e5faf", // soft blue
+    "1555bb", // perfect blue
+    "223497", // indigo
+    "20008d", // purple
+    "721a97", // purple
+    "c433a0", // magenta
+    "e52383", // pink
+    "d10c2a", // reddy red
+  ).map { Color.web(it) }
 
   val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN * 2))
 
+  fun Color.opaquenessFactor(factor: Double) = this.deriveColor(0.0, 1.0, 1.0, factor)
+
   override fun start(stage: Stage) {
     val offsetDistance = snapRandom(2.0)
-    val offsetAngle = snapRandom(90.0)
+    val offsetAngle = snapRandom(180.0)
     val offsetX = round(offsetDistance * cos(toRadians(offsetAngle)))
     val offsetY = round(offsetDistance * sin(toRadians(offsetAngle)))
 
-    val rotation = round(snapRandom(90.0 / (SHAPE_COUNT - 1)))
+    val rotation = round(snapRandom(90.0 / SHAPE_COUNT))
 
-    val color = average(Color.web(COLORS.random()), Color.web(COLORS.random()))
+    val color = COLORS.random()
     val shapeType = ShapeType.values().random()
 
-    val path = Path.of("/Users/kevinb9n/triangles.txt")
-    val desc = "$shapeType, offset ($offsetX, $offsetY), rotation $rotation\n"
-    println(desc)
-    Files.writeString(path, desc)
+    val counts = arrayOf(13, 15, 19, 22, 29, 37, 43, 64, 85)
+    val countslider = Slider(0.0, counts.size.toDouble(), counts.size / 2.0)
 
-    val colorPicker = ColorPicker(color)
+    val prop = SimpleDoubleProperty()
+    val countDisplay = Label()
+    Bindings.bindBidirectional(countDisplay.textProperty(), prop, DoubleStringConverter() as StringConverter<Number>)
+    prop.bind(bindingFromArray(countslider.valueProperty(), counts))
 
-    val triangles = (0 until SHAPE_COUNT).map { param ->
+    val txslider = Slider(-500.0, 500.0, offsetX * SHAPE_COUNT).apply {
+      this.tooltip = Tooltip("Translate X")
+      this.isShowTickLabels = true
+      this.majorTickUnit = 100.0
+    }
+    val tyslider = Slider(-500.0, 500.0, offsetY * SHAPE_COUNT).apply {
+      this.tooltip = Tooltip("Translate Y")
+      this.isShowTickLabels = true
+      this.majorTickUnit = 100.0
+    }
+
+    val triangles = (0 .. SHAPE_COUNT).map { param ->
       val height = param.toDouble()
-      val base = SHAPE_COUNT - 1 - height
+      val base = SHAPE_COUNT - height
       shapeType.centeredPolygon(base, height).apply {
-        // max sat and opaq, dim to 30%
-        this.stroke = color.deriveColor(0.0, 10.0, 0.4, 15.0)
-        fillProperty().bind(colorPicker.valueProperty())
+        visibleProperty().bind(shapeVisible(prop, param))
+
+        stroke = color.deriveColor(0.0, 10.0, 0.4, 200.0).opaquenessFactor(0.66)
+
+        opacityProperty().bind(Bindings.divide(1.7, prop))
+
         strokeLineJoin = StrokeLineJoin.ROUND
         strokeWidth = .05 // temporary
 
-        translateX = param * offsetX
-        translateY = param * offsetY
+        translateXProperty().bind(txslider.valueProperty().multiply(height / SHAPE_COUNT))
+        translateYProperty().bind(tyslider.valueProperty().multiply(height / SHAPE_COUNT))
         rotate = param * rotation
       }
     }
@@ -120,28 +153,18 @@ class Triangles : Application() {
     val sceneRoot = BorderPane()
     val pretty = Pane(outer).apply { background = Background.fill(Paint.valueOf(BACKGROUND)) }
     sceneRoot.center = pretty
-    sceneRoot.bottom = colorPicker
+    sceneRoot.bottom = HBox(6.0).apply {
+      children += listOf(countslider, countDisplay, txslider, tyslider)
+    }
 
     val scene = Scene(sceneRoot, WIN_WIDTH, WIN_HEIGHT)
 
     stage.scene = scene
     stage.show()
-    renderToPngFile(pretty, "/Users/kevinb9n/triangles.png")
-  }
-
-  private fun average(c1: Color, c2: Color): Color {
-    return Color.hsb(
-      averageHues(c1.hue, c2.hue),
-      (c1.saturation + c2.saturation) / 2.0,
-      (c1.brightness + c2.brightness) / 2.0,
-      (c1.opacity + c2.opacity) / 2.0)
-  }
-
-  private fun averageHues(hue1: Double, hue2: Double): Double {
-    val avg = (hue1 + hue2) / 2.0
-    return if (abs(hue1 - hue2) > 180.0) avg + 180.0 else avg
+    // renderToPngFile(pretty, "/Users/kevinb9n/triangles.png")
   }
 }
+
 data class ParametricShapeSet(
   val shapeType: ShapeType,
   val count: Int,
@@ -150,71 +173,62 @@ data class ParametricShapeSet(
 
 enum class ShapeType {
   ISOSCELES {
-    override fun centeredPolygon(base: Double, height: Double) =
-      polygon(
-        Point(-base / 2, -height / 2),
-        Point(base / 2, -height / 2),
-        Point(0, height / 2))
+    override fun polygon(base: Double, height: Double) =
+      arrayOf(Point(0, 0), Point(base, 0), Point(base / 2, -height))
   },
   RIGHT {
-    override fun centeredPolygon(base: Double, height: Double) =
-      polygon(
-        Point(-base / 2, -height / 2),
-        Point(base / 2, -height / 2),
-        Point(base / 2, height / 2))
-  },
-  SLANT {
-    override fun centeredPolygon(base: Double, height: Double) =
-      polygon(
-        Point(0, -height / 2),
-        Point(base, -height / 2),
-        Point(base*height/(base+height), height / 2))
+    override fun polygon(base: Double, height: Double) =
+      arrayOf(Point(0, 0), Point(base, 0), Point(0, -height))
   },
   RECTANGLE {
-    override fun centeredPolygon(base: Double, height: Double) =
-      polygon(
-        Point(-base / 2, -height / 2),
-        Point(base / 2, -height / 2),
-        Point(base / 2, height / 2),
-        Point(-base / 2, height / 2))
+    override fun polygon(base: Double, height: Double) =
+      arrayOf(Point(0, 0), Point(base, 0), Point(base, height), Point(0, height))
   },
   ISOS_TRAP {
-    override fun centeredPolygon(base: Double, height: Double) =
-      polygon(
-        Point(-base / 2, -height / 2),
-        Point(base / 2, -height / 2),
-        Point(base / 4, height / 2),
-        Point(-base / 4, height / 2))
+    override fun polygon(base: Double, height: Double) =
+      arrayOf(Point(0, height), Point(base, height), Point(base * 3/4, 0), Point(base / 4, 0))
   },
   DIAMOND {
-    override fun centeredPolygon(base: Double, height: Double) =
-      polygon(
-        Point(-base / 2, 0),
-        Point(0, -height / 2),
-        Point(base / 2, 0),
-        Point(0, height / 2))
+    override fun polygon(base: Double, height: Double) =
+      arrayOf(Point(0, 0), Point(base/2, height/2), Point(base, 0), Point(base/2, -height/2))
   },
   PGRAM {
-    override fun centeredPolygon(base: Double, height: Double) =
-      polygon(
-        Point(0, -height / 2),
-        Point(base / 2, -height / 2),
-        Point(0, height / 2),
-        Point(-base / 2, height / 2))
-  },
-  NOT_SURE {
-    override fun centeredPolygon(base: Double, height: Double) : Polygon {
-      val fraction = base / (base + height)
-      val whaction = fraction * fraction
-      val newbase = whaction * (base + height)
-      val newheight = height
-      return polygon(
-        Point(-newbase / 2, -newheight / 2),
-        Point(newbase / 2, -newheight / 2),
-        Point(0, newheight / 2))
-    }
+    override fun polygon(base: Double, height: Double) =
+      arrayOf(Point(base / 2, 0), Point(base, 0), Point(base / 2, height), Point(0, height))
   },
   ;
 
-  abstract fun centeredPolygon(base: Double, height: Double): Polygon
+  abstract fun polygon(base: Double, height: Double): Array<Point>
+
+  fun centeredPolygon(base: Double, height: Double): Polygon {
+    val points = polygon(base, height)
+    val xs = points.map { it.x }
+    val ys = points.map { it.y }
+    val centerx = mean(xs.minOrNull()!!, xs.maxOrNull()!!)
+    val centery = mean(ys.minOrNull()!!, ys.maxOrNull()!!)
+    return polygon(points.map { Point(it.x - centerx, it.y - centery) })
+  }
+
+  fun mean(a: Double, b: Double) = (a + b) / 2.0
+}
+
+fun bindingFromArray(source: ObservableDoubleValue, array: Array<Int>): IntegerBinding {
+  return object : IntegerBinding() {
+    init { bind(source) }
+    override fun computeValue() = array[min(floor(source.doubleValue()).toInt(), array.size - 1)]
+    override fun getDependencies() = singletonObservableList(source)
+    override fun dispose() = unbind(source)
+  }
+}
+
+fun shapeVisible(source: DoubleProperty, shapeNum: Int): BooleanBinding {
+  return object : BooleanBinding() {
+    init { bind(source) }
+    override fun computeValue() :Boolean {
+      val shapesm1 = source.value.toInt() - 1
+      return (shapesm1 * shapeNum % SHAPE_COUNT) == 0
+    }
+    override fun getDependencies() = singletonObservableList(source)
+    override fun dispose() = unbind(source)
+  }
 }

@@ -37,6 +37,12 @@ fun polygon(vararg points: Point): Polygon {
   return p
 }
 
+fun polygon(points: List<Point>): Polygon {
+  val p = Polygon()
+  p.points += points.flatMap { listOf(it.x, it.y) }
+  return p
+}
+
 fun GraphicsContext.drawPolygon(vertices: List<Point>) {
   fillPolygon(
     vertices.map { it.x }.toDoubleArray(),
