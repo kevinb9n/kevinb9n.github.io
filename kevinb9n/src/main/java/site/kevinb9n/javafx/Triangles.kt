@@ -1,19 +1,16 @@
 package site.kevinb9n.javafx
 
 import javafx.application.Application
-import javafx.beans.binding.Binding
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.binding.IntegerBinding
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.StringProperty
+import javafx.beans.property.IntegerProperty
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.value.ObservableDoubleValue
 import javafx.collections.FXCollections.singletonObservableList
 import javafx.geometry.Point2D
 import javafx.scene.Group
 import javafx.scene.Scene
-import javafx.scene.control.ColorPicker
 import javafx.scene.control.Label
 import javafx.scene.control.Slider
 import javafx.scene.control.Tooltip
@@ -28,7 +25,6 @@ import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineJoin
 import javafx.stage.Stage
 import javafx.util.StringConverter
-import javafx.util.converter.DoubleStringConverter
 import javafx.util.converter.IntegerStringConverter
 import java.lang.Math.toRadians
 import kotlin.math.cos
@@ -79,7 +75,7 @@ class Triangles : Application() {
     val offsetX = round(offsetDistance * cos(toRadians(offsetAngle)))
     val offsetY = round(offsetDistance * sin(toRadians(offsetAngle)))
 
-    val rotation = round(snapRandom(90.0 / SHAPE_COUNT))
+    val rotation = round(snapRandom(90.0))
 
     val color = COLORS.random()
     val shapeType = ShapeType.values().random()
@@ -87,38 +83,43 @@ class Triangles : Application() {
     val counts = arrayOf(13, 15, 19, 22, 29, 37, 43, 64, 85)
     val countslider = Slider(0.0, counts.size.toDouble(), counts.size / 2.0)
 
-    val prop = SimpleDoubleProperty()
+    val shapeCountProperty = SimpleIntegerProperty()
     val countDisplay = Label()
-    Bindings.bindBidirectional(countDisplay.textProperty(), prop, DoubleStringConverter() as StringConverter<Number>)
-    prop.bind(bindingFromArray(countslider.valueProperty(), counts))
+    Bindings.bindBidirectional(countDisplay.textProperty(), shapeCountProperty,
+      IntegerStringConverter() as StringConverter<Number>)
+    shapeCountProperty.bind(arrayLookupBinding(countslider.valueProperty(), counts))
 
     val txslider = Slider(-500.0, 500.0, offsetX * SHAPE_COUNT).apply {
-      this.tooltip = Tooltip("Translate X")
-      this.isShowTickLabels = true
-      this.majorTickUnit = 100.0
+      tooltip = Tooltip("Translate X")
     }
     val tyslider = Slider(-500.0, 500.0, offsetY * SHAPE_COUNT).apply {
-      this.tooltip = Tooltip("Translate Y")
-      this.isShowTickLabels = true
-      this.majorTickUnit = 100.0
+      tooltip = Tooltip("Translate Y")
+    }
+    val rotslider = Slider(-180.0, 180.0, rotation).apply {
+      tooltip = Tooltip("Translate Y")
+    }
+    val opacslider = Slider(0.2, 5.0, 1.7).apply {
+      tooltip = Tooltip("Opacity")
     }
 
     val triangles = (0 .. SHAPE_COUNT).map { param ->
       val height = param.toDouble()
       val base = SHAPE_COUNT - height
       shapeType.centeredPolygon(base, height).apply {
-        visibleProperty().bind(shapeVisible(prop, param))
+        visibleProperty().bind(shapeVisible(shapeCountProperty, param))
 
         stroke = color.deriveColor(0.0, 10.0, 0.4, 200.0).opaquenessFactor(0.66)
 
-        opacityProperty().bind(Bindings.divide(1.7, prop))
+        val opacprop = opacslider.valueProperty()
+        fillProperty().bind(Bindings.createObjectBinding({
+          color.opaquenessFactor(opacprop.value / shapeCountProperty.value)}, shapeCountProperty, opacprop))
 
         strokeLineJoin = StrokeLineJoin.ROUND
         strokeWidth = .05 // temporary
 
         translateXProperty().bind(txslider.valueProperty().multiply(height / SHAPE_COUNT))
         translateYProperty().bind(tyslider.valueProperty().multiply(height / SHAPE_COUNT))
-        rotate = param * rotation
+        rotateProperty().bind(rotslider.valueProperty().multiply(height / SHAPE_COUNT))
       }
     }
     val stack = Group()
@@ -154,7 +155,7 @@ class Triangles : Application() {
     val pretty = Pane(outer).apply { background = Background.fill(Paint.valueOf(BACKGROUND)) }
     sceneRoot.center = pretty
     sceneRoot.bottom = HBox(6.0).apply {
-      children += listOf(countslider, countDisplay, txslider, tyslider)
+      children += listOf(countslider, countDisplay, txslider, tyslider, rotslider, opacslider)
     }
 
     val scene = Scene(sceneRoot, WIN_WIDTH, WIN_HEIGHT)
@@ -212,7 +213,7 @@ enum class ShapeType {
   fun mean(a: Double, b: Double) = (a + b) / 2.0
 }
 
-fun bindingFromArray(source: ObservableDoubleValue, array: Array<Int>): IntegerBinding {
+fun arrayLookupBinding(source: ObservableDoubleValue, array: Array<Int>): IntegerBinding {
   return object : IntegerBinding() {
     init { bind(source) }
     override fun computeValue() = array[min(floor(source.doubleValue()).toInt(), array.size - 1)]
@@ -221,12 +222,11 @@ fun bindingFromArray(source: ObservableDoubleValue, array: Array<Int>): IntegerB
   }
 }
 
-fun shapeVisible(source: DoubleProperty, shapeNum: Int): BooleanBinding {
+fun shapeVisible(source: IntegerProperty, shapeNum: Int): BooleanBinding {
   return object : BooleanBinding() {
     init { bind(source) }
     override fun computeValue() :Boolean {
-      val shapesm1 = source.value.toInt() - 1
-      return (shapesm1 * shapeNum % SHAPE_COUNT) == 0
+      return (source.value - 1) * shapeNum % SHAPE_COUNT == 0
     }
     override fun getDependencies() = singletonObservableList(source)
     override fun dispose() = unbind(source)
