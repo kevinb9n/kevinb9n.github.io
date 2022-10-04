@@ -39,7 +39,7 @@ val SHAPE_COUNT = 252
 class Triangles : Application() {
   val WIN_WIDTH = 2000.0
   val WIN_HEIGHT = 1200.0
-  val MARGIN = 200.0
+  val MARGIN = 120.0
   val REAL_STROKE = 0.9
 
   val BACKGROUND = "#d8cab2"
@@ -49,7 +49,6 @@ class Triangles : Application() {
     "692d00", // brown
     "ee8400", // orange
     "ecc500", // yellow
-    "b2ce00", // yellow-green, bleh
     "139907", // green
     "0da73d", // kelly green
     "00b179", // turquoise
@@ -85,7 +84,9 @@ class Triangles : Application() {
 
     val shapeCountProperty = SimpleIntegerProperty()
     val countDisplay = Label()
-    Bindings.bindBidirectional(countDisplay.textProperty(), shapeCountProperty,
+    Bindings.bindBidirectional(
+      countDisplay.textProperty(),
+      shapeCountProperty,
       IntegerStringConverter() as StringConverter<Number>)
     shapeCountProperty.bind(arrayLookupBinding(countslider.valueProperty(), counts))
 
@@ -102,6 +103,7 @@ class Triangles : Application() {
       tooltip = Tooltip("Opacity")
     }
 
+    val outer = Group()
     val triangles = (0 .. SHAPE_COUNT).map { param ->
       val height = param.toDouble()
       val base = SHAPE_COUNT - height
@@ -115,8 +117,7 @@ class Triangles : Application() {
           color.opaquenessFactor(opacprop.value / shapeCountProperty.value)}, shapeCountProperty, opacprop))
 
         strokeLineJoin = StrokeLineJoin.ROUND
-        strokeWidth = .05 // temporary
-
+        strokeWidthProperty().bind(Bindings.divide(REAL_STROKE, outer.scaleXProperty()))
         translateXProperty().bind(txslider.valueProperty().multiply(height / SHAPE_COUNT))
         translateYProperty().bind(tyslider.valueProperty().multiply(height / SHAPE_COUNT))
         rotateProperty().bind(rotslider.valueProperty().multiply(height / SHAPE_COUNT))
@@ -137,14 +138,9 @@ class Triangles : Application() {
     }!!
 
     stack.rotate = bestAngle.toDouble()
-    val outer = Group()
     outer.children += stack
 
-    var scale = scaleToFit(outer.boundsInLocal, USABLE)
-    stack.children.filterIsInstance(Shape::class.java).forEach {
-      it.strokeWidth = REAL_STROKE / scale
-    }
-    scale = scaleToFit(outer.boundsInLocal, USABLE) // ok it could maybe have changed a TINY bit
+    val scale = scaleToFit(outer.boundsInLocal, USABLE) // ok it could maybe have changed a TINY bit
     outer.scaleX = scale
     outer.scaleY = scale
 
