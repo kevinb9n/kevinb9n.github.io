@@ -3,7 +3,6 @@ package site.kevinb9n.javafx
 import com.google.common.base.Stopwatch
 import javafx.application.Application
 import javafx.beans.binding.Bindings
-import javafx.beans.binding.Bindings.bindBidirectional
 import javafx.beans.binding.Bindings.format
 import javafx.beans.binding.IntegerBinding
 import javafx.beans.property.IntegerProperty
@@ -12,8 +11,10 @@ import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.value.ObservableNumberValue
 import javafx.collections.FXCollections
 import javafx.geometry.BoundingBox
+import javafx.geometry.Bounds
 import javafx.scene.Group
 import javafx.scene.Scene
+import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Slider
 import javafx.scene.control.Tooltip
@@ -23,10 +24,9 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
-import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeLineJoin
 import javafx.stage.Stage
-import javafx.util.converter.NumberStringConverter
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 fun main() = Application.launch(Triangles::class.java)
@@ -37,7 +37,7 @@ const val DEFAULT_SHAPES = 29
 
 const val WIN_WIDTH = 2000
 const val WIN_HEIGHT = 1200
-const val MARGIN = 120
+const val MARGIN = 50
 const val STROKE_WIDTH = 1.0
 
 val COLORS = listOf(
@@ -106,82 +106,62 @@ class Triangles : Application() {
     rotslider.slider.blockIncrement = 0.2
     opacslider.slider.blockIncrement = 0.05
 
-    val outer = Group()
     val strokeColor = toStrokeColor(color)
-    val triangles = (0..MAX_SHAPE_INDEX).map { shapeIndex ->
+
+    val autoScaleProp = SimpleDoubleProperty(1.0)
+    val scaler = Pane()
+    scaler.scaleXProperty().bind(autoScaleProp)
+    scaler.scaleYProperty().bind(autoScaleProp)
+
+    val thePolygons = (0..MAX_SHAPE_INDEX).map { shapeIndex ->
       shapeType.centeredPolygon(MAX_SHAPE_INDEX - shapeIndex, shapeIndex).apply {
         visibleProperty().bind(shapeVisibleProperty(shapeCountProperty, shapeIndex))
-
         stroke = strokeColor
+        strokeWidth = 1.0
         strokeLineJoin = StrokeLineJoin.ROUND
 
-        // Cancel the effects of scaling
-        strokeWidthProperty().bind(Bindings.divide(STROKE_WIDTH, outer.scaleXProperty()))
+//        // Cancel the effects of scaling
+//        strokeWidthProperty().bind(Bindings.divide(STROKE_WIDTH, autoScaleProp))
 
         val opacityProperty = opacslider.valueProperty()
         fillProperty().bindObject(shapeCountProperty, opacityProperty) {
           color.opacityFactor(opacityProperty.value / shapeCountProperty.value)
         }
 
-        // ranges -126 to 126
         val unitOffset = shapeIndex - MAX_SHAPE_INDEX / 2.0
         translateXProperty().bind(txslider.valueProperty().multiply(unitOffset))
         translateYProperty().bind(tyslider.valueProperty().multiply(unitOffset))
 
-        // if slider = 90 then we want to range from -45 to 45
         val angleOffset = shapeIndex.toDouble() / MAX_SHAPE_INDEX - 0.5
         rotateProperty().bind(rotslider.valueProperty().multiply(angleOffset))
       }
     }
 
-    val stack = Group()
-    stack.children += triangles
+    val rotater = Pane()
+    rotater.children += thePolygons
+    scaler.children += rotater
 
-    // Maximize width and minimize height by rotating the whole image
-    // Brute force, why not?
-    val goodAngle = (0..170 step 10).minByOrNull {
-      stack.rotate = it.toDouble()
-      stack.boundsInParent.height
-    }!!
-    val bestAngle = ((goodAngle - 9)..(goodAngle + 9)).minByOrNull {
-      stack.rotate = it.toDouble()
-      stack.boundsInParent.height
-    }!!
+    val translater = Pane(scaler)
+    translater.translateXProperty().bind(Bindings.createDoubleBinding({ ->
+      printBounds("in here", scaler)
+      USABLE.centerX - scaler.boundsInParent.centerX
+    }, scaler.boundsInParentProperty()))
 
-    stack.rotate = bestAngle.toDouble()
-    outer.children += stack
+    translater.translateYProperty().bind(Bindings.createDoubleBinding({ ->
+      USABLE.centerY - scaler.boundsInParent.centerY
+    }, scaler.boundsInParentProperty()))
 
-    val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN * 2))
+    rotscatra(rotater, thePolygons, autoScaleProp)
 
-    val scale = scaleToFit(outer.boundsInLocal, USABLE)
-    outer.scaleX = scale
-    outer.scaleY = scale
-
-//    val autoScaleProp = SimpleDoubleProperty()
-//    outer.scaleXProperty().bind(autoScaleProp)
-//    outer.scaleYProperty().bind(autoScaleProp)
-//    autoScaleProp.bind(Bindings.createDoubleBinding({ ->
-//      scaleToFit(outer.boundsInLocalProperty().value, usable)
-//    }, outer.boundsInLocalProperty()))
-
-    outer.translateX = USABLE.centerX - outer.boundsInParent.centerX
-    outer.translateY = USABLE.centerY - outer.boundsInParent.centerY
-    // make those local
-
-//    outer.translateXProperty().bind(Bindings.createDoubleBinding({ ->
-//      usable.centerX - outer.boundsInLocalProperty().value.centerX
-//    }, outer.boundsInLocalProperty()))
-//
-//    outer.translateYProperty().bind(Bindings.createDoubleBinding({ ->
-//      usable.centerY - outer.boundsInLocalProperty().value.centerY
-//    }, outer.boundsInParentProperty()))
+    val zoomLabel = Label()
+    zoomLabel.textProperty().bind(Bindings.format("%.2f", autoScaleProp))
 
     val sceneRoot = BorderPane()
-    val pretty = Pane(outer).apply { background = Background.fill(BACKGROUND) }
+    val pretty = Pane(translater).apply { background = Background.fill(BACKGROUND) }
     sceneRoot.center = pretty
 
-//    val button = Button("Fit")
-//    button.setOnAction { actionEvent -> println() }
+    val button = Button("Fit")
+    button.setOnAction { _ -> rotscatra(rotater, thePolygons, autoScaleProp) }
 
     sceneRoot.bottom = HBox(10.0).apply {
       children += listOf(
@@ -189,7 +169,8 @@ class Triangles : Application() {
         txslider.slider, txslider.label,
         tyslider.slider, tyslider.label,
         rotslider.slider, rotslider.label,
-        opacslider.slider, opacslider.label)
+        opacslider.slider, opacslider.label,
+        zoomLabel, button)
     }
 
     val scene = Scene(sceneRoot, WIN_WIDTH.toDouble(), WIN_HEIGHT.toDouble())
@@ -199,14 +180,33 @@ class Triangles : Application() {
     // renderToPngFile(pretty, "/Users/kevinb9n/triangles.png")
   }
 
+  private fun rotscatra(rotater: Pane, thePolygons: List<Polygon>, autoScaleProp: SimpleDoubleProperty) {
+    println("old angle ${rotater.rotate}")
+    printBounds("pre rotate", rotater)
+    rotater.rotate = findBestRotation(thePolygons)
+    println("new angle ${rotater.rotate}")
+    printBounds("post rotate", rotater)
+    val scale = scaleToFit(rotater.boundsInParent)
+    println("scale $scale")
+    autoScaleProp.value = scale
+    printBounds("post scale", rotater)
+  }
+
   fun toStrokeColor(color: Color) =
     color.deriveColor(0.0, 10.0, 0.4, 200.0).opacityFactor(0.66)
 
 }
+val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN * 2))
 
-fun findBestRotation(shapes: List<Shape>): Double {
+fun scaleToFit(bound: Bounds): Double {
+  return (min(USABLE.width / bound.width, USABLE.height / bound.height) * 100.0).roundToInt() /
+    100.0
+}
+
+fun findBestRotation(polygons: List<Polygon>): Double {
   val stopwatch = Stopwatch.createStarted()
-  val neverShown = Group(shapes)
+  val neverShown = Group()
+  neverShown.children += polygons.map(::clone)
 
   // It would be fun to find a better algorithm for this
   var best = findBestOf(0 until 180 step 30, neverShown) // 6
@@ -214,9 +214,16 @@ fun findBestRotation(shapes: List<Shape>): Double {
   best = findBestOf(best - 7 .. best + 8 step 3, neverShown) // 6
   best = findBestOf(best - 2 .. best + 2, neverShown) // 5
   println(stopwatch)
-
-  neverShown.children.clear() // ???
+  println("angle: $best")
   return best.toDouble()
+}
+
+private fun clone(it: Polygon) = Polygon().apply {
+  this.points.addAll(it.points)
+  translateX = it.translateX
+  translateY = it.translateY
+  rotate = it.rotate
+  strokeWidth = 0.0
 }
 
 fun findBestOf(anglesToTry: IntProgression, neverShown: Group) = anglesToTry.minByOrNull {

@@ -25,6 +25,7 @@ import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 data class Point(val x: Double, val y: Double) {
@@ -64,10 +65,6 @@ fun box(minCorner: Point, maxCorner: Point) = box(
 
 fun box(minCorner: Point, width: Number, height: Number) =
   BoundingBox(minCorner.x, minCorner.y, width.toDouble(), height.toDouble())
-
-fun scaleToFit(bound: Bounds, desired: Bounds): Double {
-  return min(desired.width / bound.width, desired.height / bound.height)
-}
 
 fun random(maxAbs: Number): Double {
   val r = 2 * Math.random() - 1
