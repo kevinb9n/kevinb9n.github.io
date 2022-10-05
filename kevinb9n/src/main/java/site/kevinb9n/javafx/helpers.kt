@@ -1,5 +1,13 @@
 package site.kevinb9n.javafx
 
+import javafx.beans.Observable
+import javafx.beans.binding.Bindings
+import javafx.beans.binding.BooleanBinding
+import javafx.beans.binding.IntegerBinding
+import javafx.beans.property.IntegerProperty
+import javafx.beans.property.ObjectProperty
+import javafx.beans.value.ObservableNumberValue
+import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.embed.swing.SwingFXUtils
 import javafx.geometry.BoundingBox
@@ -7,13 +15,12 @@ import javafx.geometry.Bounds
 import javafx.scene.Cursor
 import javafx.scene.Group
 import javafx.scene.Node
-import javafx.scene.Scene
 import javafx.scene.SnapshotParameters
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.input.MouseEvent
+import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
 import java.io.File
-import java.util.Comparator
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.math.cos
@@ -31,13 +38,13 @@ data class Point(val x: Double, val y: Double) {
   }
 }
 
-fun polygon(vararg points: Point): Polygon {
+fun pointsToPolygon(vararg points: Point): Polygon {
   val p = Polygon()
   p.points += points.flatMap { listOf(it.x, it.y) }
   return p
 }
 
-fun polygon(points: List<Point>): Polygon {
+fun pointsToPolygon(points: List<Point>): Polygon {
   val p = Polygon()
   p.points += points.flatMap { listOf(it.x, it.y) }
   return p
@@ -62,14 +69,19 @@ fun scaleToFit(bound: Bounds, desired: Bounds): Double {
   return min(desired.width / bound.width, desired.height / bound.height)
 }
 
+fun random(maxAbs: Number): Double {
+  val r = 2 * Math.random() - 1
+  return maxAbs.toDouble() * r
+}
+
 fun snapRandom(maxAbs: Number): Double {
   val r = 2 * Math.random() - 1 // works for maxAbs of 1
-  return round(maxAbs.toDouble() * when {
-    r > 0.8 -> 1.0
-    abs(r) < 0.2 -> 0.0
-    r < -0.8 -> -1.0
+  return maxAbs.toDouble() * when {
+    r > 0.9 -> 1.0
+    abs(r) < 0.1 -> 0.0
+    r < -0.9 -> -1.0
     else -> r
-  })
+  }
 }
 
 fun printBounds(message: String, node: Node) {
@@ -128,3 +140,30 @@ class DragToTranslate(val node: Node) : Group(node) {
     }
   }
 }
+
+fun factors(value: Int): IntArray = (1 .. value).filter { value % it == 0 }.toIntArray()
+fun mean(a: Double, b: Double) = (a + b) / 2.0
+fun centerBounds(points: List<Point>): List<Point> {
+  if (points.isEmpty()) return points
+  val xs = points.map { it.x }
+  val ys = points.map { it.y }
+  val centerx = mean(xs.minOrNull()!!, xs.maxOrNull()!!)
+  val centery = mean(ys.minOrNull()!!, ys.maxOrNull()!!)
+  return points.map { Point(it.x - centerx, it.y - centery) }
+}
+
+fun <T> ObjectProperty<T>.bindObject(vararg deps: Observable, supplier: () -> T) =
+  bind(Bindings.createObjectBinding(supplier, *deps))
+
+fun shapeVisibleProperty(source: IntegerProperty, shapeNum: Number): BooleanBinding {
+  return object : BooleanBinding() {
+    init { bind(source) }
+    override fun computeValue() :Boolean {
+      return (source.value - 1) * shapeNum.toInt() % MAX_SHAPE_INDEX == 0
+    }
+    override fun getDependencies() = FXCollections.singletonObservableList(source)
+    override fun dispose() = unbind(source)
+  }
+}
+
+fun Color.opacityFactor(factor: Double) = this.deriveColor(0.0, 1.0, 1.0, factor)

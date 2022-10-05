@@ -27,7 +27,7 @@ class MyDraggableStuff : Application() {
           translateY = 225.0
         }),
       DragToTranslate(
-        polygon(Point(200, 100), Point(300, 300), Point(100, 300)).apply {
+        pointsToPolygon(Point(200, 100), Point(300, 300), Point(100, 300)).apply {
           fill = Color.PINK
         }),
     )

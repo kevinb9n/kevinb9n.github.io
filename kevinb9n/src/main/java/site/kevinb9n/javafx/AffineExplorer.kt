@@ -11,17 +11,15 @@ import javafx.scene.control.Label
 import javafx.scene.control.Slider
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
-import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
-import javafx.scene.shape.Rectangle
 import javafx.stage.Stage
 
 fun main() = Application.launch(AffineExplorer::class.java)
 
 class AffineExplorer : Application() {
   override fun start(stage: Stage) {
-    val triangle = polygon(Point(0, 0), Point(50, 50), Point(100, 50), Point(100, 100), Point(0, 100)).apply {
+    val triangle = pointsToPolygon(Point(0, 0), Point(50, 50), Point(100, 50), Point(100, 100), Point(0, 100)).apply {
       strokeWidth = 5.0
       stroke = Color.BLACK
     }
