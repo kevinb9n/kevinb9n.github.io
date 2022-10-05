@@ -3,10 +3,8 @@ package site.kevinb9n.javafx
 import javafx.beans.Observable
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.BooleanBinding
-import javafx.beans.binding.IntegerBinding
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.ObjectProperty
-import javafx.beans.value.ObservableNumberValue
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.embed.swing.SwingFXUtils
@@ -24,8 +22,6 @@ import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.math.cos
-import kotlin.math.min
-import kotlin.math.roundToInt
 import kotlin.math.sin
 
 data class Point(val x: Double, val y: Double) {
@@ -82,18 +78,21 @@ fun snapRandom(maxAbs: Number): Double {
 }
 
 fun printBounds(message: String, node: Node) {
-  val bounds = node.boundsInParent
-  printBounds("$message / horiz", bounds.minX, bounds.maxX, bounds.centerX, bounds.width)
-  printBounds("$message /  vert", bounds.minY, bounds.maxY, bounds.centerY, bounds.height)
+  printBounds("$message local ", node.boundsInLocal)
+  printBounds("$message parent", node.boundsInParent)
+}
+fun printBounds(message: String, bounds: Bounds) {
+  val horizBounds = boundsToString(bounds.minX, bounds.maxX, bounds.centerX, bounds.width)
+  val vertBounds = boundsToString(bounds.minY, bounds.maxY, bounds.centerY, bounds.height)
+  println("$message $horizBounds x $vertBounds")
 }
 
-fun printBounds(
-  message: String, min: Double, max: Double, center: Double, extent: Double) {
+fun boundsToString(min: Double, max: Double, center: Double, extent: Double) : String {
   val minR = round(min)
   val maxR = round(max)
   val centerR = round(center)
   val extentR = round(extent)
-  println("$message: [$minR, $maxR] = $extentR (c $centerR)")
+  return "[$minR, $maxR] = $extentR (c $centerR)"
 }
 
 fun round(d: Double) = Math.round(d * 1000) / 1000.0

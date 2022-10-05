@@ -2,9 +2,11 @@ package site.kevinb9n.javafx
 
 import com.google.common.base.Stopwatch
 import javafx.application.Application
+import javafx.beans.Observable
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.format
 import javafx.beans.binding.IntegerBinding
+import javafx.beans.property.DoubleProperty
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
@@ -14,7 +16,6 @@ import javafx.geometry.BoundingBox
 import javafx.geometry.Bounds
 import javafx.scene.Group
 import javafx.scene.Scene
-import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Slider
 import javafx.scene.control.Tooltip
@@ -22,6 +23,7 @@ import javafx.scene.layout.Background
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
+import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
 import javafx.scene.shape.StrokeLineJoin
@@ -38,7 +40,7 @@ const val DEFAULT_SHAPES = 29
 const val WIN_WIDTH = 2000
 const val WIN_HEIGHT = 1200
 const val MARGIN = 50
-const val STROKE_WIDTH = 1.0
+const val STROKE_WIDTH = 0.5
 
 val COLORS = listOf(
   "001212", "c01613", "692d00", "ee8400", "ecc500", "139907", "0da73d", "00b179", "0ab7ad",
@@ -96,9 +98,9 @@ class Triangles : Application() {
     val countLabel = Label().apply { prefWidth = 40.0 }
     val shapeCountProperty = sliderFromArrayProperty(countslider, countLabel, selectableCounts, DEFAULT_SHAPES)
 
-    val txslider = LabeledSlider(Slider(-7.0, 7.0, snapRandom(3.5)), "TranslateX", "%.2f")
-    val tyslider = LabeledSlider(Slider(-7.0, 7.0, snapRandom(3.5)), "TranslateY", "%.2f")
-    val rotslider = LabeledSlider(Slider(-270.0, 270.0, snapRandom(180)), "Rotation", "%.0f")
+    val txslider = LabeledSlider(Slider(-7.0, 7.0, snapRandom(3.0)), "TranslateX", "%.2f")
+    val tyslider = LabeledSlider(Slider(-7.0, 7.0, snapRandom(3.0)), "TranslateY", "%.2f")
+    val rotslider = LabeledSlider(Slider(-180.0, 180.0, snapRandom(90)), "Rotation", "%.0f")
     val opacslider = LabeledSlider(Slider(0.2, 5.0, 1.7), "Opacity", "%.1f")
 
     txslider.slider.blockIncrement = 0.002
@@ -108,16 +110,11 @@ class Triangles : Application() {
 
     val strokeColor = toStrokeColor(color)
 
-    val autoScaleProp = SimpleDoubleProperty(1.0)
-    val scaler = Pane()
-    scaler.scaleXProperty().bind(autoScaleProp)
-    scaler.scaleYProperty().bind(autoScaleProp)
-
     val thePolygons = (0..MAX_SHAPE_INDEX).map { shapeIndex ->
       shapeType.centeredPolygon(MAX_SHAPE_INDEX - shapeIndex, shapeIndex).apply {
         visibleProperty().bind(shapeVisibleProperty(shapeCountProperty, shapeIndex))
         stroke = strokeColor
-        strokeWidth = 1.0
+        strokeWidth = STROKE_WIDTH
         strokeLineJoin = StrokeLineJoin.ROUND
 
 //        // Cancel the effects of scaling
@@ -139,29 +136,48 @@ class Triangles : Application() {
 
     val rotater = Pane()
     rotater.children += thePolygons
-    scaler.children += rotater
+    rotater.rotateProperty().bindDouble(rotater.boundsInLocalProperty()) {
+      printBounds("rotater", rotater.boundsInLocal)
+//      println("old rotate: ${rotater.rotate}")
+      val d = findBestRotation(thePolygons)
+      println("new rotate: $d")
+      d
+    }
+
+    val scaler = Pane(rotater)
+    val autoScaleProp = SimpleDoubleProperty(1.0)
+    scaler.scaleXProperty().bind(autoScaleProp)
+    scaler.scaleYProperty().bind(autoScaleProp)
+    autoScaleProp.bindDouble(scaler.boundsInLocalProperty()) {
+      printBounds("scaler", scaler.boundsInLocal)
+//      println("old scale: ${scaler.scaleX}")
+      val d = scaleToFit(scaler.boundsInLocal)
+      println("new scale: $d")
+      d
+    }
 
     val translater = Pane(scaler)
-    translater.translateXProperty().bind(Bindings.createDoubleBinding({ ->
-      printBounds("in here", scaler)
-      USABLE.centerX - scaler.boundsInParent.centerX
-    }, scaler.boundsInParentProperty()))
-
-    translater.translateYProperty().bind(Bindings.createDoubleBinding({ ->
-      USABLE.centerY - scaler.boundsInParent.centerY
-    }, scaler.boundsInParentProperty()))
-
-    rotscatra(rotater, thePolygons, autoScaleProp)
+    translater.translateXProperty().bindDouble(translater.boundsInLocalProperty()) {
+      printBounds("translater", translater.boundsInLocal)
+//      println("old translateX: ${translater.translateX}")
+      val d = USABLE.centerX - translater.boundsInLocal.centerX
+      println("new translateX: $d")
+      d
+    }
+    translater.translateYProperty().bindDouble(translater.boundsInLocalProperty()) {
+      printBounds("translater", translater.boundsInLocal)
+//      println("old translateY: ${translater.translateY}")
+      val d = USABLE.centerY - translater.boundsInLocal.centerY
+      println("new translateY: $d")
+      d
+    }
 
     val zoomLabel = Label()
-    zoomLabel.textProperty().bind(Bindings.format("%.2f", autoScaleProp))
+    zoomLabel.textProperty().bind(format("%.2f", autoScaleProp))
 
     val sceneRoot = BorderPane()
     val pretty = Pane(translater).apply { background = Background.fill(BACKGROUND) }
     sceneRoot.center = pretty
-
-    val button = Button("Fit")
-    button.setOnAction { _ -> rotscatra(rotater, thePolygons, autoScaleProp) }
 
     sceneRoot.bottom = HBox(10.0).apply {
       children += listOf(
@@ -170,7 +186,7 @@ class Triangles : Application() {
         tyslider.slider, tyslider.label,
         rotslider.slider, rotslider.label,
         opacslider.slider, opacslider.label,
-        zoomLabel, button)
+        zoomLabel)
     }
 
     val scene = Scene(sceneRoot, WIN_WIDTH.toDouble(), WIN_HEIGHT.toDouble())
@@ -180,17 +196,8 @@ class Triangles : Application() {
     // renderToPngFile(pretty, "/Users/kevinb9n/triangles.png")
   }
 
-  private fun rotscatra(rotater: Pane, thePolygons: List<Polygon>, autoScaleProp: SimpleDoubleProperty) {
-    println("old angle ${rotater.rotate}")
-    printBounds("pre rotate", rotater)
-    rotater.rotate = findBestRotation(thePolygons)
-    println("new angle ${rotater.rotate}")
-    printBounds("post rotate", rotater)
-    val scale = scaleToFit(rotater.boundsInParent)
-    println("scale $scale")
-    autoScaleProp.value = scale
-    printBounds("post scale", rotater)
-  }
+  private fun DoubleProperty.bindDouble(vararg dependencies: Observable, supplier: () -> Double) =
+    bind(Bindings.createDoubleBinding(supplier, *dependencies))
 
   fun toStrokeColor(color: Color) =
     color.deriveColor(0.0, 10.0, 0.4, 200.0).opacityFactor(0.66)
@@ -223,7 +230,13 @@ private fun clone(it: Polygon) = Polygon().apply {
   translateX = it.translateX
   translateY = it.translateY
   rotate = it.rotate
-  strokeWidth = 0.0
+  scaleX = it.scaleX
+  scaleY = it.scaleY
+//  strokeWidth = it.strokeWidth
+//  strokeLineJoin = it.strokeLineJoin
+//  strokeType = it.strokeType
+//  stroke = it.stroke
+//  require(boundsInLocal == it.boundsInLocal) { "\n$boundsInLocal\n${it.boundsInLocal}" }
 }
 
 fun findBestOf(anglesToTry: IntProgression, neverShown: Group) = anglesToTry.minByOrNull {
