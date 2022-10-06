@@ -7,23 +7,22 @@ import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.format
 import javafx.beans.binding.IntegerBinding
 import javafx.beans.property.DoubleProperty
-import javafx.beans.property.IntegerProperty
 import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.value.ObservableNumberValue
 import javafx.collections.FXCollections
 import javafx.geometry.BoundingBox
 import javafx.geometry.Bounds
+import javafx.geometry.Pos
 import javafx.scene.Group
 import javafx.scene.Scene
+import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Slider
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.Background
 import javafx.scene.layout.BorderPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
+import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
 import javafx.scene.shape.StrokeLineJoin
@@ -37,8 +36,8 @@ const val MAX_SHAPE_INDEX = 252
 val CHOOSABLE_SHAPES = 8..127
 const val DEFAULT_SHAPES = 29
 
-const val WIN_WIDTH = 2000
-const val WIN_HEIGHT = 1200
+const val WIN_WIDTH = 1600
+const val WIN_HEIGHT = 1000
 const val MARGIN = 50
 const val STROKE_WIDTH = 0.5
 
@@ -49,7 +48,8 @@ val COLORS = listOf(
 
 val BACKGROUND = Color.web("d8cab2")
 
-fun sliderFromArrayProperty(slider: Slider, label: Label, array: IntArray, defaultValue: Int): IntegerProperty {
+fun sliderFromArrayProperty(slider: Slider, label: Label, array: IntArray, defaultValue: Int):
+  DoubleProperty {
   // Has to be a double property, letting lookupByIndexBinding round() it, otherwise it gets floored
   val where = array.indexOf(defaultValue)
   require(where != -1)
@@ -62,9 +62,9 @@ fun sliderFromArrayProperty(slider: Slider, label: Label, array: IntArray, defau
     value = where.toDouble()
   }
 
-  return SimpleIntegerProperty().apply {
+  return SimpleDoubleProperty().apply {
     bind(lookupByIndexBinding(slider.valueProperty(), array))
-    label.textProperty().bind(format("%d", this))
+    label.textProperty().bind(format("Shapes = %.0f", this))
   }
 }
 
@@ -83,36 +83,43 @@ class Triangles : Application() {
     val color = COLORS.random()
     val shapeType = ShapeType.values().random()
 
-    val selectableCounts = factors(MAX_SHAPE_INDEX)
-      .map { it + 1 }
-      .filter { it in CHOOSABLE_SHAPES }
-      .toIntArray()
-
-    val countslider = Slider().apply {
-      tooltip = Tooltip("Shape count")
-      prefWidth = 300.0
-      isShowTickMarks = true
-      isSnapToTicks = true
-      blockIncrement = 1.0
+    val controlPanel = VBox(10.0).also { it.prefWidth = 300.0 }
+    val countControl = SliderWithReadout(Slider(), "Shapes", 1.0, "", """
+      How many shapes would you like to see?
+    """).also {
+      it.valueProperty.unbind()
+      it.valueProperty.bind(sliderFromArrayProperty(it.slider, it.label, selectableCounts(), DEFAULT_SHAPES))
+      it.slider.isSnapToTicks = true
+      controlPanel.children += it
     }
-    val countLabel = Label().apply { prefWidth = 40.0 }
-    val shapeCountProperty = sliderFromArrayProperty(countslider, countLabel, selectableCounts, DEFAULT_SHAPES)
 
-    val txslider = LabeledSlider(Slider(-7.0, 7.0, snapRandom(3.0)), "TranslateX", "%.2f")
-    val tyslider = LabeledSlider(Slider(-7.0, 7.0, snapRandom(3.0)), "TranslateY", "%.2f")
-    val rotslider = LabeledSlider(Slider(-180.0, 180.0, snapRandom(90)), "Rotation", "%.0f")
-    val opacslider = LabeledSlider(Slider(0.2, 5.0, 1.7), "Opacity", "%.1f")
+    val xControl = SliderWithReadout(Slider(-7.0, 7.0, snapRandom(3.0)), "Translate X", 0.005, "%.2f", """
+      First and last shapes are separated by this distance in the "X" direction, and intervening
+      shapes are linearly interpolated. Unit is the max shape height/width.
+    """).also { controlPanel.children += it }
 
-    txslider.slider.blockIncrement = 0.002
-    tyslider.slider.blockIncrement = 0.002
-    rotslider.slider.blockIncrement = 0.2
-    opacslider.slider.blockIncrement = 0.05
+    val yControl = SliderWithReadout(Slider(-7.0, 7.0, snapRandom(3.0)), "Translate Y", 0.005, "%.2f", """
+      First and last shapes are separated by this distance in the "Y" direction, and intervening
+      shapes are linearly interpolated. Unit is the max shape height/width.
+    """).also { controlPanel.children += it }
+
+    val incrRotControl = SliderWithReadout(Slider(-180.0, 180.0, snapRandom(90)), "Rotation", 0.1, "%.0f", """
+      The last shape is rotated at this angle relative to the first shape, and intervening shapes
+      are linearly interpolated.
+    """).also { controlPanel.children += it }
+
+    val overallRotControl = SliderWithReadout(Slider(-180.0, 180.0, snapRandom(180)),
+      "Overall rotation", 0.1, "%.0f", "Rotate the entire diagram").also { controlPanel.children += it }
+
+    val opacityControl = SliderWithReadout(Slider(0.2, 5.0, 1.7), "Opacity", 0.05, "%.1f", """
+      You'll want to make the shapes more transparent when they are highly overlapping.
+    """).also { controlPanel.children += it }
 
     val strokeColor = toStrokeColor(color)
 
     val thePolygons = (0..MAX_SHAPE_INDEX).map { shapeIndex ->
       shapeType.centeredPolygon(MAX_SHAPE_INDEX - shapeIndex, shapeIndex).apply {
-        visibleProperty().bind(shapeVisibleProperty(shapeCountProperty, shapeIndex))
+        visibleProperty().bind(shapeVisibleProperty(countControl.valueProperty, shapeIndex))
         stroke = strokeColor
         strokeWidth = STROKE_WIDTH
         strokeLineJoin = StrokeLineJoin.ROUND
@@ -120,73 +127,63 @@ class Triangles : Application() {
 //        // Cancel the effects of scaling
 //        strokeWidthProperty().bind(Bindings.divide(STROKE_WIDTH, autoScaleProp))
 
-        val opacityProperty = opacslider.valueProperty()
-        fillProperty().bindObject(shapeCountProperty, opacityProperty) {
-          color.opacityFactor(opacityProperty.value / shapeCountProperty.value)
+        val opacityProperty = opacityControl.valueProperty
+        fillProperty().bindObject(countControl.valueProperty, opacityProperty) {
+          color.opacityFactor(opacityProperty.value / countControl.valueProperty.value)
         }
 
         val unitOffset = shapeIndex - MAX_SHAPE_INDEX / 2.0
-        translateXProperty().bind(txslider.valueProperty().multiply(unitOffset))
-        translateYProperty().bind(tyslider.valueProperty().multiply(unitOffset))
+        translateXProperty().bind(xControl.valueProperty.multiply(unitOffset))
+        translateYProperty().bind(yControl.valueProperty.multiply(unitOffset))
 
         val angleOffset = shapeIndex.toDouble() / MAX_SHAPE_INDEX - 0.5
-        rotateProperty().bind(rotslider.valueProperty().multiply(angleOffset))
+        rotateProperty().bind(incrRotControl.valueProperty.multiply(angleOffset))
       }
     }
 
-    val rotater = Pane()
+    val rotater = Group()
     rotater.children += thePolygons
-    rotater.rotateProperty().bindDouble(rotater.boundsInLocalProperty()) {
-      printBounds("rotater", rotater.boundsInLocal)
-//      println("old rotate: ${rotater.rotate}")
-      val d = findBestRotation(thePolygons)
-      println("new rotate: $d")
-      d
+    rotater.rotateProperty().bind(overallRotControl.valueProperty)
+
+
+    val scaler = StackPane(rotater)
+    StackPane.setAlignment(scaler, Pos.CENTER)
+
+    val mainArea = StackPane(scaler).apply {
+      background = Background.fill(BACKGROUND)
+      StackPane.setAlignment(this, Pos.CENTER)
+      // clip =
     }
 
-    val scaler = Pane(rotater)
+    val sceneRoot = BorderPane().apply {
+      center = mainArea
+      right = controlPanel
+    }
+
     val autoScaleProp = SimpleDoubleProperty(1.0)
     scaler.scaleXProperty().bind(autoScaleProp)
     scaler.scaleYProperty().bind(autoScaleProp)
-    autoScaleProp.bindDouble(scaler.boundsInLocalProperty()) {
-      printBounds("scaler", scaler.boundsInLocal)
-//      println("old scale: ${scaler.scaleX}")
-      val d = scaleToFit(scaler.boundsInLocal)
-      println("new scale: $d")
-      d
+    autoScaleProp.bindDouble(scaler.boundsInLocalProperty(), mainArea.widthProperty(), mainArea.heightProperty()) {
+      scaleToFit(scaler.boundsInLocal, mainArea.width, mainArea.height)
     }
 
-    val translater = Pane(scaler)
-    translater.translateXProperty().bindDouble(translater.boundsInLocalProperty()) {
-      printBounds("translater", translater.boundsInLocal)
-//      println("old translateX: ${translater.translateX}")
-      val d = USABLE.centerX - translater.boundsInLocal.centerX
-      println("new translateX: $d")
-      d
+    controlPanel.children += Label().also {
+      it.textProperty().bind(format("Zoom = %.2f", autoScaleProp))
     }
-    translater.translateYProperty().bindDouble(translater.boundsInLocalProperty()) {
-      printBounds("translater", translater.boundsInLocal)
-//      println("old translateY: ${translater.translateY}")
-      val d = USABLE.centerY - translater.boundsInLocal.centerY
-      println("new translateY: $d")
-      d
+    controlPanel.children += Button("Shape").apply {
+      setOnAction() { _ -> dump(thePolygons[MAX_SHAPE_INDEX / 4]) }
     }
-
-    val zoomLabel = Label()
-    zoomLabel.textProperty().bind(format("%.2f", autoScaleProp))
-
-    val sceneRoot = BorderPane()
-    val pretty = Pane(translater).apply { background = Background.fill(BACKGROUND) }
-    sceneRoot.center = pretty
-
-    sceneRoot.bottom = HBox(10.0).apply {
-      children += listOf(
-        countslider, countLabel,
-        txslider.slider, txslider.label,
-        tyslider.slider, tyslider.label,
-        rotslider.slider, rotslider.label,
-        opacslider.slider, opacslider.label,
-        zoomLabel)
+    controlPanel.children += Button("Rotater").apply {
+      setOnAction() { _ -> dump(rotater) }
+    }
+    controlPanel.children += Button("Scaler").apply {
+      setOnAction() { _ -> dump(scaler) }
+    }
+    controlPanel.children += Button("Main area").apply {
+      setOnAction() { _ -> dump(mainArea) }
+    }
+    controlPanel.children += Button("Scene root").apply {
+      setOnAction() { _ -> dump(sceneRoot) }
     }
 
     val scene = Scene(sceneRoot, WIN_WIDTH.toDouble(), WIN_HEIGHT.toDouble())
@@ -196,6 +193,11 @@ class Triangles : Application() {
     // renderToPngFile(pretty, "/Users/kevinb9n/triangles.png")
   }
 
+  private fun selectableCounts() = factors(MAX_SHAPE_INDEX)
+    .map { it + 1 }
+    .filter { it in CHOOSABLE_SHAPES }
+    .toIntArray()
+
   private fun DoubleProperty.bindDouble(vararg dependencies: Observable, supplier: () -> Double) =
     bind(Bindings.createDoubleBinding(supplier, *dependencies))
 
@@ -203,11 +205,9 @@ class Triangles : Application() {
     color.deriveColor(0.0, 10.0, 0.4, 200.0).opacityFactor(0.66)
 
 }
-val USABLE = box(Point(MARGIN, MARGIN), Point(WIN_WIDTH - MARGIN, WIN_HEIGHT - MARGIN * 2))
 
-fun scaleToFit(bound: Bounds): Double {
-  return (min(USABLE.width / bound.width, USABLE.height / bound.height) * 100.0).roundToInt() /
-    100.0
+fun scaleToFit(bound: Bounds, width: Double, height: Double): Double {
+  return min((width - 2 * MARGIN) / bound.width, (height - 2 * MARGIN) / bound.height)
 }
 
 fun findBestRotation(polygons: List<Polygon>): Double {
@@ -244,22 +244,31 @@ fun findBestOf(anglesToTry: IntProgression, neverShown: Group) = anglesToTry.min
   neverShown.boundsInParent.height
 }!!
 
-class LabeledSlider(val slider: Slider, tooltip: String, format: String) {
-  val label = labelFor(slider, format)
-
-  init {
-    slider.tooltip = Tooltip(tooltip)
-    slider.prefWidth = 300.0
+class SliderWithReadout(
+    val slider: Slider,
+    name: String,
+    fineTune: Double,
+    format: String,
+    tooltip: String = "") : VBox(6.0) {
+  val valueProperty = SimpleDoubleProperty()
+  val label = Label().also {
+    it.textProperty().bind(format("$name = $format", valueProperty))
+    it.tooltip = Tooltip(tooltip)
   }
+  init {
+    style = ("-fx-background-color: white;"
+      + "-fx-border-color: black;"
+      + "-fx-border-width: 1;"
+      + "-fx-border-radius: 6;"
+      + "-fx-padding: 8;")
+    children += label
+    children += slider
 
-  fun valueProperty() = slider.valueProperty()
-
-  private fun labelFor(control: Slider, format: String) =
-    Label().apply {
-      prefWidth = 40.0
-      textProperty().bind(format(format, control.valueProperty()))
+    slider.tooltip = Tooltip(tooltip)
+    slider.blockIncrement = fineTune
+    valueProperty.bind(slider.valueProperty())
+  }
     }
-}
 
 enum class ShapeType(val points: List<Point>) {
   ISOS_TRI(listOf(Point(0, 1), Point(1, 1), Point(0.5, 0))),

@@ -3,21 +3,25 @@ package site.kevinb9n.javafx
 import javafx.beans.Observable
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.BooleanBinding
-import javafx.beans.property.IntegerProperty
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.Property
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.embed.swing.SwingFXUtils
 import javafx.geometry.BoundingBox
 import javafx.geometry.Bounds
+import javafx.geometry.Point2D
+import javafx.geometry.Point3D
 import javafx.scene.Cursor
 import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.SnapshotParameters
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.input.MouseEvent
+import javafx.scene.layout.Region
 import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
+import javafx.scene.shape.Shape
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
@@ -151,15 +155,69 @@ fun centerBounds(points: List<Point>): List<Point> {
 fun <T> ObjectProperty<T>.bindObject(vararg deps: Observable, supplier: () -> T) =
   bind(Bindings.createObjectBinding(supplier, *deps))
 
-fun shapeVisibleProperty(source: IntegerProperty, shapeNum: Number): BooleanBinding {
+fun shapeVisibleProperty(source: Property<Number>, shapeNum: Number): BooleanBinding {
   return object : BooleanBinding() {
     init { bind(source) }
     override fun computeValue() :Boolean {
-      return (source.value - 1) * shapeNum.toInt() % MAX_SHAPE_INDEX == 0
+      return (source.value.toInt() - 1) * shapeNum.toInt() % MAX_SHAPE_INDEX == 0
     }
     override fun getDependencies() = FXCollections.singletonObservableList(source)
     override fun dispose() = unbind(source)
   }
+}
+
+fun r(d: Double) = java.lang.String.format("%.4g", d)
+fun pt(pt: Point2D) = java.lang.String.format("(%s, %s)", r(pt.x), r(pt.y))
+fun pt(pt: Point3D) = java.lang.String.format("(%s, %s)", r(pt.x), r(pt.y))
+
+fun dump(node: Node) {
+  with(node) {
+    println("rotation ${r(rotate)} axis ${pt(rotationAxis)}")
+    println("scale ${r(scaleX)} x ${r(scaleY)}")
+    println("translate ${r(translateX)} x ${r(translateY)}")
+    println("layout ${r(layoutX)} x ${r(layoutY)}")
+
+    printBounds("local", boundsInLocal)
+    printBounds("parent", boundsInParent)
+    printBounds("layout", layoutBounds)
+    if (clip != null) {
+      printBounds("clip", clip.boundsInLocal)
+    }
+
+    println("computeAreaInScreen: ${r(computeAreaInScreen())}")
+    println("localToParent: ${pt(localToParent(0.0, 0.0))} ${pt(localToParent(1.0, 1.0))}")
+    println("localToScene: ${pt(localToScene(0.0, 0.0))} ${pt(localToScene(1.0, 1.0))}")
+    println("localToScreen: ${pt(localToScreen(0.0, 0.0))} ${pt(localToScreen(1.0, 1.0))}")
+    println("isManaged: ${isManaged}, isVisible: ${isVisible}, viewOrder: ${r(viewOrder)}")
+  }
+  if (node is Region) _dump(node)
+  if (node is Shape) _dump(node)
+  println()
+  println()
+}
+
+private fun _dump(region: Region) {
+  with(region) {
+    println("dims ${r(width)} x ${r(height)}")
+    println("min dims ${r(minWidth)} x ${r(minHeight)}")
+    println("max dims ${r(maxWidth)} x ${r(maxHeight)}")
+    println("pref dims ${r(prefWidth)} x ${r(prefHeight)}")
+    println("shape = $shape")
+    println("scaleShape = ${scaleShapeProperty().get()}, centerShape = ${centerShapeProperty().get()}")
+  }
+}
+
+private fun _dump(shape: Shape) {
+  with(shape) {
+    println("fill $fill")
+    println("smooth ${smoothProperty().get()}")
+    println("stroke $stroke type $strokeType width ${r(strokeWidth)}")
+  }
+  if (shape is Polygon) _dump(shape)
+}
+
+private fun _dump(polygon: Polygon) {
+  println("points ${polygon.points}")
 }
 
 fun Color.opacityFactor(factor: Double) = this.deriveColor(0.0, 1.0, 1.0, factor)
