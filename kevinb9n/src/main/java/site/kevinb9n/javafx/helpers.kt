@@ -2,9 +2,11 @@ package site.kevinb9n.javafx
 
 import javafx.beans.Observable
 import javafx.beans.binding.Bindings
+import javafx.beans.binding.Bindings.min
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.embed.swing.SwingFXUtils
@@ -18,15 +20,19 @@ import javafx.scene.Node
 import javafx.scene.SnapshotParameters
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.input.MouseEvent
+import javafx.scene.layout.Pane
 import javafx.scene.layout.Region
+import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
+import javafx.scene.shape.Rectangle
 import javafx.scene.shape.Shape
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
+
 
 data class Point(val x: Double, val y: Double) {
   constructor(x: Number, y: Number) : this(x.toDouble(), y.toDouble())
@@ -171,7 +177,11 @@ fun pt(pt: Point2D) = java.lang.String.format("(%s, %s)", r(pt.x), r(pt.y))
 fun pt(pt: Point3D) = java.lang.String.format("(%s, %s)", r(pt.x), r(pt.y))
 
 fun dump(node: Node) {
+  println()
   with(node) {
+    println("node $id")
+    println("type ${javaClass.simpleName}")
+
     println("rotation ${r(rotate)} axis ${pt(rotationAxis)}")
     println("scale ${r(scaleX)} x ${r(scaleY)}")
     println("translate ${r(translateX)} x ${r(translateY)}")
@@ -192,7 +202,6 @@ fun dump(node: Node) {
   }
   if (node is Region) _dump(node)
   if (node is Shape) _dump(node)
-  println()
   println()
 }
 
@@ -221,3 +230,33 @@ private fun _dump(polygon: Polygon) {
 }
 
 fun Color.opacityFactor(factor: Double) = this.deriveColor(0.0, 1.0, 1.0, factor)
+
+fun createScalePane(region: Region): StackPane {
+  require(region.parent == null)
+  require(region.prefWidth != Region.USE_COMPUTED_SIZE)
+  require(region.prefHeight != Region.USE_COMPUTED_SIZE)
+
+  val scaleBothProperty = SimpleDoubleProperty()
+  val group = Group(region).apply {
+    scaleXProperty().bind(scaleBothProperty)
+    scaleYProperty().bind(scaleBothProperty)
+  }
+
+  return StackPane(group).apply {
+    prefWidthProperty().bind(region.prefWidthProperty())
+    prefHeightProperty().bind(region.prefHeightProperty())
+    scaleBothProperty.bind(min(
+      widthProperty().divide(region.prefWidthProperty()),
+      heightProperty().divide(region.prefHeightProperty())))
+  }
+}
+
+fun makeItClipNormally(pane: Pane) {
+  val outputClip = Rectangle()
+  pane.setClip(outputClip)
+
+  pane.layoutBoundsProperty().addListener { ov, oldValue, newValue ->
+    outputClip.width = newValue.getWidth()
+    outputClip.height = newValue.getHeight()
+  }
+}

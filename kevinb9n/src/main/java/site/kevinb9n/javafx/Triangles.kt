@@ -11,9 +11,8 @@ import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.value.ObservableNumberValue
 import javafx.collections.FXCollections
 import javafx.geometry.BoundingBox
-import javafx.geometry.Bounds
-import javafx.geometry.Pos
 import javafx.scene.Group
+import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -21,13 +20,12 @@ import javafx.scene.control.Slider
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.Background
 import javafx.scene.layout.BorderPane
-import javafx.scene.layout.StackPane
+import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
 import javafx.scene.shape.StrokeLineJoin
 import javafx.stage.Stage
-import kotlin.math.min
 import kotlin.math.roundToInt
 
 fun main() = Application.launch(Triangles::class.java)
@@ -117,7 +115,7 @@ class Triangles : Application() {
 
     val strokeColor = toStrokeColor(color)
 
-    val thePolygons = (0..MAX_SHAPE_INDEX).map { shapeIndex ->
+    val shapeList = (0..MAX_SHAPE_INDEX).map { shapeIndex ->
       shapeType.centeredPolygon(MAX_SHAPE_INDEX - shapeIndex, shapeIndex).apply {
         visibleProperty().bind(shapeVisibleProperty(countControl.valueProperty, shapeIndex))
         stroke = strokeColor
@@ -138,59 +136,68 @@ class Triangles : Application() {
 
         val angleOffset = shapeIndex.toDouble() / MAX_SHAPE_INDEX - 0.5
         rotateProperty().bind(incrRotControl.valueProperty.multiply(angleOffset))
+
+        id = "Shape " + shapeIndex
       }
     }
 
-    val rotater = Group()
-    rotater.children += thePolygons
-    rotater.rotateProperty().bind(overallRotControl.valueProperty)
+    val rotator = Group().apply {
+      children += shapeList
+      rotateProperty().bind(overallRotControl.valueProperty)
+      id = "rotator"
+    }
 
+    val cropper = Pane(rotator).apply {
+      id = "cropper"
+      val boundsProp = rotator.boundsInParentProperty()
+//      translateXProperty().bindDouble(boundsProp) { -rotator.boundsInParent.minX }
+//      translateYProperty().bindDouble(boundsProp) { -rotator.boundsInParent.minY }
+      prefWidthProperty().bindDouble(boundsProp) { rotator.boundsInParent.width }
+      prefHeightProperty().bindDouble(boundsProp) { rotator.boundsInParent.height }
+      // makeItClipNormally(this)
+    }
 
-    val scaler = StackPane(rotater)
-    StackPane.setAlignment(scaler, Pos.CENTER)
-
-    val mainArea = StackPane(scaler).apply {
+    val scaler = createScalePane(cropper).apply {
       background = Background.fill(BACKGROUND)
-      StackPane.setAlignment(this, Pos.CENTER)
-      // clip =
+      id = "scaler"
     }
+    makeItClipNormally(scaler)
 
-    val sceneRoot = BorderPane().apply {
-      center = mainArea
+    val root = BorderPane().apply {
+      center = scaler
       right = controlPanel
+      controlPanel.viewOrder = 1.0 // ???
+      id = "root"
     }
 
-    val autoScaleProp = SimpleDoubleProperty(1.0)
-    scaler.scaleXProperty().bind(autoScaleProp)
-    scaler.scaleYProperty().bind(autoScaleProp)
-    autoScaleProp.bindDouble(scaler.boundsInLocalProperty(), mainArea.widthProperty(), mainArea.heightProperty()) {
-      scaleToFit(scaler.boundsInLocal, mainArea.width, mainArea.height)
+//    scaler.translateXProperty().bindDouble(rotater.boundsInParentProperty(), mainArea.boundsInParentProperty()) {
+//      mainArea.boundsInParent.centerX - rotater.boundsInParent.centerX
+//    }
+//    scaler.translateYProperty().bindDouble(rotater.boundsInParentProperty(), mainArea.boundsInParentProperty()) {
+//      mainArea.boundsInParent.centerY - rotater.boundsInParent.centerY
+//    }
+
+
+//    val autoScaleProp = SimpleDoubleProperty(1.0)
+//    scaler.scaleXProperty().bind(autoScaleProp)
+//    scaler.scaleYProperty().bind(autoScaleProp)
+//    autoScaleProp.bindDouble(rotater.boundsInParentProperty(), mainArea.boundsInLocalProperty()) {
+//       scaleToFit(rotater.boundsInParentProperty().get(), mainArea.boundsInLocalProperty().get())
+//    }
+//
+//    controlPanel.children += Label().also {
+//      it.textProperty().bind(format("Zoom = %.2f", autoScaleProp))
+//    }
+
+    val node: Node = shapeList[MAX_SHAPE_INDEX / 4]
+    controlPanel.children += generateSequence(node) { it.parent }.map {
+      Button(it.id ?: it.javaClass.simpleName).apply { setOnAction { _ -> dump(it) } }
     }
 
-    controlPanel.children += Label().also {
-      it.textProperty().bind(format("Zoom = %.2f", autoScaleProp))
-    }
-    controlPanel.children += Button("Shape").apply {
-      setOnAction() { _ -> dump(thePolygons[MAX_SHAPE_INDEX / 4]) }
-    }
-    controlPanel.children += Button("Rotater").apply {
-      setOnAction() { _ -> dump(rotater) }
-    }
-    controlPanel.children += Button("Scaler").apply {
-      setOnAction() { _ -> dump(scaler) }
-    }
-    controlPanel.children += Button("Main area").apply {
-      setOnAction() { _ -> dump(mainArea) }
-    }
-    controlPanel.children += Button("Scene root").apply {
-      setOnAction() { _ -> dump(sceneRoot) }
-    }
-
-    val scene = Scene(sceneRoot, WIN_WIDTH.toDouble(), WIN_HEIGHT.toDouble())
+    val scene = Scene(root, WIN_WIDTH.toDouble(), WIN_HEIGHT.toDouble())
 
     stage.scene = scene
     stage.show()
-    // renderToPngFile(pretty, "/Users/kevinb9n/triangles.png")
   }
 
   private fun selectableCounts() = factors(MAX_SHAPE_INDEX)
@@ -204,10 +211,6 @@ class Triangles : Application() {
   fun toStrokeColor(color: Color) =
     color.deriveColor(0.0, 10.0, 0.4, 200.0).opacityFactor(0.66)
 
-}
-
-fun scaleToFit(bound: Bounds, width: Double, height: Double): Double {
-  return min((width - 2 * MARGIN) / bound.width, (height - 2 * MARGIN) / bound.height)
 }
 
 fun findBestRotation(polygons: List<Polygon>): Double {
