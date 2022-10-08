@@ -14,6 +14,7 @@ import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import site.kevinb9n.plane.Point
 
 fun main() = Application.launch(AffineExplorer::class.java)
 

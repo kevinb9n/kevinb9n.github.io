@@ -8,6 +8,7 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Rectangle
 import javafx.stage.Stage
+import site.kevinb9n.plane.Point
 
 fun main() = Application.launch(MyDraggableStuff::class.java)
 

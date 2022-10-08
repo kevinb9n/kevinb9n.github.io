@@ -27,6 +27,7 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
 import javafx.scene.shape.Rectangle
 import javafx.scene.shape.Shape
+import site.kevinb9n.plane.Point
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
@@ -34,16 +35,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-data class Point(val x: Double, val y: Double) {
-  constructor(x: Number, y: Number) : this(x.toDouble(), y.toDouble())
-
-  fun translate(distance: Number, degrees: Number): Point {
-    val radians = Math.toRadians(degrees.toDouble())
-    return Point(
-      x + distance.toDouble() * cos(radians),
-      y + distance.toDouble() * sin(radians))
-  }
-}
 
 fun pointsToPolygon(vararg points: Point): Polygon {
   val p = Polygon()

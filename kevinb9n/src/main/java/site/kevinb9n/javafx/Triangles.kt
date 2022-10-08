@@ -26,6 +26,7 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
 import javafx.scene.shape.StrokeLineJoin
 import javafx.stage.Stage
+import site.kevinb9n.plane.Point
 import kotlin.math.roundToInt
 
 fun main() = Application.launch(Triangles::class.java)
