@@ -1,49 +1,37 @@
 package site.kevinb9n.plane
 
-import site.kevinb9n.plane.Angle.Companion.cos
-import site.kevinb9n.plane.Angle.Companion.fromRadians
-import site.kevinb9n.plane.Angle.Companion.sin
-import kotlin.math.acos
-import kotlin.math.hypot
+interface Vector {
+  val x: Double
+  val y: Double
 
-data class Vector(val x: Double, val y: Double) {
-  constructor(x: Number, y: Number) : this(x.toDouble(), y.toDouble())
+  val magnitude: Double
+  val direction: Angle
 
-  fun magnitude() = hypot(x, y)
+  fun unitVector(): Vector
+  fun rotate(a: Angle) = PolarVector(magnitude, direction + a)
 
-  fun direction(): Angle {
-    val unitVector = unitVector()
-    val sign = if (unitVector.y > 0.0) 1 else -1
-    return fromRadians(sign * acos(unitVector.x)).also {
-      assert(closeEnough(cos(it), unitVector.x)) { "${cos(it)} != ${unitVector.x}" }
-      assert(closeEnough(sin(it), unitVector.y)) { "${sin(it)} != ${unitVector.y}" }
-    }
-  }
+  operator fun unaryMinus(): Vector = this * -1.0
 
-  fun unitVector() = (this / magnitude()).also { it.checkMagnitudeIs(1.0) }
+  operator fun plus(other: Vector): Vector = CartesianVector(x + other.x, y + other.y)
 
-  fun checkMagnitudeIs(mag: Double) = assert(closeEnough(magnitude(), mag)) { magnitude() }
+  operator fun plus(p: Point) = Point(x + p.x, y + p.y)
 
-  fun rotate(a: Angle) = from(magnitude(), direction() + a)
+  operator fun minus(other: Vector): Vector = this + -other
 
-  operator fun unaryMinus() = this * -1
+  operator fun times(scalar: Number): Vector
 
-  operator fun plus(other: Vector) = Vector(x + other.x, y + other.y)
-  operator fun plus(p: Point) = p + this
-
-  operator fun minus(other: Vector) = this + -other
-
-  operator fun times(scalar: Number) = Vector(x * scalar.toDouble(), y * scalar.toDouble())
+  operator fun div(scalar: Number): Vector
 
   /** dot product */
-  fun dot(other: Vector) = x * other.x + y * other.y
-  fun crossMag(other: Vector) = x * other.y - y * other.x
-
-  operator fun div(scalar: Number) = Vector(x / scalar.toDouble(), y / scalar.toDouble())
+  fun dot(other: Vector): Double
+  fun crossMag(other: Vector): Double
+  fun isLeftTurn(other: Vector): Boolean
+  fun collinear(other: Vector): Boolean
+  fun isHorizontal(): Boolean
+  fun angleWith(other: Vector) = other.direction - direction
 
   companion object {
-    val ZERO = Vector(0, 0)
+    val ZERO = CartesianVector(0, 0)
     operator fun Number.times(v: Vector) = v * this
-    fun from(magnitude: Number, angle: Angle) = magnitude * angle.unitVector()
   }
 }

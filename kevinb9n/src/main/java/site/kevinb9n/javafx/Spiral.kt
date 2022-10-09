@@ -10,7 +10,8 @@ import javafx.scene.shape.StrokeLineCap
 import javafx.stage.Stage
 import site.kevinb9n.plane.Angle
 import site.kevinb9n.plane.Point
-import site.kevinb9n.plane.Vector
+import site.kevinb9n.plane.CartesianVector
+import site.kevinb9n.plane.PolarVector
 
 const val WIDTH = 2400.0
 const val HEIGHT = 1350.0
@@ -52,7 +53,7 @@ class Spiral : Application() {
     var next = Point(WIDTH / 2, HEIGHT / 2)
     for (i in 0 until SEGMENTS) {
       points += next
-      next = next + Vector.from(length, Angle.fromDegrees(heading))
+      next = next + PolarVector(length, Angle.fromDegrees(heading))
       heading = (heading + ANGLE) % 360
       length *= RATIO
     }

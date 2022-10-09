@@ -2,7 +2,6 @@ package site.kevinb9n.plane
 
 import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.acos
 import kotlin.math.cos
 import kotlin.math.round
 import kotlin.math.sin
@@ -13,7 +12,7 @@ data class Angle(private val seconds: Double) {
   val turns = degrees / 360.0
   val radians = turns * 2.0 * PI
 
-  fun unitVector() = Vector(cos(this), sin(this))
+  fun unitVector() = CartesianVector(cos(this), sin(this))
 
   /** Returns this angle expressed in the range [-HALF_TURN, HALF_TURN) */
   fun normalize() = seconds.modWithMininum(TURN.seconds, -HALF_TURN.seconds)
