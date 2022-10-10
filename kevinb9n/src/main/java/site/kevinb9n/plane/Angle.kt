@@ -15,16 +15,17 @@ data class Angle(private val seconds: Double) {
   fun unitVector() = CartesianVector(cos(this), sin(this))
 
   /** Returns this angle expressed in the range [-HALF_TURN, HALF_TURN) */
-  fun normalize() = seconds.modWithMininum(TURN.seconds, -HALF_TURN.seconds)
+  fun normalize() = (this + HALF_TURN) % TURN - HALF_TURN
 
   /** Returns this angle expressed in the range [0, TURN) */
-  fun normalizeUnsigned() = fromSeconds(seconds % TURN.seconds)
+  fun normalizeUnsigned() = this % TURN
 
   operator fun unaryMinus() = fromSeconds(-seconds)
   operator fun plus(other: Angle) = fromSeconds(seconds + other.seconds)
   operator fun minus(other: Angle) = this + -other
   operator fun times(scalar: Number) = fromSeconds(seconds * scalar.toDouble())
   operator fun div(scalar: Number) = fromSeconds(seconds / scalar.toDouble())
+  operator fun rem(angle: Angle) = fromSeconds(seconds.mod(angle.seconds))
 
   companion object {
     val ZERO = fromSeconds(0.0)
@@ -32,7 +33,7 @@ data class Angle(private val seconds: Double) {
     fun fromSeconds(s: Number) = Angle(fixNearInteger(s.toDouble(), 1e-9))
     fun fromMinutes(m: Number) = fromSeconds(m.toDouble() * 60.0)
     fun fromDegrees(d: Number) = fromMinutes(d.toDouble() * 60.0)
-    fun fromTurns  (t: Number) = fromDegrees(t.toDouble() * 360.0)
+    fun fromTurns(t: Number) = fromDegrees(t.toDouble() * 360.0)
 
     fun fromRadians(r: Number): Angle {
       val candidate = fromTurns(r.toDouble() / 2.0 / PI)
@@ -46,6 +47,5 @@ data class Angle(private val seconds: Double) {
     fun sin(a: Angle) = sin(a.radians)
     fun cos(a: Angle) = cos(a.radians)
     fun tan(a: Angle) = tan(a.radians)
-
   }
 }

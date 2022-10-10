@@ -4,4 +4,5 @@ package site.kevinb9n.plane
 // Allowed to have zero area
 interface ClosedShape: Object2D {
   fun area(): Number
+  fun similar(other: ClosedShape): Boolean
 }

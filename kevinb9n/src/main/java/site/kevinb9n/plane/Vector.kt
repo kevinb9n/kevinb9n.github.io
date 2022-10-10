@@ -6,6 +6,7 @@ interface Vector {
 
   val magnitude: Double
   val direction: Angle
+  val slope: Double
 
   fun unitVector(): Vector
   fun rotate(a: Angle) = PolarVector(magnitude, direction + a)
@@ -33,5 +34,7 @@ interface Vector {
   companion object {
     val ZERO = CartesianVector(0, 0)
     operator fun Number.times(v: Vector) = v * this
+
+    fun mean(vararg vectors: Vector) = vectors.reduce(Vector::plus) / vectors.size
   }
 }

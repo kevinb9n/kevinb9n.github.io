@@ -12,13 +12,14 @@ data class CartesianVector(override val x: Double, override val y: Double) : Vec
   override val magnitude = hypot(x, y)
 
   override val direction: Angle get() {
-    val unitVector = unitVector()
+    val unitVector = unitVector() // or use atan to avoid this?
     val sign = if (unitVector.y > 0.0) 1 else -1
     return fromRadians(sign * acos(unitVector.x)).also {
       assert(closeEnough(cos(it), unitVector.x)) { "${cos(it)} != ${unitVector.x}" }
       assert(closeEnough(sin(it), unitVector.y)) { "${sin(it)} != ${unitVector.y}" }
     }
   }
+  override val slope = y / x
 
   override fun unitVector() = (this / magnitude).also { it.checkMagnitudeIs(1.0) }
 
@@ -43,4 +44,5 @@ data class CartesianVector(override val x: Double, override val y: Double) : Vec
   override operator fun div(scalar: Number) = CartesianVector(x / scalar.toDouble(), y / scalar.toDouble())
 
   override fun isHorizontal() = y == 0.0
+  override fun equals(other: Any?) = other is Vector && x == other.x && y == other.y
 }

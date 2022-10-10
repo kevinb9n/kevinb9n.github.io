@@ -46,4 +46,16 @@ class TriangleTest {
     assertThat(triangle(g, e, f)).isEqualTo(tri)
     assertThat(triangle(g, f, e)).isEqualTo(tri)
   }
+
+  @Test
+  fun testCentroid() {
+    val t = triangle(CartesianVector(12, 0), CartesianVector(0, 9))
+    assertThat(t.leg1).isEqualTo(CartesianVector(12, 0))
+    assertThat(t.leg2).isEqualTo(CartesianVector(0, 9))
+    assertThat(t.leg3).isEqualTo(CartesianVector(-12, -9))
+    assertThat(t.centroid()).isEqualTo(CartesianVector(8.0, 3.0))
+
+    val t2 = triangle(Point(-45, -26), Point(45, -26), Point(0, 52))
+    assertThat(t2.centroid()).isEqualTo(CartesianVector(45.041650474527216, 25.985567581458014))
+  }
 }

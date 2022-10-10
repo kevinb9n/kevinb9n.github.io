@@ -54,7 +54,7 @@ class Spiral : Application() {
     for (i in 0 until SEGMENTS) {
       points += next
       next = next + PolarVector(length, Angle.fromDegrees(heading))
-      heading = (heading + ANGLE) % 360
+      heading = (heading + ANGLE).mod(360.0)
       length *= RATIO
     }
 

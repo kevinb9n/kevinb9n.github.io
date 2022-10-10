@@ -51,4 +51,12 @@ class PointVectorTest {
     assertThat(Point(1, 2).distance(Point(1, 2))).isEqualTo(0.0)
     assertThat(Point(1, 2).distance(Point(4, 6))).isEqualTo(5.0)
   }
+
+  @Test fun stuff() {
+    assertThat(0.0.mod(5.0)).isEqualTo(0.0)
+    assertThat(1.0.mod(5.0)).isEqualTo(1.0)
+    assertThat(4.999.mod(5.0)).isEqualTo(4.999)
+    assertThat(5.0.mod(5.0)).isEqualTo(0.0)
+    assertThat((-4.0).mod(5.0)).isEqualTo(1.0)
+  }
 }
