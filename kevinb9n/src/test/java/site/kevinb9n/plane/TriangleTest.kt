@@ -61,7 +61,7 @@ class TriangleTest {
 
   @Test
   fun testCC() {
-    assertThat(enclose(Point(8, 6), Point(7, 5), Point(3, 9))).isEqualTo(
+    assertThat(threePointCircle(Point(8, 6), Point(7, 5), Point(3, 9))).isEqualTo(
       Circle(Point(5.5, 7.5), 2.9154759474226504))
   }
 }

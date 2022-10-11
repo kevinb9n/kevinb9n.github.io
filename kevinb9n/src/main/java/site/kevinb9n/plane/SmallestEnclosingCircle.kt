@@ -9,7 +9,7 @@ fun enclose(a: Point, b: Point): Circle {
   return Circle(a + halfway, halfway.magnitude)
 }
 
-fun enclose(a: Point, b: Point, c: Point): Circle {
+fun threePointCircle(a: Point, b: Point, c: Point): Circle? {
   val bmc = b - c
   val amb = a - b
   val cma = c - a
@@ -17,20 +17,21 @@ fun enclose(a: Point, b: Point, c: Point): Circle {
   val o = Point(
     mean(minOf(a.x, b.x, c.x), maxOf(a.x, b.x, c.x)),
     mean(minOf(a.y, b.y, c.y), maxOf(a.y, b.y, c.y)))
-  val ao = a - o
-  val bo = b - o
-  val co = c - o
-
-  val d = 2 * (ao.x * bmc.y + bo.x * cma.y + co.x * amb.y)
-  val x = (ao.magsq * bmc.y + bo.magsq * cma.y + co.magsq * amb.y) / d
-  val y = (ao.magsq * bmc.x + bo.magsq * cma.x + co.magsq * amb.x) / -d
+  val amo = a - o
+  val bmo = b - o
+  val cmo = c - o
+  // +- -+ +-
+  val d = 2 * (amo.x * bmc.y + bmo.x * cma.y + cmo.x * amb.y)
+  if (d == 0.0) return null
+  val x = (amo.magsq * bmc.y + bmo.magsq * cma.y + cmo.magsq * amb.y) / d
+  val y = (amo.magsq * bmc.x + bmo.magsq * cma.x + cmo.magsq * amb.x) / -d
   with(o + CartesianVector(x, y)) {
     return Circle(this, maxOf(distance(a), distance(b), distance(c)))
   }
 }
 
-fun enclose(a: Point, b: Point, c: Point, d: Point, vararg rest: Point) =
-  enclose(listOf(a, b, c, d) + rest.toList())
+fun enclose(a: Point, b: Point, c: Point, vararg rest: Point) =
+  enclose(listOf(a, b, c) + rest.toList())
 
 fun enclose(points: List<Point>): Circle {
   require(points.isNotEmpty())
@@ -62,7 +63,7 @@ private fun makeCircleTwoPoints(newPoint1: Point, newPoint2: Point, oldPoints: L
   var right: Circle? = null
 
   for (nextPoint in oldPoints.filter { it !in circle }) {
-    val candidate = enclose(newPoint1, newPoint2, nextPoint)
+    val candidate = threePointCircle(newPoint1, newPoint2, nextPoint) ?: continue
     val cross = vector.crossMag(nextPoint - newPoint1)
     if (cross > 0 && (shouldReplace(vector, candidate, newPoint1, left))) {
       left = candidate
