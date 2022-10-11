@@ -9,6 +9,7 @@ data class Point(val x: Double, val y: Double) {
   operator fun minus(v: Vector): Point = this + -v
 
   fun distance(other: Point) = (this - other).magnitude
+  fun midpoint(pt2: Point) = this + (pt2 - this) / 2.0
 
   companion object {
     val ORIGIN = Point(0, 0)

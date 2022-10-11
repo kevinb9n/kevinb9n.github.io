@@ -8,6 +8,7 @@ import site.kevinb9n.plane.Angle.Companion.tan
 data class PolarVector(override val magnitude: Double, override val direction: Angle) : Vector {
   override val x = magnitude * cos(direction)
   override val y = magnitude * sin(direction)
+  override val magsq = magnitude * magnitude
   override val slope = tan(direction)
 
   override fun unitVector() = PolarVector(1.0, direction)

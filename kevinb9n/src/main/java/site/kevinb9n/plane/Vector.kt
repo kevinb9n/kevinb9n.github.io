@@ -5,6 +5,7 @@ interface Vector {
   val y: Double
 
   val magnitude: Double
+  val magsq: Double
   val direction: Angle
   val slope: Double
 

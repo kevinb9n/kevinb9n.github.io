@@ -10,6 +10,7 @@ data class CartesianVector(override val x: Double, override val y: Double) : Vec
   constructor(x: Number, y: Number) : this(x.toDouble(), y.toDouble())
 
   override val magnitude = hypot(x, y)
+  override val magsq = x * x + y * y
 
   override val direction: Angle get() {
     val unitVector = unitVector() // or use atan to avoid this?

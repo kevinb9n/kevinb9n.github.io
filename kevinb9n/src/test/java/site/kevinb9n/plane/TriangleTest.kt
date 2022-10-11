@@ -58,4 +58,10 @@ class TriangleTest {
     val t2 = triangle(Point(-45, -26), Point(45, -26), Point(0, 52))
     assertThat(t2.centroid()).isEqualTo(CartesianVector(45.041650474527216, 25.985567581458014))
   }
+
+  @Test
+  fun testCC() {
+    assertThat(enclose(Point(8, 6), Point(7, 5), Point(3, 9))).isEqualTo(
+      Circle(Point(5.5, 7.5), 2.9154759474226504))
+  }
 }

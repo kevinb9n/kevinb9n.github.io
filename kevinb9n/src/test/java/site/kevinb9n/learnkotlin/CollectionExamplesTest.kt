@@ -23,13 +23,19 @@ class CollectionExamplesTest {
     c.apply { forEach(::println) } as List<Int>
     c.asIterable() as Iterable<Int>
     c.asSequence() as Sequence<Int>
+
+    // key expr "to" val expr
     c.associate(transform = { "foo $it" to it + 0.1 }) as Map<String, Double>
-    c.associateBy(keySelector = { "foo $it" }) as Map<String, Int> // last wins
     c.associateBy(keySelector = { "foo $it" }, valueTransform = { it + 0.1 }) as Map<String, Double>
-    c.associateByTo(destination = mutableMapOf(), keySelector = { "foo $it" }) as MutableMap<String, Int>
-    c.associateByTo(destination = mutableMapOf(), keySelector = { "foo $it" }, valueTransform = { it + 0.1 }) as MutableMap<String, Double>
-    c.associateTo(destination = mutableMapOf(), transform = { "foo $it" to it + 0.1 }) as MutableMap<String, Double>
+
+    // key expr to actual value, last wins
+    c.associateBy(keySelector = { "foo $it" }) as Map<String, Int>
+    // actual key to value expr
     c.associateWith(valueSelector = { it + 0.1 }) as Map<Int, Double>
+
+    c.associateTo(destination = mutableMapOf(), transform = { "foo $it" to it + 0.1 }) as MutableMap<String, Double>
+    c.associateByTo(destination = mutableMapOf(), keySelector = { "foo $it" }, valueTransform = { it + 0.1 }) as MutableMap<String, Double>
+    c.associateByTo(destination = mutableMapOf(), keySelector = { "foo $it" }) as MutableMap<String, Int>
     c.associateWithTo(destination = mutableMapOf(), valueSelector = { it + 0.1 }) as MutableMap<Int, Double>
     c.average() as Double // numeric types only
     c.chunked(size = 5) as List<List<Int>>
@@ -57,6 +63,7 @@ class CollectionExamplesTest {
     c.isNotEmpty() as Boolean // same as any()
     c.plus(5)
     c.plusElement(5)
+
 
   }
 }
