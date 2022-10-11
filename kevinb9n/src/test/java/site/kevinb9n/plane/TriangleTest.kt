@@ -3,6 +3,7 @@ package site.kevinb9n.plane
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
 import site.kevinb9n.plane.Triangle.Companion.triangle
+import site.kevinb9n.plane.Vector.Companion.vector
 
 class TriangleTest {
   @Test
@@ -26,9 +27,9 @@ class TriangleTest {
     assertThat(triangle(d, a, b)).isEqualTo(tri2)
     assertThat(triangle(d, b, a)).isEqualTo(tri2)
 
-    val v1 = CartesianVector(-1, -1)
-    val v2 = CartesianVector(-4, 4)
-    val v3 = CartesianVector(5, -3)
+    val v1 = vector(-1, -1)
+    val v2 = vector(-4, 4)
+    val v3 = vector(5, -3)
     assertThat(triangle(v1, v2)).isEqualTo(tri)
     assertThat(triangle(v2, v3)).isEqualTo(tri)
     assertThat(triangle(v3, v1)).isEqualTo(tri)
@@ -49,14 +50,14 @@ class TriangleTest {
 
   @Test
   fun testCentroid() {
-    val t = triangle(CartesianVector(12, 0), CartesianVector(0, 9))
-    assertThat(t.leg1).isEqualTo(CartesianVector(12, 0))
-    assertThat(t.leg2).isEqualTo(CartesianVector(0, 9))
-    assertThat(t.leg3).isEqualTo(CartesianVector(-12, -9))
-    assertThat(t.centroid()).isEqualTo(CartesianVector(8.0, 3.0))
+    val t = triangle(vector(12, 0), vector(0, 9))
+    assertThat(t.leg1).isEqualTo(vector(12, 0))
+    assertThat(t.leg2).isEqualTo(vector(0, 9))
+    assertThat(t.leg3).isEqualTo(vector(-12, -9))
+    assertThat(t.centroid()).isEqualTo(vector(8.0, 3.0))
 
     val t2 = triangle(Point(-45, -26), Point(45, -26), Point(0, 52))
-    assertThat(t2.centroid()).isEqualTo(CartesianVector(45.041650474527216, 25.985567581458014))
+    assertThat(t2.centroid()).isEqualTo(vector(45.041650474527216, 25.985567581458014))
   }
 
   @Test

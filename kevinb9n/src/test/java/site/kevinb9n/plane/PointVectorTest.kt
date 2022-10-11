@@ -2,7 +2,9 @@ package site.kevinb9n.plane
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
+import site.kevinb9n.plane.Angle.Companion.degrees
 import site.kevinb9n.plane.Vector.Companion.times
+import site.kevinb9n.plane.Vector.Companion.vector
 import kotlin.math.sqrt
 
 class PointVectorTest {
@@ -33,18 +35,18 @@ class PointVectorTest {
   }
 
   @Test fun testDirection() {
-    assertThat(CartesianVector(-1, 0).direction).isEqualTo(Angle.fromDegrees(-180.0))
-    assertThat(CartesianVector(-1, -1).direction).isEqualTo(Angle.fromDegrees(-135.0))
-    assertThat(CartesianVector(0, -1).direction).isEqualTo(Angle.fromDegrees(-90.0))
-    assertThat(CartesianVector(1, -1).direction).isEqualTo(Angle.fromDegrees(-45.0))
-    assertThat(CartesianVector(1, 0).direction).isEqualTo(Angle.fromDegrees(0.0))
-    assertThat(CartesianVector(1, 1).direction).isEqualTo(Angle.fromDegrees(45.0))
-    assertThat(CartesianVector(0, 1).direction).isEqualTo(Angle.fromDegrees(90.0))
-    assertThat(CartesianVector(-1, 1).direction).isEqualTo(Angle.fromDegrees(135.0))
+    assertThat(CartesianVector(-1, 0).direction).isEqualTo(degrees(-180.0))
+    assertThat(CartesianVector(-1, -1).direction).isEqualTo(degrees(-135.0))
+    assertThat(CartesianVector(0, -1).direction).isEqualTo(degrees(-90.0))
+    assertThat(CartesianVector(1, -1).direction).isEqualTo(degrees(-45.0))
+    assertThat(CartesianVector(1, 0).direction).isEqualTo(degrees(0.0))
+    assertThat(CartesianVector(1, 1).direction).isEqualTo(degrees(45.0))
+    assertThat(CartesianVector(0, 1).direction).isEqualTo(degrees(90.0))
+    assertThat(CartesianVector(-1, 1).direction).isEqualTo(degrees(135.0))
 
-    assertThat(CartesianVector(1, 2 - sqrt(3.0)).direction).isEqualTo(Angle.fromDegrees(15.0))
-    assertThat(CartesianVector(1, sqrt(2.0) - 1.0).direction).isEqualTo(Angle.fromDegrees(22.5))
-    assertThat(CartesianVector(sqrt(3.0), 1.0).direction).isEqualTo(Angle.fromDegrees(30.0))
+    assertThat(CartesianVector(1, 2 - sqrt(3.0)).direction).isEqualTo(degrees(15.0))
+    assertThat(CartesianVector(1, sqrt(2.0) - 1.0).direction).isEqualTo(degrees(22.5))
+    assertThat(CartesianVector(sqrt(3.0), 1.0).direction).isEqualTo(degrees(30.0))
   }
 
   @Test fun testDistance() {
@@ -58,5 +60,34 @@ class PointVectorTest {
     assertThat(4.999.mod(5.0)).isEqualTo(4.999)
     assertThat(5.0.mod(5.0)).isEqualTo(0.0)
     assertThat((-4.0).mod(5.0)).isEqualTo(1.0)
+  }
+
+  @Test fun creation() {
+    val rad3 = sqrt(3.0)
+    val d60 = degrees(60.0)
+
+    val cv = vector(x=1.0, y=rad3)
+    assertThat(vector(x=1.0, y=rad3, magnitude=2.0, direction=d60)).isEqualTo(cv)
+    assertThat(vector(x=1.0, y=rad3, magnitude=2.0)).isEqualTo(cv)
+    assertThat(vector(x=1.0, y=rad3, direction=d60)).isEqualTo(cv)
+    assertThat(vector(x=1.0, magnitude=2.0, direction=d60)).isEqualTo(cv)
+    assertThat(vector(y=rad3, magnitude=2.0, direction=d60)).isEqualTo(cv)
+    assertThat(vector(x=1.0, magnitude=2.0)).isEqualTo(cv)
+    assertThat(vector(x=1.0, direction= d60)).isEqualTo(cv)
+    assertThat(vector(y=rad3, magnitude=2.0)).isEqualTo(cv)
+    assertThat(vector(y=rad3, direction= d60)).isEqualTo(cv)
+    assertThat(vector(magnitude=2.0, direction= d60)).isEqualTo(cv)
+
+    val pv = vector(magnitude = 2.0, direction = d60)
+    assertThat(vector(x=1.0, y=rad3, magnitude=2.0, direction=d60)).isEqualTo(pv)
+    assertThat(vector(x=1.0, y=rad3, magnitude=2.0)).isEqualTo(pv)
+    assertThat(vector(x=1.0, y=rad3, direction= d60)).isEqualTo(pv)
+    assertThat(vector(x=1.0, magnitude=2.0, direction= d60)).isEqualTo(pv)
+    assertThat(vector(y=rad3, magnitude=2.0, direction= d60)).isEqualTo(pv)
+    assertThat(vector(x=1.0, y=rad3)).isEqualTo(pv)
+    assertThat(vector(x=1.0, magnitude=2.0)).isEqualTo(pv)
+    assertThat(vector(x=1.0, direction= d60)).isEqualTo(pv)
+    assertThat(vector(y=rad3, magnitude=2.0)).isEqualTo(pv)
+    assertThat(vector(y=rad3, direction= d60)).isEqualTo(pv)
   }
 }

@@ -1,6 +1,7 @@
 package site.kevinb9n.plane
 
 import site.kevinb9n.javafx.mean
+import site.kevinb9n.plane.Vector.Companion.vector
 
 fun enclose(a: Point) = Circle(a, 0.0)
 
@@ -25,7 +26,7 @@ fun threePointCircle(a: Point, b: Point, c: Point): Circle? {
   if (d == 0.0) return null
   val x = (amo.magsq * bmc.y + bmo.magsq * cma.y + cmo.magsq * amb.y) / d
   val y = (amo.magsq * bmc.x + bmo.magsq * cma.x + cmo.magsq * amb.x) / -d
-  with(o + CartesianVector(x, y)) {
+  with(o + vector(x, y)) {
     return Circle(this, maxOf(distance(a), distance(b), distance(c)))
   }
 }

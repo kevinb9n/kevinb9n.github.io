@@ -1,5 +1,7 @@
 package site.kevinb9n.plane
 
+import site.kevinb9n.plane.Vector.Companion.vector
+
 // Goal is that == means congruent, and similar only has to check ratios
 // An ordered pair of vectors where the first vector is always at angle 0 and the
 // second always at angle 0-180 should do it
@@ -61,7 +63,7 @@ data class Triangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
     fun triangle(a: Vector, b: Vector): Triangle {
       if (a.collinear(b)) {
         val list = listOf(a.magnitude, b.magnitude, (a + b).magnitude).sorted()
-        return Triangle(CartesianVector(list[0], 0), CartesianVector(list[1], 0))
+        return Triangle(vector(list[0], 0), vector(list[1], 0))
       }
       val legs = if (a.isLeftTurn(b)) {
         listOf(a, b, -(a + b))
