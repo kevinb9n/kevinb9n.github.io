@@ -1,7 +1,7 @@
 package site.kevinb9n.plane.stuff
 
 import site.kevinb9n.plane.Point
-import site.kevinb9n.plane.PosCircle
+import site.kevinb9n.plane.Circle
 import site.kevinb9n.plane.Vector.Companion.vector
 import site.kevinb9n.plane.sumProduct
 import kotlin.math.max
@@ -27,8 +27,8 @@ import kotlin.math.max
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-fun makeCircle(points: List<Point>): PosCircle {
-  var c: PosCircle = makeCircleOnePoint(points.subList(0, 1), points[0])
+fun makeCircle(points: List<Point>): Circle {
+  var c: Circle = makeCircleOnePoint(points.subList(0, 1), points[0])
   for (i in 1 until points.size) {
     val p = points[i]
     if (p !in c) {
@@ -39,7 +39,7 @@ fun makeCircle(points: List<Point>): PosCircle {
 }
 
 // One boundary point known
-private fun makeCircleOnePoint(points: List<Point>, p: Point): PosCircle {
+private fun makeCircleOnePoint(points: List<Point>, p: Point): Circle {
   var c = makeDiameter(p, points[0])
 
   for (i in 1 until points.size) {
@@ -52,10 +52,10 @@ private fun makeCircleOnePoint(points: List<Point>, p: Point): PosCircle {
 }
 
 // Two boundary points known
-private fun makeCircleTwoPoints(points: List<Point>, p: Point, q: Point): PosCircle {
+private fun makeCircleTwoPoints(points: List<Point>, p: Point, q: Point): Circle {
   val pqCircle = makeDiameter(p, q)
-  var left: PosCircle? = null
-  var right: PosCircle? = null
+  var left: Circle? = null
+  var right: Circle? = null
 
   // For each point not in the two-point circle
   val vector = q - p
@@ -82,14 +82,14 @@ private fun makeCircleTwoPoints(points: List<Point>, p: Point, q: Point): PosCir
   }
 }
 
-fun makeDiameter(a: Point, b: Point): PosCircle {
+fun makeDiameter(a: Point, b: Point): Circle {
   val c = a.midpoint(b)
-  return PosCircle(c, max(c.distance(a), c.distance(b)))
+  return Circle(c, max(c.distance(a), c.distance(b)))
 }
 
 fun edges(points: List<Point>) = points.windowed(2).map { it[0] - it[1] }
 
-fun threePointCircle(a: Point, b: Point, c: Point): PosCircle? {
+fun threePointCircle(a: Point, b: Point, c: Point): Circle? {
   val points = listOf(a, b, c)
   val boxCenter = BoundingBox(points).midpoint
   val relToBoxCenter = points.map { it - boxCenter }
@@ -104,7 +104,7 @@ fun threePointCircle(a: Point, b: Point, c: Point): PosCircle? {
     sumProduct(relToBoxCenter.map { it.magsq }, edges.map { it.x }) / -denom,
   )
   val radius = listOf(a, b, c).maxOf { center.distance(it) }
-  return PosCircle(center, radius)
+  return Circle(center, radius)
 }
 
 data class BoundingBox private constructor(val min: Point, val max: Point) {

@@ -6,11 +6,11 @@ import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import site.kevinb9n.plane.Point
-import site.kevinb9n.plane.PosCircle
+import site.kevinb9n.plane.Circle
 import site.kevinb9n.plane.stuff.makeCircle
 import kotlin.math.roundToInt
 
-fun enclose(points: List<Point>): PosCircle {
+fun enclose(points: List<Point>): Circle {
   return makeCircle(points)
 }
 fun main() = Application.launch(EnclosingCircleDemo::class.java)
@@ -21,7 +21,7 @@ class EnclosingCircleDemo : Application() {
     val points = generateSequence { randomPoint() }.take(numPoints).toList()
     require(points.size == numPoints)
     println(points)
-    val enclosingCircle: PosCircle = enclose(points)
+    val enclosingCircle: Circle = enclose(points)
     println(enclosingCircle)
     val root = Pane()
     root.children += toJavafx(enclosingCircle).also {
@@ -32,12 +32,12 @@ class EnclosingCircleDemo : Application() {
     val edgePoints = points.filter { it.distance(enclosingCircle.center) >= enclosingCircle.radius - 1e-8 }
     root.children += edgePoints.map {
       val antipode = it + (enclosingCircle.center - it) * 2.0
-      toJavafx(PosCircle(antipode, 8.0)).also {
+      toJavafx(Circle(antipode, 8.0)).also {
         it.fill = Color.DARKGREEN
       }
     }
     root.children += points.map {
-      toJavafx(PosCircle(it, 8.0)).also {
+      toJavafx(Circle(it, 8.0)).also {
         it.fill = Color.DARKRED
       }
     }
@@ -48,7 +48,7 @@ class EnclosingCircleDemo : Application() {
     stage.show()
   }
 
-  private fun toJavafx(circle: PosCircle) = javafx.scene.shape.Circle(
+  private fun toJavafx(circle: Circle) = javafx.scene.shape.Circle(
     circle.center.x, circle.center.y, circle.radius)
 
   private fun randomPoint() = Point(200.0 + 600.0 * Math.random(), 200.0 + 600.0 * Math.random())

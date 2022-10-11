@@ -12,7 +12,7 @@ import site.kevinb9n.plane.Vector.Companion.vector
 // standardize rotation: leg1 should always be at angle 0, and leg2 at angle 0-180
 // and the largest angle is special, it's the only one that can be right or obtuse
 
-data class Triangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
+data class UnTriangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
   // the angle between leg1 and leg2 is not leg1.angleWith(leg2), but HALF_TURN - that.
   // should I rethink the representation??
   init {
@@ -32,7 +32,7 @@ data class Triangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
   val leg3 = -(leg1 + leg2)
 
   override fun similar(other: ClosedShape): Boolean {
-    return other is Triangle
+    return other is UnTriangle
       && closeEnough(leg2.direction.degrees, other.leg2.direction.degrees)
       && closeEnough(leg2.magnitude * other.leg1.magnitude, leg1.magnitude * other.leg2.magnitude)
   }
@@ -60,10 +60,10 @@ data class Triangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
 
   companion object {
     fun triangle(a: Point, b: Point, c: Point) = triangle(b - a, c - b)
-    fun triangle(a: Vector, b: Vector): Triangle {
+    fun triangle(a: Vector, b: Vector): UnTriangle {
       if (a.collinear(b)) {
         val list = listOf(a.magnitude, b.magnitude, (a + b).magnitude).sorted()
-        return Triangle(vector(list[0], 0), vector(list[1], 0))
+        return UnTriangle(vector(list[0], 0), vector(list[1], 0))
       }
       val legs = if (a.isLeftTurn(b)) {
         listOf(a, b, -(a + b))
@@ -74,7 +74,7 @@ data class Triangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
       val leg1 = cyclicGet(legs, longest + 1)
       val leg2 = cyclicGet(legs, longest + 2)
       val angle = -leg1.direction
-      return Triangle(leg1.rotate(angle), leg2.rotate(angle))
+      return UnTriangle(leg1.rotate(angle), leg2.rotate(angle))
     }
   }
 }

@@ -2,7 +2,7 @@ package site.kevinb9n.plane
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
-import site.kevinb9n.plane.Triangle.Companion.triangle
+import site.kevinb9n.plane.UnTriangle.Companion.triangle
 import site.kevinb9n.plane.Vector.Companion.vector
 
 class TriangleTest {
