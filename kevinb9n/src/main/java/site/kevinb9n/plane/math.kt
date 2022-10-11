@@ -17,3 +17,6 @@ fun fixNearInteger(d: Double, toler: Double): Double {
 fun distance(a: Double, b: Double) = abs(a - b)
 
 fun Double.modWithMinimum(modulus: Double, minimum: Double) = minimum + (this - minimum).mod(modulus)
+fun Int.modWithMinimum(modulus: Int, minimum: Int) = minimum + (this - minimum).mod(modulus)
+
+fun sumProduct(list1: List<Double>, list2: List<Double>) = list1.zip(list2) { a, b -> a * b }.sum()
