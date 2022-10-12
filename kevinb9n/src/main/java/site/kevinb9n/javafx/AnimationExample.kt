@@ -14,25 +14,26 @@ fun main() = Application.launch(AnimationExample::class.java)
 class AnimationExample : Application() {
   override fun start(stage: Stage) {
     val hexagon = Polygon()
-    hexagon.getPoints().addAll(arrayOf(
-      200.0, 50.0,
-      400.0, 50.0,
-      450.0, 150.0,
-      400.0, 250.0,
-      200.0, 250.0,
-      150.0, 150.0))
+    hexagon.points += arrayOf(
+      203.0, 150.0,
+      251.5, 66.0,
+      348.5, 66.0,
+      397.0, 150.0,
+      348.5, 234.0,
+      251.5, 234.0)
     hexagon.setFill(Color.BLUE)
-    val rotateTransition = RotateTransition()
-    rotateTransition.duration = Duration.millis(1000.0)
-    rotateTransition.node = hexagon
-    rotateTransition.byAngle = 360.0
-    rotateTransition.cycleCount = 50
-    rotateTransition.isAutoReverse = false
-    rotateTransition.play()
+
+    RotateTransition().apply {
+      duration = Duration.millis(10000.0)
+      node = hexagon
+      byAngle = 3600.0
+      cycleCount = 100
+      isAutoReverse = false
+      play()
+    }
     val root = Group(hexagon)
-    val scene = Scene(root, 600.0, 300.0)
     stage.title = "Rotate transition example"
-    stage.scene = scene
+    stage.scene = Scene(root, 600.0, 300.0)
     stage.show()
   }
 }

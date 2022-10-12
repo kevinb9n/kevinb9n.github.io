@@ -27,6 +27,7 @@ data class UnTriangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
       require(leg2.magnitude <= leg3mag)
     }
   }
+
   override fun area() = leg1.crossMag(leg2) / 2.0
 
   val leg3 = -(leg1 + leg2)
@@ -43,23 +44,23 @@ data class UnTriangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
 //   this is the vector from leg1's start point to the centroid
   fun centroid() = Vector.mean(leg1, leg1, leg2)
 
-  data class Segment(val point1: Point, val point2: Point) {
-    init {
-      require(point1 != point2)
-    }
-    fun intersection(other: Segment): Point {
-      require(slope != other.slope)
-      // formulas for line:  y - point1.y = m (x - point1.x)
-      return Point.ORIGIN
-    }
-    fun isVertical() = point1.x == point2.x
-    fun isHorizontal() = point1.y == point2.y
-
-    val slope: Double = (point2 - point1).slope
-  }
-
   companion object {
     fun triangle(a: Point, b: Point, c: Point) = triangle(b - a, c - b)
+    // counter clockwise order
+    fun triangle(aLen: Double, bLen: Double, cLen: Double): UnTriangle {
+      val list = listOf(aLen, bLen, cLen)
+      val max : Int = (0..2).maxByOrNull { list[it] }!!
+      val leg1 = cyclicGet(list, max - 2)
+      val leg2 = cyclicGet(list, max - 1)
+      val leg3 = cyclicGet(list, max)
+
+      assert(leg3 >= leg1)
+      assert(leg3 >= leg2)
+      require(leg1 + leg2 >= leg3)
+
+      val a = Angle.acos((leg1 * leg1 + leg2 * leg2 - leg3 * leg3) / (2 * leg1 * leg2))
+      return triangle(vector(leg1, 0), vector(magnitude = leg2, direction = Angle.HALF_TURN - a))
+    }
     fun triangle(a: Vector, b: Vector): UnTriangle {
       if (a.collinear(b)) {
         val list = listOf(a.magnitude, b.magnitude, (a + b).magnitude).sorted()
@@ -77,8 +78,4 @@ data class UnTriangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
       return UnTriangle(leg1.rotate(angle), leg2.rotate(angle))
     }
   }
-}
-
-fun <T> cyclicGet(list: List<T>, i: Int): T {
-  return list[i % list.size]
 }

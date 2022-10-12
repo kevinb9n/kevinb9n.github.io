@@ -47,14 +47,14 @@ fun main() {
 private fun roundToBinaryDecimalPlaces(result: Double) =
   Math.scalb(Math.rint(Math.scalb(result, 30)), -30)
 
-enum class Num(val value: Double) {
+private enum class Num(val value: Double) {
   a(1 + Math.random()),
   b(2 + Math.random()),
   c(3 + Math.random()),
   d(4 + Math.random())
 }
 
-enum class Combiner(val fmt: String) {
+private enum class Combiner(val fmt: String) {
   TREE("(%s %s %s) %s (%s %s %s)") {
     override fun combine(a: Num, b: Num, c: Num, d: Num, one: Op, two: Op, three: Op): Double {
       return two.op(one.op(a.value, b.value), three.op(c.value, d.value))
@@ -103,4 +103,4 @@ enum class Op(var s: String, var commutes: Boolean) {
   override fun toString() = s
 }
 
-data class Formula(val c: Combiner, val op1: Op, val op2: Op, val op3: Op)
+private data class Formula(val c: Combiner, val op1: Op, val op2: Op, val op3: Op)

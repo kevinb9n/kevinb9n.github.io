@@ -59,4 +59,12 @@ class TriangleTest {
     val t2 = triangle(Point(-45, -26), Point(45, -26), Point(0, 52))
     assertThat(t2.centroid()).isEqualTo(vector(45.04165047452724, 25.985567581458017))
   }
+
+  @Test
+  fun testFromSides() {
+    val t = triangle(8.0, 6.0, 7.0)
+    assertThat(t.leg1).isEqualTo(vector(6.0, 0.0))
+    assertThat(t.leg2.magnitude).isWithin(1e-14).of(7.0)
+    assertThat(t.leg3.magnitude).isWithin(1e-14).of(8.0)
+  }
 }

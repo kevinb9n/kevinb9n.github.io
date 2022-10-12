@@ -89,5 +89,4 @@ interface Vector {
   fun collinear(other: Vector): Boolean
   fun isHorizontal(): Boolean
   fun angleWith(other: Vector) = other.direction - direction
-
 }

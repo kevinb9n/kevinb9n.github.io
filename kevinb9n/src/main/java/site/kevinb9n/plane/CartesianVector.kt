@@ -38,4 +38,8 @@ Vector {
 
   override fun isHorizontal() = y == 0.0
   override fun equals(other: Any?) = other is Vector && closeEnough(x, other.x) && closeEnough(y, other.y)
+
+  override fun toString(): String {
+    return "CartesianVector(x=$x, y=$y, magnitude=$magnitude, direction=$direction)"
+  }
 }

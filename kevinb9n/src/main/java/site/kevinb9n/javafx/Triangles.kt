@@ -2,8 +2,6 @@ package site.kevinb9n.javafx
 
 import com.google.common.base.Stopwatch
 import javafx.application.Application
-import javafx.beans.Observable
-import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.format
 import javafx.beans.binding.IntegerBinding
 import javafx.beans.property.DoubleProperty
@@ -27,6 +25,7 @@ import javafx.scene.shape.Polygon
 import javafx.scene.shape.StrokeLineJoin
 import javafx.stage.Stage
 import site.kevinb9n.plane.Point
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 fun main() = Application.launch(Triangles::class.java)
@@ -92,23 +91,34 @@ class Triangles : Application() {
       controlPanel.children += it
     }
 
-    val xControl = SliderWithReadout(Slider(-7.0, 7.0, snapRandom(3.0)), "Translate X", 0.005, "%.2f", """
+    val incrXControl = SliderWithReadout(Slider(-7.0, 7.0, snapRandom(3.0)), "Translate X increment", 0.001, "%.2f", """
       First and last shapes are separated by this distance in the "X" direction, and intervening
       shapes are linearly interpolated. Unit is the max shape height/width.
     """).also { controlPanel.children += it }
 
-    val yControl = SliderWithReadout(Slider(-7.0, 7.0, snapRandom(3.0)), "Translate Y", 0.005, "%.2f", """
+    val incrYControl = SliderWithReadout(Slider(-7.0, 7.0, snapRandom(3.0)), "Translate Y increment", 0.001, "%.2f", """
       First and last shapes are separated by this distance in the "Y" direction, and intervening
       shapes are linearly interpolated. Unit is the max shape height/width.
     """).also { controlPanel.children += it }
 
-    val incrRotControl = SliderWithReadout(Slider(-180.0, 180.0, snapRandom(90)), "Rotation", 0.1, "%.0f", """
+    val incrRotControl = SliderWithReadout(Slider(-180.0, 180.0, snapRandom(90)), "Rotation increment", 0.02, "%.0f", """
       The last shape is rotated at this angle relative to the first shape, and intervening shapes
       are linearly interpolated.
     """).also { controlPanel.children += it }
 
+    val overallXControl = SliderWithReadout(Slider(0.0, 2000.0, 0.0),
+      "Overall Translate X", 1.0, "%.0f", "Horizontally position the diagram").also {
+      controlPanel.children += it }
+
+    val overallYControl = SliderWithReadout(Slider(0.0, 2000.0, 0.0),
+      "Overall Translate Y", 1.0, "%.0f", "Vertically position the diagram").also { controlPanel
+      .children += it }
+
     val overallRotControl = SliderWithReadout(Slider(-180.0, 180.0, snapRandom(180)),
-      "Overall rotation", 0.1, "%.0f", "Rotate the entire diagram").also { controlPanel.children += it }
+      "Overall rotation", 0.5, "%.0f", "Rotate the entire diagram").also { controlPanel.children += it }
+
+    val overallScaleControl = SliderWithReadout(Slider(0.0, 10.0, 1.0),
+      "Overall scale", 0.1, "%.2f", "Scale the entire diagram").also { controlPanel.children += it }
 
     val opacityControl = SliderWithReadout(Slider(0.2, 5.0, 1.7), "Opacity", 0.05, "%.1f", """
       You'll want to make the shapes more transparent when they are highly overlapping.
@@ -116,6 +126,7 @@ class Triangles : Application() {
 
     val strokeColor = toStrokeColor(color)
 
+    val rotator = Group()
     val shapeList = (0..MAX_SHAPE_INDEX).map { shapeIndex ->
       shapeType.centeredPolygon(MAX_SHAPE_INDEX - shapeIndex, shapeIndex).apply {
         visibleProperty().bind(shapeVisibleProperty(countControl.valueProperty, shapeIndex))
@@ -123,8 +134,10 @@ class Triangles : Application() {
         strokeWidth = STROKE_WIDTH
         strokeLineJoin = StrokeLineJoin.ROUND
 
-//        // Cancel the effects of scaling
-//        strokeWidthProperty().bind(Bindings.divide(STROKE_WIDTH, autoScaleProp))
+        // Cancel the effects of scaling
+        strokeWidthProperty().bindDouble(rotator.scaleYProperty()) {
+          1.5 / maxOf(abs(rotator.scaleY), 0.01)
+        }
 
         val opacityProperty = opacityControl.valueProperty
         fillProperty().bindObject(countControl.valueProperty, opacityProperty) {
@@ -132,8 +145,8 @@ class Triangles : Application() {
         }
 
         val unitOffset = shapeIndex - MAX_SHAPE_INDEX / 2.0
-        translateXProperty().bind(xControl.valueProperty.multiply(unitOffset))
-        translateYProperty().bind(yControl.valueProperty.multiply(unitOffset))
+        translateXProperty().bind(incrXControl.valueProperty.multiply(unitOffset))
+        translateYProperty().bind(incrYControl.valueProperty.multiply(unitOffset))
 
         val angleOffset = shapeIndex.toDouble() / MAX_SHAPE_INDEX - 0.5
         rotateProperty().bind(incrRotControl.valueProperty.multiply(angleOffset))
@@ -142,23 +155,24 @@ class Triangles : Application() {
       }
     }
 
-    val rotator = Group().apply {
+    rotator.apply {
       children += shapeList
       rotateProperty().bind(overallRotControl.valueProperty)
+      scaleXProperty().bind(overallScaleControl.valueProperty)
+      scaleYProperty().bind(overallScaleControl.valueProperty)
       id = "rotator"
     }
 
     val cropper = Pane(rotator).apply {
       id = "cropper"
-      val boundsProp = rotator.boundsInParentProperty()
-//      translateXProperty().bindDouble(boundsProp) { -rotator.boundsInParent.minX }
-//      translateYProperty().bindDouble(boundsProp) { -rotator.boundsInParent.minY }
-      prefWidthProperty().bindDouble(boundsProp) { rotator.boundsInParent.width }
-      prefHeightProperty().bindDouble(boundsProp) { rotator.boundsInParent.height }
+      translateXProperty().bind(overallXControl.valueProperty)
+      translateYProperty().bind(overallYControl.valueProperty)
+//      prefWidthProperty().bindDouble(boundsProp) { rotator.boundsInParent.width }
+//      prefHeightProperty().bindDouble(boundsProp) { rotator.boundsInParent.height }
       // makeItClipNormally(this)
     }
 
-    val scaler = createScalePane(cropper).apply {
+    val scaler = Pane(cropper).apply {
       background = Background.fill(BACKGROUND)
       id = "scaler"
     }
@@ -205,9 +219,6 @@ class Triangles : Application() {
     .map { it + 1 }
     .filter { it in CHOOSABLE_SHAPES }
     .toIntArray()
-
-  private fun DoubleProperty.bindDouble(vararg dependencies: Observable, supplier: () -> Double) =
-    bind(Bindings.createDoubleBinding(supplier, *dependencies))
 
   fun toStrokeColor(color: Color) =
     color.deriveColor(0.0, 10.0, 0.4, 200.0).opacityFactor(0.66)

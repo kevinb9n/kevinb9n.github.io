@@ -37,7 +37,7 @@ data class Angle private constructor(private val seconds: Double) {
 
     fun degrees(d: Number) = seconds(d.toDouble() * 60.0 * 60.0)
     fun turns  (t: Number) = degrees(t.toDouble() * 360.0)
-    fun radians(r: Number) = degrees(r.toDouble() / degrees(1).radians)
+    fun radians(r: Number) = degrees(r.toDouble() / degrees(1.0).radians)
 
     fun asin(sin: Double) = radians(kotlin.math.asin(sin))
     fun acos(cos: Double) = radians(kotlin.math.acos(cos))

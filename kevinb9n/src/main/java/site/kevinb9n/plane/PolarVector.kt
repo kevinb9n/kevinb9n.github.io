@@ -27,4 +27,8 @@ data class PolarVector(override val magnitude: Double, override val direction: A
   override fun equals(other: Any?): Boolean {
     return other is Vector && closeEnough(magnitude, other.magnitude) && closeEnough(direction.degrees, other.direction.degrees)
   }
+
+  override fun toString(): String {
+    return "PolarVector(x=$x, y=$y, magnitude=$magnitude, direction=$direction)"
+  }
 }

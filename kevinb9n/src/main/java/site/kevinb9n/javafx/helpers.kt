@@ -4,6 +4,7 @@ import javafx.beans.Observable
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.min
 import javafx.beans.binding.BooleanBinding
+import javafx.beans.property.DoubleProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleDoubleProperty
@@ -31,9 +32,6 @@ import site.kevinb9n.plane.Point
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
-import kotlin.math.cos
-import kotlin.math.sin
-
 
 
 fun pointsToPolygon(vararg points: Point): Polygon {
@@ -149,8 +147,11 @@ fun centerBounds(points: List<Point>): List<Point> {
   return points.map { Point(it.x - centerx, it.y - centery) }
 }
 
-fun <T> ObjectProperty<T>.bindObject(vararg deps: Observable, supplier: () -> T) =
-  bind(Bindings.createObjectBinding(supplier, *deps))
+fun <T> ObjectProperty<T>.bindObject(vararg dependencies: Observable, supplier: () -> T) =
+  bind(Bindings.createObjectBinding(supplier, *dependencies))
+
+fun DoubleProperty.bindDouble(vararg dependencies: Observable, supplier: () -> Double) =
+  bind(Bindings.createDoubleBinding(supplier, *dependencies))
 
 fun shapeVisibleProperty(source: Property<Number>, shapeNum: Number): BooleanBinding {
   return object : BooleanBinding() {
