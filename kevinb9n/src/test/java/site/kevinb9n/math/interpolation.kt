@@ -1,10 +1,10 @@
 package site.kevinb9n.math
 
-interface Interpolator {
+interface Interpolatr {
   fun interpolate(d: Double): Double
 }
 
-fun interpolator(earlyEagerness: Double, lateEagerness: Double): Interpolator {
+fun interpolator(earlyEagerness: Double, lateEagerness: Double): Interpolatr {
   require(earlyEagerness > 0.0 && earlyEagerness < 1.0) { earlyEagerness }
   require(lateEagerness > 0.0 && lateEagerness < 1.0) { lateEagerness }
 
@@ -23,7 +23,7 @@ fun interpolator(earlyEagerness: Double, lateEagerness: Double): Interpolator {
   val mci = MonotoneCubicInterpolator.of(
     doubleArrayOf(0.0, x1, x2, 1.0),
     doubleArrayOf(0.0, y1, y2, 1.0))
-  return object : Interpolator {
+  return object : Interpolatr {
     override fun interpolate(d: Double) = mci.applyAsDouble(d)
   }
 }

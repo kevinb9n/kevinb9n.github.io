@@ -31,7 +31,7 @@ public class MonotoneCubicInterpolator {
     if (xVals.length != yVals.length)
       throw new IllegalArgumentException("Array len " + xVals.length + " != " + yVals.length);
     if (xVals.length < 3)
-      throw new IllegalArgumentException("Array lengths < 4: " + xVals.length);
+      throw new IllegalArgumentException("Array lengths < 3: " + xVals.length);
 
     // Add one artificial control point before and after real ones
     double[] x = xVals; // extendControlPoints(xVals);
