@@ -76,11 +76,8 @@ class InterpolatorDemo : Application() {
   fun simpleInterpolator(xs: DoubleArray, ys: DoubleArray): DoubleUnaryOperator {
     val xtrans = LinearTransformation.mapping(xs[0], 0.0).and(xs[2], 1.0)
     val ytrans = LinearTransformation.mapping(ys[0], 0.0).and(ys[2], 1.0)
-    val rytrans = ytrans.inverse()
-    val xprop = xtrans.transform(xs[1])
-    val yprop = ytrans.transform(ys[1])
-    val exp = ln(yprop) / ln(xprop)
-    return DoubleUnaryOperator { rytrans.transform(pow(xtrans.transform(it), exp)) }
+    val exp = ln(ytrans.transform(ys[1])) / ln(xtrans.transform(xs[1]))
+    return DoubleUnaryOperator { ytrans.inverse().transform(pow(xtrans.transform(it), exp)) }
   }
 
   infix fun ClosedRange<Double>.step(step: Double): Sequence<Double> =
