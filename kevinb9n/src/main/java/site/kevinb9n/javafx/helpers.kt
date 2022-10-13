@@ -4,10 +4,12 @@ import javafx.beans.Observable
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.min
 import javafx.beans.binding.BooleanBinding
+import javafx.beans.binding.IntegerBinding
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.value.ObservableNumberValue
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.embed.swing.SwingFXUtils
@@ -20,6 +22,8 @@ import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.SnapshotParameters
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.control.Label
+import javafx.scene.control.Slider
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.layout.Region
@@ -32,6 +36,7 @@ import site.kevinb9n.plane.Point
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 
 fun pointsToPolygon(vararg points: Point): Polygon {
@@ -118,10 +123,8 @@ class DragToTranslate(val node: Node) : Group(node) {
     addEventFilter(MouseEvent.MOUSE_ENTERED) { scene.cursor = Cursor.HAND }
     addEventFilter(MouseEvent.MOUSE_EXITED) { scene.cursor = Cursor.DEFAULT }
     addEventFilter(MouseEvent.MOUSE_PRESSED) {
-      println("press")
       drag = TranslatingDrag(it, node) }
     addEventFilter(MouseEvent.MOUSE_DRAGGED) {
-      println("drag")
       drag.adjust(node, it) }
   }
 
@@ -250,5 +253,35 @@ fun makeItClipNormally(pane: Pane) {
   pane.layoutBoundsProperty().addListener { ov, oldValue, newValue ->
     outputClip.width = newValue.getWidth()
     outputClip.height = newValue.getHeight()
+  }
+}
+
+fun sliderFromArrayProperty(slider: Slider, label: Label, array: IntArray, defaultValue: Int, format: String):
+  DoubleProperty {
+  // Has to be a double, letting lookupByIndexBinding round it, otherwise it gets floored and the
+  // slider actually acts weird
+  val where = array.indexOf(defaultValue)
+  require(where != -1)
+
+  with(slider) {
+    min = 0.0
+    max = array.size - 1.0
+    majorTickUnit = 1.0
+    minorTickCount = 0
+    value = where.toDouble()
+  }
+
+  return SimpleDoubleProperty().apply {
+    bind(lookupByIndexBinding(slider.valueProperty(), array))
+    label.textProperty().bind(Bindings.format(format, this))
+  }
+}
+
+fun lookupByIndexBinding(source: ObservableNumberValue, array: IntArray): IntegerBinding {
+  return object : IntegerBinding() {
+    init { bind(source) }
+    override fun computeValue() = array[source.doubleValue().roundToInt()]
+    override fun getDependencies() = FXCollections.singletonObservableList(source)
+    override fun dispose() = unbind(source)
   }
 }

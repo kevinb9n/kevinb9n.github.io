@@ -3,11 +3,7 @@ package site.kevinb9n.javafx
 import com.google.common.base.Stopwatch
 import javafx.application.Application
 import javafx.beans.binding.Bindings.format
-import javafx.beans.binding.IntegerBinding
-import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.value.ObservableNumberValue
-import javafx.collections.FXCollections
 import javafx.geometry.BoundingBox
 import javafx.scene.Group
 import javafx.scene.Node
@@ -25,19 +21,15 @@ import javafx.scene.shape.Polygon
 import javafx.scene.shape.StrokeLineJoin
 import javafx.stage.Stage
 import site.kevinb9n.plane.Point
-import kotlin.math.abs
-import kotlin.math.roundToInt
 
 fun main() = Application.launch(Triangles::class.java)
 
 const val MAX_SHAPE_INDEX = 252
-val CHOOSABLE_SHAPES = 8..127
-const val DEFAULT_SHAPES = 29
+val CHOOSABLE_SHAPES = 8..100
+const val DEFAULT_SHAPE_COUNT = 29
 
-const val WIN_WIDTH = 1600
-const val WIN_HEIGHT = 1000
-const val MARGIN = 50
-const val STROKE_WIDTH = 0.5
+const val INITIAL_WIN_WIDTH = 1300
+const val INITIAL_WIN_HEIGHT = 900
 
 val COLORS = listOf(
   "001212", "c01613", "692d00", "ee8400", "ecc500", "139907", "0da73d", "00b179", "0ab7ad",
@@ -46,97 +38,69 @@ val COLORS = listOf(
 
 val BACKGROUND = Color.web("d8cab2")
 
-fun sliderFromArrayProperty(slider: Slider, label: Label, array: IntArray, defaultValue: Int):
-  DoubleProperty {
-  // Has to be a double property, letting lookupByIndexBinding round() it, otherwise it gets floored
-  val where = array.indexOf(defaultValue)
-  require(where != -1)
-
-  with(slider) {
-    min = 0.0
-    max = array.size - 1.0
-    majorTickUnit = 1.0
-    minorTickCount = 0
-    value = where.toDouble()
-  }
-
-  return SimpleDoubleProperty().apply {
-    bind(lookupByIndexBinding(slider.valueProperty(), array))
-    label.textProperty().bind(format("Shapes = %.0f", this))
-  }
-}
-
-fun lookupByIndexBinding(source: ObservableNumberValue, array: IntArray): IntegerBinding {
-  return object : IntegerBinding() {
-    init { bind(source) }
-    override fun computeValue() = array[source.doubleValue().roundToInt()]
-    override fun getDependencies() = FXCollections.singletonObservableList(source)
-    override fun dispose() = unbind(source)
-  }
-}
-
 class Triangles : Application() {
 
   override fun start(stage: Stage) {
-    val color = COLORS.random()
+    // defaults
     val shapeType = ShapeType.values().random()
+    val color = COLORS.random()
+    val strokeColor = toStrokeColor(color)
 
-    val controlPanel = VBox(10.0).also { it.prefWidth = 300.0 }
+    val controlPanel = VBox(10.0).also { it.prefWidth = 270.0 }
     val countControl = SliderWithReadout(Slider(), "Shapes", 1.0, "", """
       How many shapes would you like to see?
     """).also {
       it.valueProperty.unbind()
-      it.valueProperty.bind(sliderFromArrayProperty(it.slider, it.label, selectableCounts(), DEFAULT_SHAPES))
+      it.valueProperty.bind(sliderFromArrayProperty(it.slider, it.label, selectableCounts(), DEFAULT_SHAPE_COUNT, "Shapes = %.0f"))
       it.slider.isSnapToTicks = true
       controlPanel.children += it
     }
 
-    val incrXControl = SliderWithReadout(Slider(-7.0, 7.0, snapRandom(3.0)), "Translate X increment", 0.001, "%.2f", """
+    val incrXControl = SliderWithReadout(Slider(-7.0, 7.0, snapRandom(2.0)), "Translate X increment", 0.001, "%.2f", """
       First and last shapes are separated by this distance in the "X" direction, and intervening
       shapes are linearly interpolated. Unit is the max shape height/width.
     """).also { controlPanel.children += it }
 
-    val incrYControl = SliderWithReadout(Slider(-7.0, 7.0, snapRandom(3.0)), "Translate Y increment", 0.001, "%.2f", """
+    val incrYControl = SliderWithReadout(Slider(-7.0, 7.0, snapRandom(2.0)), "Translate Y increment", 0.001, "%.2f", """
       First and last shapes are separated by this distance in the "Y" direction, and intervening
       shapes are linearly interpolated. Unit is the max shape height/width.
     """).also { controlPanel.children += it }
 
-    val incrRotControl = SliderWithReadout(Slider(-180.0, 180.0, snapRandom(90)), "Rotation increment", 0.02, "%.0f", """
+    val incrRotControl = SliderWithReadout(Slider(-225.0, 225.0, snapRandom(90)), "Rotation increment", 0.02, "%.0f", """
       The last shape is rotated at this angle relative to the first shape, and intervening shapes
       are linearly interpolated.
     """).also { controlPanel.children += it }
 
-    val overallXControl = SliderWithReadout(Slider(0.0, 2000.0, 0.0),
+    val overallXControl = SliderWithReadout(Slider(0.0, 2000.0, 500.0),
       "Overall Translate X", 1.0, "%.0f", "Horizontally position the diagram").also {
       controlPanel.children += it }
 
-    val overallYControl = SliderWithReadout(Slider(0.0, 2000.0, 0.0),
+    val overallYControl = SliderWithReadout(Slider(0.0, 2000.0, 500.0),
       "Overall Translate Y", 1.0, "%.0f", "Vertically position the diagram").also { controlPanel
       .children += it }
 
-    val overallRotControl = SliderWithReadout(Slider(-180.0, 180.0, snapRandom(180)),
+    val overallRotControl = SliderWithReadout(Slider(-225.0, 225.0, snapRandom(180)),
       "Overall rotation", 0.5, "%.0f", "Rotate the entire diagram").also { controlPanel.children += it }
 
-    val overallScaleControl = SliderWithReadout(Slider(0.0, 10.0, 1.0),
+    val overallScaleControl = SliderWithReadout(Slider(0.1, 20.0, 2.0),
       "Overall scale", 0.1, "%.2f", "Scale the entire diagram").also { controlPanel.children += it }
 
     val opacityControl = SliderWithReadout(Slider(0.2, 5.0, 1.7), "Opacity", 0.05, "%.1f", """
       You'll want to make the shapes more transparent when they are highly overlapping.
     """).also { controlPanel.children += it }
 
-    val strokeColor = toStrokeColor(color)
 
     val rotator = Group()
     val shapeList = (0..MAX_SHAPE_INDEX).map { shapeIndex ->
       shapeType.centeredPolygon(MAX_SHAPE_INDEX - shapeIndex, shapeIndex).apply {
-        visibleProperty().bind(shapeVisibleProperty(countControl.valueProperty, shapeIndex))
+        id = "Shape " + shapeIndex
         stroke = strokeColor
-        strokeWidth = STROKE_WIDTH
         strokeLineJoin = StrokeLineJoin.ROUND
 
-        // Cancel the effects of scaling
-        strokeWidthProperty().bindDouble(rotator.scaleYProperty()) {
-          1.5 / maxOf(abs(rotator.scaleY), 0.01)
+        visibleProperty().bind(shapeVisibleProperty(countControl.valueProperty, shapeIndex))
+
+        strokeWidthProperty().bindDouble(rotator.localToSceneTransformProperty(), countControl.valueProperty) {
+          180 / (50 + countControl.valueProperty.get()) / (5 + rotator.scaleY)
         }
 
         val opacityProperty = opacityControl.valueProperty
@@ -151,7 +115,6 @@ class Triangles : Application() {
         val angleOffset = shapeIndex.toDouble() / MAX_SHAPE_INDEX - 0.5
         rotateProperty().bind(incrRotControl.valueProperty.multiply(angleOffset))
 
-        id = "Shape " + shapeIndex
       }
     }
 
@@ -169,7 +132,6 @@ class Triangles : Application() {
       translateYProperty().bind(overallYControl.valueProperty)
 //      prefWidthProperty().bindDouble(boundsProp) { rotator.boundsInParent.width }
 //      prefHeightProperty().bindDouble(boundsProp) { rotator.boundsInParent.height }
-      // makeItClipNormally(this)
     }
 
     val scaler = Pane(cropper).apply {
@@ -209,7 +171,7 @@ class Triangles : Application() {
       Button(it.id ?: it.javaClass.simpleName).apply { setOnAction { _ -> dump(it) } }
     }
 
-    val scene = Scene(root, WIN_WIDTH.toDouble(), WIN_HEIGHT.toDouble())
+    val scene = Scene(root, INITIAL_WIN_WIDTH.toDouble(), INITIAL_WIN_HEIGHT.toDouble())
 
     stage.scene = scene
     stage.show()
