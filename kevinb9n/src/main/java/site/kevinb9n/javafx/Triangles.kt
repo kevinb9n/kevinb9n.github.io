@@ -23,7 +23,6 @@ import javafx.stage.Stage
 import site.kevinb9n.javafx.InterpolatorDemo.JavafxSplineInterpolation
 import site.kevinb9n.plane.Angle
 import site.kevinb9n.plane.Point
-import kotlin.math.cos
 
 fun main() = Application.launch(Triangles::class.java)
 
@@ -59,27 +58,31 @@ class Triangles : Application() {
       controlPanel.children += it
     }
 
-    val onAxisControl = SliderWithReadout(Slider(-7.0, 7.0, 0.0), "Offset on-axis", 0.001, "%.2f", """
+    val onAxisControl = SliderWithReadout(Slider(-7.0, 7.0, 0.0), "Offset on-axis", 0.005, "%.2f", """
       First and last shapes are separated by this distance in the "X" direction, and intervening
       shapes are linearly interpolated. Unit is the max shape height/width.
     """).also { controlPanel.children += it }
 
-    val offAxisControl = SliderWithReadout(Slider(-7.0, 7.0, 0.0), "Offset off-axis", 0.001, "%.2f", """
+    val onAxisBunchyControl = SliderWithReadout(Slider(0.1, 0.9, 0.5), "On axis bunchiness", 0.01, "%.02f", """
+      get bunchy
+    """).also { controlPanel.children += it }
+
+    val offAxisControl = SliderWithReadout(Slider(-7.0, 7.0, 0.0), "Offset off-axis", 0.005, "%.2f", """
       First and last shapes are separated by this distance in the "Y" direction, and intervening
       shapes are linearly interpolated. Unit is the max shape height/width.
     """).also { controlPanel.children += it }
 
-    val axisControl = SliderWithReadout(Slider(-200.0, 200.0, 0.0), "Axis for offset", 0.02, "%.0f", """
+    val axisControl = SliderWithReadout(Slider(-200.0, 200.0, 0.0), "Axis for offset", 0.2, "%.0f", """
       The last shape is rotated at this angle relative to the first shape, and intervening shapes
       are linearly interpolated.
     """).also { controlPanel.children += it }
 
-    val incrRotControl = SliderWithReadout(Slider(-200.0, 200.0, 0.0), "Rotation increment", 0.02, "%.0f", """
+    val incrRotControl = SliderWithReadout(Slider(-200.0, 200.0, 0.0), "Rotation increment", 0.2, "%.0f", """
       The last shape is rotated at this angle relative to the first shape, and intervening shapes
       are linearly interpolated.
     """).also { controlPanel.children += it }
 
-    val rotBunchControl = SliderWithReadout(Slider(0.0, 1.0, 0.5), "Rotation bunchiness", 0.005, "%.02f", """
+    val rotBunchControl = SliderWithReadout(Slider(0.1, 0.9, 0.5), "Rotation bunchiness", 0.01, "%.02f", """
       get bunchy
     """).also { controlPanel.children += it }
 
@@ -120,16 +123,23 @@ class Triangles : Application() {
           color.opacityFactor(opacityProperty.value / countControl.valueProperty.value)
         }
 
-        val unitOffset = shapeIndex - MAX_SHAPE_INDEX / 2.0
-        translateXProperty().bindDouble(onAxisControl.valueProperty, offAxisControl.valueProperty, axisControl.valueProperty) {
-          unitOffset *
-            (onAxisControl.valueProperty.get() * Angle.degrees(axisControl.valueProperty.get()).cos() +
-            offAxisControl.valueProperty.get() * Angle.degrees(axisControl.valueProperty.get() + 90).cos())
+        val fuck = shapeIndex.toDouble() / MAX_SHAPE_INDEX
+        val unadjustedfuck = MAX_SHAPE_INDEX * (fuck - 0.5)
+        translateXProperty().bindDouble(onAxisControl.valueProperty, offAxisControl.valueProperty, axisControl.valueProperty, onAxisBunchyControl.valueProperty) {
+          val fkn = JavafxSplineInterpolation.byEagerness(onAxisBunchyControl.valueProperty.get())
+          val adjustedfuck = MAX_SHAPE_INDEX * (fkn(fuck) - 0.5)
+          val d = adjustedfuck * onAxisControl.valueProperty.get()
+          val axis = Angle.degrees(axisControl.valueProperty.get())
+          val d1 = unadjustedfuck * offAxisControl.valueProperty.get()
+          d * axis.cos() - d1 * axis.sin()
         }
-        translateYProperty().bindDouble(onAxisControl.valueProperty, offAxisControl.valueProperty, axisControl.valueProperty) {
-          unitOffset *
-            (onAxisControl.valueProperty.get() * Angle.degrees(axisControl.valueProperty.get()).sin() +
-            offAxisControl.valueProperty.get() * Angle.degrees(axisControl.valueProperty.get() + 90).sin())
+        translateYProperty().bindDouble(onAxisControl.valueProperty, offAxisControl.valueProperty, axisControl.valueProperty, onAxisBunchyControl.valueProperty) {
+          val fkn = JavafxSplineInterpolation.byEagerness(onAxisBunchyControl.valueProperty.get())
+          val adjustedfuck = MAX_SHAPE_INDEX * (fkn(fuck) - 0.5)
+          val d = adjustedfuck * onAxisControl.valueProperty.get()
+          val axis = Angle.degrees(axisControl.valueProperty.get())
+          val d1 = unadjustedfuck * offAxisControl.valueProperty.get()
+          d * axis.sin() + d1 * axis.cos()
         }
 
         rotateProperty().bindDouble(incrRotControl.valueProperty, rotBunchControl.valueProperty) {
