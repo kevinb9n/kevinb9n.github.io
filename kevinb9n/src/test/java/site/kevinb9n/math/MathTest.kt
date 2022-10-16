@@ -1,26 +1,38 @@
 package site.kevinb9n.math
 
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import org.junit.jupiter.api.Test
 
 class MathTest {
+  val r = java.util.Random()
+
   @Test
-  fun floorDivMod() { // TODO
-    (-10..10).forEach { a ->
-      ((-10..-1) + (1..10)).forEach { b ->
-        assertThat(a.floorDiv(b) * b + a.mod(b)).isEqualTo(a)
-      }
+  fun divRemI() {
+    val divRem = DivModPair({a,b-> a/b}, {a,b->a%b})
+    for (i in 1..1000) {
+      divRem.check(r.nextInt(60) - 30, r.nextInt(20) - 10)
     }
   }
 
   @Test
-  fun divRem() {
-    (-10..10).forEach { d ->
-      (-10..10).forEach { m ->
-        if (m != 0) assertThat(d / m * m + d % m).isEqualTo(d)
+  fun floorDivModI() {
+    val floorMod = DivModPair(Int::floorDiv, Int::mod)
+    for (i in 1..1000) {
+      floorMod.check(r.nextInt(60) - 30, r.nextInt(20) - 10)
+    }
+  }
+
+  data class DivModPair(
+    val divver: (Int, Int) -> Int,
+    val modder: (Int, Int) -> Int) {
+    fun check(a: Int, b: Int) {
+      if (b != 0) {
+        assertWithMessage("$a $b").that(divver(a, b) * b + modder(a, b)).isEqualTo(a)
       }
     }
   }
+
 
   @Test
   fun testGcd() {
