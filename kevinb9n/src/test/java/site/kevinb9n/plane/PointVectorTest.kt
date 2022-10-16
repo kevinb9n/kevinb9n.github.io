@@ -1,5 +1,6 @@
 package site.kevinb9n.plane
 
+import com.google.common.truth.Subject
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
 import site.kevinb9n.plane.Angle.Companion.degrees
@@ -65,24 +66,24 @@ class PointVectorTest {
     assertThat(vector(x=1.0, y=rad3, magnitude=2.0, direction=d60)).isEqualTo(cv)
     assertThat(vector(x=1.0, y=rad3, magnitude=2.0)).isEqualTo(cv)
     assertThat(vector(x=1.0, y=rad3, direction=d60)).isEqualTo(cv)
-    assertThat(vector(x=1.0, magnitude=2.0, direction=d60)).isEqualTo(cv)
-    assertThat(vector(y=rad3, magnitude=2.0, direction=d60)).isEqualTo(cv)
+    assertThat((vector(x=1.0, magnitude=2.0, direction=d60) - cv).magnitude).isWithin(1e-10).of(0.0)
+    assertThat((vector(y=rad3, magnitude=2.0, direction=d60) - cv).magnitude).isWithin(1e-10).of(0.0)
     assertThat(vector(x=1.0, magnitude=2.0)).isEqualTo(cv)
-    assertThat(vector(x=1.0, direction= d60)).isEqualTo(cv)
+    assertThat(vector(x=1.0, direction=d60)).isEqualTo(cv)
     assertThat(vector(y=rad3, magnitude=2.0)).isEqualTo(cv)
-    assertThat(vector(y=rad3, direction= d60)).isEqualTo(cv)
-    assertThat(vector(magnitude=2.0, direction= d60)).isEqualTo(cv)
+    assertThat(vector(y=rad3, direction=d60)).isEqualTo(cv)
+    assertThat((vector(magnitude=2.0, direction=d60) - cv).magnitude).isWithin(1e-10).of(0.0)
 
-    val pv = vector(magnitude = 2.0, direction = d60)
+    val pv = vector(magnitude=2.0, direction=d60)
     assertThat(vector(x=1.0, y=rad3, magnitude=2.0, direction=d60)).isEqualTo(pv)
     assertThat(vector(x=1.0, y=rad3, magnitude=2.0)).isEqualTo(pv)
-    assertThat(vector(x=1.0, y=rad3, direction= d60)).isEqualTo(pv)
-    assertThat(vector(x=1.0, magnitude=2.0, direction= d60)).isEqualTo(pv)
-    assertThat(vector(y=rad3, magnitude=2.0, direction= d60)).isEqualTo(pv)
+    assertThat(vector(x=1.0, y=rad3, direction=d60)).isEqualTo(pv)
+    assertThat(vector(x=1.0, magnitude=2.0, direction=d60)).isEqualTo(pv)
+    assertThat(vector(y=rad3, magnitude=2.0, direction=d60)).isEqualTo(pv)
     assertThat(vector(x=1.0, y=rad3)).isEqualTo(pv)
     assertThat(vector(x=1.0, magnitude=2.0)).isEqualTo(pv)
-    assertThat(vector(x=1.0, direction= d60)).isEqualTo(pv)
+    assertThat(vector(x=1.0, direction=d60)).isEqualTo(pv)
     assertThat(vector(y=rad3, magnitude=2.0)).isEqualTo(pv)
-    assertThat(vector(y=rad3, direction= d60)).isEqualTo(pv)
+    assertThat(vector(y=rad3, direction=d60)).isEqualTo(pv)
   }
 }

@@ -5,19 +5,7 @@ import org.junit.jupiter.api.Test
 
 class MathTest {
   @Test
-  fun what() {
-    (-6..6).forEach { a->
-      print("${if (a >= 0) " $a" else "$a" }:  ")
-      ((-6..-1) + (1..6)).forEach { b->
-        val c = a.mod(b)
-        print("${if (c >= 0) " $c" else "$c"} ")
-      }
-      println()
-    }
-  }
-
-  @Test
-  fun floorDivMod() {
+  fun floorDivMod() { // TODO
     (-10..10).forEach { a ->
       ((-10..-1) + (1..10)).forEach { b ->
         assertThat(a.floorDiv(b) * b + a.mod(b)).isEqualTo(a)
@@ -27,9 +15,9 @@ class MathTest {
 
   @Test
   fun divRem() {
-    (-10..10).forEach { a ->
-      ((-10..-1) + (1..10)).forEach { b ->
-        assertThat(a / b * b + a % b).isEqualTo(a)
+    (-10..10).forEach { d ->
+      (-10..10).forEach { m ->
+        if (m != 0) assertThat(d / m * m + d % m).isEqualTo(d)
       }
     }
   }
@@ -57,6 +45,5 @@ class MathTest {
     assertThat(gcd(4, 6)).isEqualTo(2)
     assertThat(gcd(4, 10)).isEqualTo(2)
     assertThat(gcd(6, 9)).isEqualTo(3)
-
   }
 }

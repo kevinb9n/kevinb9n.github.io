@@ -1,7 +1,5 @@
 package site.kevinb9n.plane
 
-import site.kevinb9n.math.closeEnough
-
 data class PolarVector(override val magnitude: Double, override val direction: Angle) : Vector2D {
   override val x = magnitude * direction.cos()
   override val y = magnitude * direction.sin()
@@ -25,8 +23,7 @@ data class PolarVector(override val magnitude: Double, override val direction: A
   override fun isHorizontal() = direction == Angle.ZERO || direction == Angle.HALF_TURN
 
   override fun equals(other: Any?): Boolean {
-    return other is Vector2D && closeEnough(magnitude, other.magnitude)
-      && closeEnough(direction.degrees, other.direction.degrees)
+    return other is Vector2D && magnitude == other.magnitude && direction == other.direction
   }
 
   override fun toString(): String {
