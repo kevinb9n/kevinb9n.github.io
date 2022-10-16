@@ -5,6 +5,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.tan
 
+// Represents an angle in the range [-180, 180) degrees / [-pi, pi) radians
+// operations are cyclic
 data class Angle private constructor(private val seconds: Double) {
   init {
     require(seconds >= -HALF_TURN_IN_SECONDS)
@@ -18,6 +20,7 @@ data class Angle private constructor(private val seconds: Double) {
   operator fun plus(other: Angle) = seconds(seconds + other.seconds)
   operator fun minus(other: Angle) = this + -other
   operator fun times(scalar: Number) = seconds(seconds * scalar.toDouble())
+  operator fun compareTo(other: Angle) = seconds.compareTo(other.seconds)
 
   fun sin() = sin(radians)
   fun cos() = cos(radians)

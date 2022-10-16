@@ -5,13 +5,12 @@ import com.google.common.collect.HashMultiset
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import org.junit.jupiter.api.Test
-import site.kevinb9n.plane.stuff.makeCircle
-
-fun enclose(points: List<Point>): Circle {
-  return makeCircle(points)
-}
+import site.kevinb9n.plane.stuff.enclosingCircle
 
 class EnclosingCircleTest {
+  fun enclose(points: List<Point>): Circle {
+    return enclosingCircle(points)
+  }
   @Test
   fun test() {
     assertThat(enclose(listOf(Point.ORIGIN))).isEqualTo(Circle(Point.ORIGIN, 0.0))

@@ -75,7 +75,7 @@ data class UnTriangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
       val leg1 = cyclicGet(legs, longest + 1)
       val leg2 = cyclicGet(legs, longest + 2)
       val angle = -leg1.direction
-      return UnTriangle(leg1.rotate(angle), leg2.rotate(angle))
+      return UnTriangle(leg1 + angle, leg2 + angle)
     }
   }
 }

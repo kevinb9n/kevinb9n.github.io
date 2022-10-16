@@ -7,21 +7,19 @@ import javafx.scene.paint.Color
 import javafx.stage.Stage
 import site.kevinb9n.plane.Point
 import site.kevinb9n.plane.Circle
-import site.kevinb9n.plane.stuff.makeCircle
+import site.kevinb9n.plane.stuff.enclosingCircle
 import kotlin.math.roundToInt
 
-fun enclose(points: List<Point>): Circle {
-  return makeCircle(points)
-}
 fun main() = Application.launch(EnclosingCircleDemo::class.java)
+
 class EnclosingCircleDemo : Application() {
   override fun start(stage: Stage) {
     val numPoints = Math.pow(2.0, 1.0 + Math.random() * 5.0).roundToInt()
     require(numPoints in 2 until 64)
     val points = generateSequence { randomPoint() }.take(numPoints).toList()
     require(points.size == numPoints)
-    println(points)
-    val enclosingCircle: Circle = enclose(points)
+
+    val enclosingCircle = enclosingCircle(points)
     println(enclosingCircle)
     val root = Pane()
     root.children += toJavafx(enclosingCircle).also {

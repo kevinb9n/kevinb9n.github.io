@@ -68,13 +68,13 @@ interface Vector {
   val slope: Double
 
   fun unitVector(): Vector
-  fun rotate(a: Angle) = PolarVector(magnitude, direction + a)
 
   operator fun unaryMinus(): Vector = this * -1.0
 
   operator fun plus(other: Vector): Vector = CartesianVector(x + other.x, y + other.y)
 
   operator fun plus(p: Point) = Point(x + p.x, y + p.y)
+  operator fun plus(a: Angle) = PolarVector(magnitude, direction + a)
 
   operator fun minus(other: Vector): Vector = this + -other
 
