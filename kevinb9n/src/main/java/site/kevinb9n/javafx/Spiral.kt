@@ -10,9 +10,9 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.StrokeLineCap
 import javafx.stage.Stage
 import site.kevinb9n.plane.Angle
-import site.kevinb9n.plane.Point
-import site.kevinb9n.plane.Vector
-import site.kevinb9n.plane.Vector.Companion.vector
+import site.kevinb9n.plane.Point2
+import site.kevinb9n.plane.Vector2
+import site.kevinb9n.plane.Vector2.Companion.vector
 
 fun main() = Application.launch(Spiral::class.java)
 
@@ -41,7 +41,7 @@ private const val NUM_TRIANGLES = NUM_EDGES - 5
 
 class Spiral : Application() {
   private val ZERO_EDGE = Edge(
-    Point(WIDTH / 2, HEIGHT / 2),
+    Point2(WIDTH / 2, HEIGHT / 2),
     vector(direction = Angle.ZERO, magnitude = INITIAL_LENGTH))
 
   override fun start(stage: Stage) {
@@ -65,19 +65,19 @@ class Spiral : Application() {
     // renderToPngFile(root, "/Users/kevinb9n/spiral.png")
   }
 
-  private fun GraphicsContext.drawCenter(points: List<Point>) {
+  private fun GraphicsContext.drawCenter(points: List<Point2>) {
     fill = averageColors(FILL_COLORS).darker().desaturate()
     drawPolygon(points.subList(0, 5))
   }
 
-  private fun GraphicsContext.drawTriangles(points: List<Point>) {
+  private fun GraphicsContext.drawTriangles(points: List<Point2>) {
     for (i in 0 until NUM_TRIANGLES) {
       fill = FILL_COLORS[i % 9]
       drawPolygon(listOf(points[i], points[i + 1], points[i + 5]))
     }
   }
 
-  private fun GraphicsContext.drawEdges(points: List<Point>) {
+  private fun GraphicsContext.drawEdges(points: List<Point2>) {
     lineWidth = INITIAL_THICKNESS
     lineCap = StrokeLineCap.ROUND
     stroke = EDGE_COLOR
@@ -87,7 +87,7 @@ class Spiral : Application() {
     }
   }
 
-  private fun GraphicsContext.drawEdge(from: Point, to: Point) = strokeLine(from.x, from.y, to.x, to.y)
+  private fun GraphicsContext.drawEdge(from: Point2, to: Point2) = strokeLine(from.x, from.y, to.x, to.y)
 
   // This is just stupidness :-)
   private fun averageColors(colors: List<Color>): Color {
@@ -99,7 +99,7 @@ class Spiral : Application() {
   }
 }
 
-private data class Edge(val p: Point, val v: Vector) {
+private data class Edge(val p: Point2, val v: Vector2) {
   fun next() = Edge(p + v, v * RATIO + ANGLE)
 
   companion object {

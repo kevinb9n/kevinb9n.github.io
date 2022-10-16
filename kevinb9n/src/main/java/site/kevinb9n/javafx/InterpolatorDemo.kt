@@ -11,7 +11,7 @@ import javafx.scene.shape.Circle
 import javafx.scene.shape.Polyline
 import javafx.stage.Stage
 import site.kevinb9n.math.MonotoneCubicInterpolator
-import site.kevinb9n.plane.Point
+import site.kevinb9n.plane.Point2
 import java.lang.Math.pow
 import kotlin.math.ln
 
@@ -64,11 +64,11 @@ class InterpolatorDemo : Application() {
   }
 
   interface Interpolation {
-    fun forPoints(points: List<Point>): (Double) -> Double
+    fun forPoints(points: List<Point2>): (Double) -> Double
   }
 
   object JoshInterpolation : Interpolation {
-    override fun forPoints(points: List<Point>): (Double) -> Double {
+    override fun forPoints(points: List<Point2>): (Double) -> Double {
       val fn = MonotoneCubicInterpolator.of(
         points.map { it.x }.toDoubleArray(),
         points.map { it.y }.toDoubleArray())
@@ -78,12 +78,12 @@ class InterpolatorDemo : Application() {
 
   object JavafxSplineInterpolation : Interpolation {
     fun byEagerness(eagerness: Double): (Double) -> Double {
-      return forPoints(listOf(Point(0, 0), Point(1 - eagerness, eagerness), Point(1, 1)))
+      return forPoints(listOf(Point2(0, 0), Point2(1 - eagerness, eagerness), Point2(1, 1)))
     }
 
-    override fun forPoints(points: List<Point>): (Double) -> Double {
+    override fun forPoints(points: List<Point2>): (Double) -> Double {
       require(points.size == 3)
-      val sorted = points.sortedBy(Point::x)
+      val sorted = points.sortedBy(Point2::x)
       val first = sorted.first()
       val last = sorted.last()
       val firstY = first.y
@@ -91,10 +91,10 @@ class InterpolatorDemo : Application() {
 
       val xToUnit = LinearTransformation.mapping(first.x, 0.0).and(last.x, 1.0)
       val yToUnit = LinearTransformation.mapping(firstY, 0.0).and(lastY, 1.0)
-      fun normalize(p: Point) = Point(xToUnit.transform(p.x), yToUnit.transform(p.y))
+      fun normalize(p: Point2) = Point2(xToUnit.transform(p.x), yToUnit.transform(p.y))
 
-      require(normalize(points[0]) == Point(0.0, 0.0))
-      require(normalize(points[2]) == Point(1.0, 1.0))
+      require(normalize(points[0]) == Point2(0.0, 0.0))
+      require(normalize(points[2]) == Point2(1.0, 1.0))
       val a = normalize(points[1])
       val spline = Interpolator.SPLINE(a.x, a.y, a.x, a.y)
 
@@ -103,9 +103,9 @@ class InterpolatorDemo : Application() {
   }
 
   object PowerInterpolation : Interpolation {
-    override fun forPoints(points: List<Point>): (Double) -> Double {
+    override fun forPoints(points: List<Point2>): (Double) -> Double {
       require(points.size == 3)
-      val sorted = points.sortedBy(Point::x)
+      val sorted = points.sortedBy(Point2::x)
       val first = sorted.first()
       val last = sorted.last()
       val firstY = first.y
@@ -113,10 +113,10 @@ class InterpolatorDemo : Application() {
 
       val xToUnit = LinearTransformation.mapping(first.x, 0.0).and(last.x, 1.0)
       val yToUnit = LinearTransformation.mapping(firstY, 0.0).and(lastY, 1.0)
-      fun normalize(p: Point) = Point(xToUnit.transform(p.x), yToUnit.transform(p.y))
+      fun normalize(p: Point2) = Point2(xToUnit.transform(p.x), yToUnit.transform(p.y))
 
-      require(normalize(points[0]) == Point(0.0, 0.0))
-      require(normalize(points[2]) == Point(1.0, 1.0))
+      require(normalize(points[0]) == Point2(0.0, 0.0))
+      require(normalize(points[2]) == Point2(1.0, 1.0))
       val a = normalize(points[1])
       val exp = ln(a.y) / ln(a.x)
       val spline = object : Interpolator() {
@@ -127,7 +127,7 @@ class InterpolatorDemo : Application() {
   }
 
   fun replacePoints(circles: List<Circle>, powerline: Polyline, cubicline: Polyline, splineline: Polyline) {
-    val pts = circles.map { Point(it.boundsInParent.centerX, it.boundsInParent.centerY) }
+    val pts = circles.map { Point2(it.boundsInParent.centerX, it.boundsInParent.centerY) }
     val sequence = 100.0..700.0 step 4.0
 
     val interp1 = JoshInterpolation.forPoints(pts)

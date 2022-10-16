@@ -86,18 +86,10 @@ private enum class Combiner(val fmt: String) {
 }
 
 enum class Op(var s: String, var commutes: Boolean) {
-  PLUS("+", true) {
-    override fun op(a: Double, b: Double) = a + b
-  },
-  MINUS("-", false) {
-    override fun op(a: Double, b: Double) = a - b
-  },
-  TIMES("*", true) {
-    override fun op(a: Double, b: Double) = a * b
-  },
-  DIVIDE("/", false) {
-    override fun op(a: Double, b: Double) = a / b
-  };
+  PLUS("+", true) { override fun op(a: Double, b: Double) = a + b },
+  MINUS("-", false) { override fun op(a: Double, b: Double) = a - b },
+  TIMES("*", true) { override fun op(a: Double, b: Double) = a * b },
+  DIVIDE("/", false) { override fun op(a: Double, b: Double) = a / b };
 
   abstract fun op(a: Double, b: Double): Double
   override fun toString() = s

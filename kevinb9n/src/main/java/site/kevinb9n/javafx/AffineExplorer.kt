@@ -13,16 +13,15 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
-import javafx.scene.shape.Rectangle
 import javafx.stage.Stage
-import site.kevinb9n.plane.Point
+import site.kevinb9n.plane.Point2
 import kotlin.math.abs
 
 fun main() = Application.launch(AffineExplorer::class.java)
 
 class AffineExplorer : Application() {
   override fun start(stage: Stage) {
-    val polygon = pointsToPolygon(Point(0, 0), Point(50, 50), Point(100, 50), Point(100, 100), Point(0, 100)).apply {
+    val polygon = pointsToPolygon(Point2(0, 0), Point2(50, 50), Point2(100, 50), Point2(100, 100), Point2(0, 100)).apply {
       stroke = Color.BLACK
     }
 

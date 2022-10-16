@@ -1,6 +1,7 @@
 package site.kevinb9n.plane
 
-import site.kevinb9n.plane.Vector.Companion.vector
+import site.kevinb9n.math.closeEnough
+import site.kevinb9n.plane.Vector2.Companion.vector
 
 // Goal is that == means congruent, and similar only has to check ratios
 // An ordered pair of vectors where the first vector is always at angle 0 and the
@@ -12,7 +13,7 @@ import site.kevinb9n.plane.Vector.Companion.vector
 // standardize rotation: leg1 should always be at angle 0, and leg2 at angle 0-180
 // and the largest angle is special, it's the only one that can be right or obtuse
 
-data class UnTriangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
+data class UnTriangle(val leg1: Vector2, val leg2: Vector2): ConvexPolygon {
   // the angle between leg1 and leg2 is not leg1.angleWith(leg2), but HALF_TURN - that.
   // should I rethink the representation??
   init {
@@ -42,10 +43,10 @@ data class UnTriangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
     && closeEnough(leg1.magnitude, leg3.magnitude)
 
 //   this is the vector from leg1's start point to the centroid
-  fun centroid() = Vector.mean(leg1, leg1, leg2)
+  fun centroid() = Vector2.mean(leg1, leg1, leg2)
 
   companion object {
-    fun triangle(a: Point, b: Point, c: Point) = triangle(b - a, c - b)
+    fun triangle(a: Point2, b: Point2, c: Point2) = triangle(b - a, c - b)
     // counter clockwise order
     fun triangle(aLen: Double, bLen: Double, cLen: Double): UnTriangle {
       val list = listOf(aLen, bLen, cLen)
@@ -61,7 +62,7 @@ data class UnTriangle(val leg1: Vector, val leg2: Vector): ConvexPolygon {
       val a = Angle.acos((leg1 * leg1 + leg2 * leg2 - leg3 * leg3) / (2 * leg1 * leg2))
       return triangle(vector(leg1, 0), vector(magnitude = leg2, direction = Angle.HALF_TURN - a))
     }
-    fun triangle(a: Vector, b: Vector): UnTriangle {
+    fun triangle(a: Vector2, b: Vector2): UnTriangle {
       if (a.collinear(b)) {
         val list = listOf(a.magnitude, b.magnitude, (a + b).magnitude).sorted()
         return UnTriangle(vector(list[0], 0), vector(list[1], 0))

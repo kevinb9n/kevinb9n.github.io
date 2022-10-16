@@ -8,7 +8,7 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Rectangle
 import javafx.stage.Stage
-import site.kevinb9n.plane.Point
+import site.kevinb9n.plane.Point2
 
 fun main() = Application.launch(MyDraggableStuff::class.java)
 
@@ -28,7 +28,7 @@ class MyDraggableStuff : Application() {
           translateY = 225.0
         }),
       DragToTranslate(
-        pointsToPolygon(Point(200, 100), Point(300, 300), Point(100, 300)).apply {
+        pointsToPolygon(Point2(200, 100), Point2(300, 300), Point2(100, 300)).apply {
           fill = Color.PINK
         }),
     )

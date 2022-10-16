@@ -1,5 +1,7 @@
 package site.kevinb9n.plane
 
+import site.kevinb9n.math.fixNearInteger
+import site.kevinb9n.math.modWithMinimum
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin

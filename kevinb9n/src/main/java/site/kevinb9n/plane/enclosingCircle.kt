@@ -19,23 +19,20 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package site.kevinb9n.plane.stuff
+package site.kevinb9n.plane
 
-import site.kevinb9n.plane.BoundingBox
-import site.kevinb9n.plane.Point
-import site.kevinb9n.plane.Circle
-import site.kevinb9n.plane.Vector.Companion.vector
-import site.kevinb9n.plane.sumProduct
+import site.kevinb9n.math.sumProduct
+import site.kevinb9n.plane.Vector2.Companion.vector
 import kotlin.math.max
 
-fun enclosingCircle(a: Point) = Circle(a, 0.0)
+fun enclosingCircle(a: Point2) = Circle(a, 0.0)
 
-fun enclosingCircle(a: Point, b: Point): Circle {
+fun enclosingCircle(a: Point2, b: Point2): Circle {
   val c = a.midpoint(b)
   return Circle(c, max(c.distance(a), c.distance(b))) // damn fp error
 }
 
-fun enclosingCircle(a: Point, b: Point, c: Point): Circle { //?
+fun enclosingCircle(a: Point2, b: Point2, c: Point2): Circle { //?
   val points = listOf(a, b, c)
   val boxCenter = BoundingBox(points).midpoint
   val relToBoxCenter = points.map { it - boxCenter }
@@ -52,7 +49,7 @@ fun enclosingCircle(a: Point, b: Point, c: Point): Circle { //?
   return Circle(center, radius)
 }
 
-fun enclosingCircle(points: List<Point>): Circle {
+fun enclosingCircle(points: List<Point2>): Circle {
   var circle = enclosingCircle(points[0])
   for ((i, newPoint) in points.withIndex()) {
     if (newPoint !in circle) {
@@ -63,7 +60,7 @@ fun enclosingCircle(points: List<Point>): Circle {
 }
 
 // One boundary point known
-private fun oneKnownBoundaryPoint(points: List<Point>, bound: Point): Circle {
+private fun oneKnownBoundaryPoint(points: List<Point2>, bound: Point2): Circle {
   var circle = enclosingCircle(bound, points[0])
   for ((i, newPoint) in points.withIndex()) {
     if (newPoint !in circle) {
@@ -74,19 +71,16 @@ private fun oneKnownBoundaryPoint(points: List<Point>, bound: Point): Circle {
 }
 
 // Two boundary points known
-private fun twoKnownBoundaryPoints(points: List<Point>, p: Point, q: Point): Circle {
+private fun twoKnownBoundaryPoints(points: List<Point2>, p: Point2, q: Point2): Circle {
   val pqCircle = enclosingCircle(p, q)
   var left: Circle? = null
   var right: Circle? = null
 
-  // For each point not in the two-point circle
   val vector = q - p
   for (r in points) {
     if (pqCircle.contains(r)) continue
-
-    // Form a circumcircle and classify it on left or right side
     val crossMag = vector.crossMag(r - p)
-    val circle = enclosingCircle(p, q, r) ?: continue
+    val circle = enclosingCircle(p, q, r)
     if (crossMag > 0 && (left == null || vector.crossMag(circle.center - p) > vector.crossMag(left.center - p))) {
       left = circle
     } else if (crossMag < 0 && (right == null || vector.crossMag(circle.center - p) < vector.crossMag(right.center - p))) {
@@ -97,6 +91,6 @@ private fun twoKnownBoundaryPoints(points: List<Point>, p: Point, q: Point): Cir
   return when {
     left == null -> right ?: pqCircle
     right == null -> left
-    else -> listOf(left, right).minByOrNull { it.radius }!!
+    else -> if (left.radius < right.radius) left else right
   }
 }

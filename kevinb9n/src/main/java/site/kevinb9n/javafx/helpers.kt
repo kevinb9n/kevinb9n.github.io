@@ -32,38 +32,33 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Polygon
 import javafx.scene.shape.Rectangle
 import javafx.scene.shape.Shape
-import site.kevinb9n.plane.Point
+import site.kevinb9n.math.mean
+import site.kevinb9n.plane.Point2
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-
-fun pointsToPolygon(vararg points: Point): Polygon {
+fun pointsToPolygon(vararg points: Point2): Polygon {
   val p = Polygon()
   p.points += points.flatMap { listOf(it.x, it.y) }
   return p
 }
 
-fun pointsToPolygon(points: List<Point>): Polygon {
+fun pointsToPolygon(points: List<Point2>): Polygon {
   val p = Polygon()
   p.points += points.flatMap { listOf(it.x, it.y) }
   return p
 }
 
-fun GraphicsContext.drawPolygon(vertices: List<Point>) {
+fun GraphicsContext.drawPolygon(vertices: List<Point2>) {
   fillPolygon(
     vertices.map { it.x }.toDoubleArray(),
     vertices.map { it.y }.toDoubleArray(),
     vertices.size)
 }
 
-fun box(minCorner: Point, maxCorner: Point) = box(
-  minCorner,
-  maxCorner.x - minCorner.x,
-  maxCorner.y - minCorner.y)
-
-fun box(minCorner: Point, width: Number, height: Number) =
+fun box(minCorner: Point2, width: Number, height: Number) =
   BoundingBox(minCorner.x, minCorner.y, width.toDouble(), height.toDouble())
 
 fun random(maxAbs: Number): Double {
@@ -92,14 +87,14 @@ fun printBounds(message: String, bounds: Bounds) {
 }
 
 fun boundsToString(min: Double, max: Double, center: Double, extent: Double) : String {
-  val minR = round(min)
-  val maxR = round(max)
-  val centerR = round(center)
-  val extentR = round(extent)
+  val minR = round3(min)
+  val maxR = round3(max)
+  val centerR = round3(center)
+  val extentR = round3(extent)
   return "[$minR, $maxR] = $extentR (c $centerR)"
 }
 
-fun round(d: Double) = Math.round(d * 1000) / 1000.0
+fun round3(d: Double) = Math.round(d * 1000) / 1000.0
 
 fun renderToPngFile(node: Node, filename: String) {
   val snap = node.snapshot(SnapshotParameters(), null)
@@ -139,15 +134,13 @@ class DragToTranslate(val node: Node) : Group(node) {
   }
 }
 
-fun factors(value: Int): IntArray = (1 .. value).filter { value % it == 0 }.toIntArray()
-fun mean(a: Double, b: Double) = (a + b) / 2.0
-fun centerBounds(points: List<Point>): List<Point> {
+fun centerBounds(points: List<Point2>): List<Point2> {
   if (points.isEmpty()) return points
   val xs = points.map { it.x }
   val ys = points.map { it.y }
   val centerx = mean(xs.minOrNull()!!, xs.maxOrNull()!!)
   val centery = mean(ys.minOrNull()!!, ys.maxOrNull()!!)
-  return points.map { Point(it.x - centerx, it.y - centery) }
+  return points.map { Point2(it.x - centerx, it.y - centery) }
 }
 
 fun <T> ObjectProperty<T>.bindObject(vararg dependencies: Observable, supplier: () -> T) =
@@ -250,7 +243,7 @@ fun makeItClipNormally(pane: Pane) {
   val outputClip = Rectangle()
   pane.setClip(outputClip)
 
-  pane.layoutBoundsProperty().addListener { ov, oldValue, newValue ->
+  pane.layoutBoundsProperty().addListener { _, _, newValue ->
     outputClip.width = newValue.getWidth()
     outputClip.height = newValue.getHeight()
   }
