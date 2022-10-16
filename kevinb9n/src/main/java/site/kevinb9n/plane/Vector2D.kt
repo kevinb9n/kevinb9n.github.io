@@ -18,11 +18,11 @@ interface Vector2D : Vector<Point2D, Vector2D> {
       require(md == null || md >= 0.0)
 
       val v = if (md == 0.0) {
-        PolarVector2D(0.0, Angle.ZERO)
+        PolarVector(0.0, Angle.ZERO)
       } else if (xd != null && yd != null) {
         CartesianVector2D(xd, yd)
       } else if (md != null && direction != null) {
-        PolarVector2D(md.toDouble(), direction)
+        PolarVector(md.toDouble(), direction)
       } else if (md != null) {
         if (xd != null) {
           CartesianVector2D(xd, sqrt(md * md - xd * xd))
@@ -32,9 +32,9 @@ interface Vector2D : Vector<Point2D, Vector2D> {
       } else {
         require(direction != null)
         if (xd != null) {
-          CartesianVector2D(xd, direction.tan() * xd) // PolarVector2D(xd / direction!!.cos(), direction)
+          CartesianVector2D(xd, direction.tan() * xd) // PolarVector(xd / direction!!.cos(), direction)
         } else {
-          CartesianVector2D(yd!! / direction.tan(), yd) // PolarVector2D(yd / direction!!.sin(), direction)
+          CartesianVector2D(yd!! / direction.tan(), yd) // PolarVector(yd / direction!!.sin(), direction)
         }
       }
 
@@ -70,7 +70,7 @@ interface Vector2D : Vector<Point2D, Vector2D> {
   override fun plus(other: Vector2D) = CartesianVector2D(x + other.x, y + other.y)
   override fun plus(point: Point2D) = Point2D(x + point.x, y + point.y)
 
-  fun rotate(angle: Angle) = PolarVector2D(magnitude, direction + angle)
+  fun rotate(angle: Angle) = PolarVector(magnitude, direction + angle)
   fun dot(other: Vector2D): Double
   fun cross(other: Vector2D): Double
   fun isLeftTurn(other: Vector2D): Boolean
