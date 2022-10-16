@@ -23,7 +23,7 @@ import javafx.stage.Stage
 import site.kevinb9n.javafx.InterpolatorDemo.JavafxSplineInterpolation
 import site.kevinb9n.math.factors
 import site.kevinb9n.plane.Angle
-import site.kevinb9n.plane.Point2
+import site.kevinb9n.plane.Point2D
 
 fun main() = Application.launch(Triangles::class.java)
 
@@ -282,19 +282,19 @@ class SliderWithReadout(
   }
     }
 
-enum class ShapeType(val points: List<Point2>) {
-  ISOS_TRI(listOf(Point2(0, 1), Point2(1, 1), Point2(0.5, 0))),
-  RIGHT_TRI(listOf(Point2(0, 1), Point2(1, 1), Point2(0, 0))),
-  RECTANGLE(listOf(Point2(0, 1), Point2(1, 1), Point2(1, 0), Point2(0, 0))),
-  ISOS_TRAP(listOf(Point2(0, 1), Point2(1, 1), Point2(0.75, 0), Point2(0.25, 0))),
-  RHOMBUS(listOf(Point2(0.5, 1), Point2(1, 0.5), Point2(0.5, 0), Point2(0, 0.5))),
-  PGRAM(listOf(Point2(0, 1), Point2(0.5, 1), Point2(1, 0), Point2(0.5, 0))),
+enum class ShapeType(val points: List<Point2D>) {
+  ISOS_TRI(listOf(Point2D(0, 1), Point2D(1, 1), Point2D(0.5, 0))),
+  RIGHT_TRI(listOf(Point2D(0, 1), Point2D(1, 1), Point2D(0, 0))),
+  RECTANGLE(listOf(Point2D(0, 1), Point2D(1, 1), Point2D(1, 0), Point2D(0, 0))),
+  ISOS_TRAP(listOf(Point2D(0, 1), Point2D(1, 1), Point2D(0.75, 0), Point2D(0.25, 0))),
+  RHOMBUS(listOf(Point2D(0.5, 1), Point2D(1, 0.5), Point2D(0.5, 0), Point2D(0, 0.5))),
+  PGRAM(listOf(Point2D(0, 1), Point2D(0.5, 1), Point2D(1, 0), Point2D(0.5, 0))),
   ;
 
   fun centeredPolygon(width: Number, height: Number): Polygon {
     val widthd = width.toDouble()
     val heightd = height.toDouble()
-    val realPoints = points.map { Point2((it.x - 0.5) * widthd, (it.y - 0.5) * heightd) }
+    val realPoints = points.map { Point2D((it.x - 0.5) * widthd, (it.y - 0.5) * heightd) }
     val polygon = pointsToPolygon(realPoints)
     require(polygon.boundsInLocal == BoundingBox(-widthd / 2, -heightd / 2, widthd, heightd))
     return polygon

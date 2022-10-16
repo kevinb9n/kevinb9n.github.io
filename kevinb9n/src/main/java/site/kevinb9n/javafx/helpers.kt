@@ -33,32 +33,31 @@ import javafx.scene.shape.Polygon
 import javafx.scene.shape.Rectangle
 import javafx.scene.shape.Shape
 import site.kevinb9n.math.mean
-import site.kevinb9n.plane.Point2
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-fun pointsToPolygon(vararg points: Point2): Polygon {
+fun pointsToPolygon(vararg points: site.kevinb9n.plane.Point2D): Polygon {
   val p = Polygon()
   p.points += points.flatMap { listOf(it.x, it.y) }
   return p
 }
 
-fun pointsToPolygon(points: List<Point2>): Polygon {
+fun pointsToPolygon(points: List<site.kevinb9n.plane.Point2D>): Polygon {
   val p = Polygon()
   p.points += points.flatMap { listOf(it.x, it.y) }
   return p
 }
 
-fun GraphicsContext.drawPolygon(vertices: List<Point2>) {
+fun GraphicsContext.drawPolygon(vertices: List<site.kevinb9n.plane.Point2D>) {
   fillPolygon(
     vertices.map { it.x }.toDoubleArray(),
     vertices.map { it.y }.toDoubleArray(),
     vertices.size)
 }
 
-fun box(minCorner: Point2, width: Number, height: Number) =
+fun box(minCorner: site.kevinb9n.plane.Point2D, width: Number, height: Number) =
   BoundingBox(minCorner.x, minCorner.y, width.toDouble(), height.toDouble())
 
 fun random(maxAbs: Number): Double {
@@ -134,13 +133,13 @@ class DragToTranslate(val node: Node) : Group(node) {
   }
 }
 
-fun centerBounds(points: List<Point2>): List<Point2> {
+fun centerBounds(points: List<site.kevinb9n.plane.Point2D>): List<site.kevinb9n.plane.Point2D> {
   if (points.isEmpty()) return points
   val xs = points.map { it.x }
   val ys = points.map { it.y }
   val centerx = mean(xs.minOrNull()!!, xs.maxOrNull()!!)
   val centery = mean(ys.minOrNull()!!, ys.maxOrNull()!!)
-  return points.map { Point2(it.x - centerx, it.y - centery) }
+  return points.map { site.kevinb9n.plane.Point2D(it.x - centerx, it.y - centery) }
 }
 
 fun <T> ObjectProperty<T>.bindObject(vararg dependencies: Observable, supplier: () -> T) =

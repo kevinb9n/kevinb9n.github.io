@@ -5,7 +5,6 @@ import javafx.scene.Scene
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
-import javafx.scene.transform.Rotate
 import javafx.scene.transform.Scale
 import javafx.stage.Stage
 

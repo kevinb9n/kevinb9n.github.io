@@ -14,14 +14,14 @@ import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.stage.Stage
-import site.kevinb9n.plane.Point2
+import site.kevinb9n.plane.Point2D
 import kotlin.math.abs
 
 fun main() = Application.launch(AffineExplorer::class.java)
 
 class AffineExplorer : Application() {
   override fun start(stage: Stage) {
-    val polygon = pointsToPolygon(Point2(0, 0), Point2(50, 50), Point2(100, 50), Point2(100, 100), Point2(0, 100)).apply {
+    val polygon = pointsToPolygon(Point2D(0, 0), Point2D(50, 50), Point2D(100, 50), Point2D(100, 100), Point2D(0, 100)).apply {
       stroke = Color.BLACK
     }
 

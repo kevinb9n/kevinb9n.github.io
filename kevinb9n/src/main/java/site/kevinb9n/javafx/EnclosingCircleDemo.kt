@@ -5,9 +5,9 @@ import javafx.scene.Scene
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.stage.Stage
-import site.kevinb9n.plane.Point2
 import site.kevinb9n.plane.Circle
-import site.kevinb9n.plane.enclosingCircle
+import site.kevinb9n.plane.Circle.Companion.enclosingCircle
+import site.kevinb9n.plane.Point2D
 import kotlin.math.roundToInt
 
 fun main() = Application.launch(EnclosingCircleDemo::class.java)
@@ -49,5 +49,5 @@ class EnclosingCircleDemo : Application() {
   private fun toJavafx(circle: Circle) = javafx.scene.shape.Circle(
     circle.center.x, circle.center.y, circle.radius)
 
-  private fun randomPoint() = Point2(200.0 + 600.0 * Math.random(), 200.0 + 600.0 * Math.random())
+  private fun randomPoint() = Point2D(200.0 + 600.0 * Math.random(), 200.0 + 600.0 * Math.random())
 }

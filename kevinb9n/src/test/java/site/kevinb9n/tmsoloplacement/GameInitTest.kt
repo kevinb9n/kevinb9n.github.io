@@ -31,7 +31,7 @@ class GameInitTest {
   ) {
     val cityLocations = HashMultiset.create<HexArea>()
     val greeneryLocations = HashMultiset.create<HexArea>()
-    for (i in 1..100_000) {
+    for (i in 1..1_000) { // so whole test takes ~1 second
       val board = Board(pm.map)
       val deck = AllExpansionsDeck()
 
