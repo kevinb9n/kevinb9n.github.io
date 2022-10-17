@@ -36,6 +36,7 @@ Vector2D {
   override operator fun div(scalar: Number) = CartesianVector2D(x / scalar.toDouble(), y / scalar.toDouble())
 
   override fun isHorizontal() = y == 0.0
+
   override fun equals(other: Any?) = other is Vector2D && closeEnough(x, other.x) && closeEnough(y, other.y)
 
   override fun toString(): String {

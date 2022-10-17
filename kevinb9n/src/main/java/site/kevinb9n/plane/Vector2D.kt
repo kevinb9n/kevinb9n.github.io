@@ -3,7 +3,7 @@ package site.kevinb9n.plane
 import site.kevinb9n.math.closeEnough
 import kotlin.math.sqrt
 
-interface Vector2D : Vector<Point2D, Vector2D> {
+interface Vector2D : AffineVector<Point2D, Vector2D> {
   companion object {
     private val TOLER = 1e-14
     fun vector(
@@ -76,5 +76,5 @@ interface Vector2D : Vector<Point2D, Vector2D> {
   fun isLeftTurn(other: Vector2D): Boolean
   fun collinear(other: Vector2D): Boolean
   fun isHorizontal(): Boolean
-  fun angleWith(other: Vector2D) = other.direction - direction // TODO: reverse??
+  fun angleWith(other: Vector2D) = other.direction - direction
 }

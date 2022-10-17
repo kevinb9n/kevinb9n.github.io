@@ -1,6 +1,6 @@
 package site.kevinb9n.plane
 
-interface Vector<P: Point<P, V>, V : Vector<P, V>> {
+interface AffineVector<P: AffinePoint<P, V>, V : AffineVector<P, V>> {
   val magnitude: Double
 
   // Useless or senseless: unaryPlus contains set invoke not
@@ -22,4 +22,4 @@ interface Vector<P: Point<P, V>, V : Vector<P, V>> {
 }
 
 // Make scalar multiplication commutative or whatever
-operator fun <P: Point<P, V>, V: Vector<P, V>> Number.times(v: V): V = v * this
+operator fun <P: AffinePoint<P, V>, V: AffineVector<P, V>> Number.times(v: V): V = v * this
