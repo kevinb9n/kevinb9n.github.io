@@ -6,6 +6,8 @@ data class PolarVector(override val magnitude: Double, override val direction: A
   override val magsq = magnitude * magnitude
   override val slope = direction.tan()
 
+  override fun reflect() = Vector2D.vector(magnitude=magnitude, direction=-direction)
+
   override fun unaryMinus() = PolarVector(magnitude, direction + Angle.HALF_TURN)
 
   override fun times(scalar: Number) = PolarVector(magnitude * scalar.toDouble(), direction)

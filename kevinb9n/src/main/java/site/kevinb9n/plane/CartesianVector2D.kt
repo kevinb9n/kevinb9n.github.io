@@ -2,6 +2,7 @@ package site.kevinb9n.plane
 
 import site.kevinb9n.math.closeEnough
 import site.kevinb9n.plane.Angle.Companion.radians
+import site.kevinb9n.plane.Vector2D.Companion.vector
 import kotlin.math.atan2
 import kotlin.math.hypot
 
@@ -15,8 +16,7 @@ Vector2D {
   override val direction = radians(atan2(y, x))
   override val slope = y / x
 
-  fun checkMagnitudeIs(mag: Double) = assert(closeEnough(magnitude, mag)) { magnitude }
-
+  override fun reflect() = vector(x, -y)
   override operator fun unaryMinus() = this * -1
 
   override operator fun plus(other: Vector2D) = CartesianVector2D(x + other.x, y + other.y)

@@ -88,62 +88,46 @@ class PointVectorTest {
     assertThat(vector(y=rad3, direction=d60)).isEqualTo(pv)
   }
 
-  fun dot(a1: Vector2D, a2: Vector2D, b1: Vector2D, b2: Vector2D): Double {
+  fun dot(a: Pair<Vector2D, Vector2D>, b: Pair<Vector2D, Vector2D>): Double {
     val x = doubleArrayOf(
-      a1.dot(b1),
-      a1.dot(b2),
-      a2.dot(b1),
-      a2.dot(b2),
+      a.first.dot(b.first),
+      a.first.dot(b.second),
+      a.second.dot(b.first),
+      a.second.dot(b.second),
     )
     val mean = Stats.meanOf(*x)
-    assertThat(x[0]).isWithin(1e-14).of(mean)
-    assertThat(x[1]).isWithin(1e-14).of(mean)
-    assertThat(x[2]).isWithin(1e-14).of(mean)
-    assertThat(x[3]).isWithin(1e-14).of(mean)
+    for (y in x) {
+      assertThat(y).isWithin(1e-14).of(mean)
+    }
+    return mean
+  }
+
+  fun cross(a: Pair<Vector2D, Vector2D>, b: Pair<Vector2D, Vector2D>): Double {
+    val x = doubleArrayOf(
+      a.first.cross(b.first),
+      a.first.cross(b.second),
+      a.second.cross(b.first),
+      a.second.cross(b.second),
+    )
+    val mean = Stats.meanOf(*x)
+    for (y in x) {
+      assertThat(y).isWithin(1e-14).of(mean)
+    }
     return mean
   }
 
   @Test fun products() {
-    val v1at30a = vector(magnitude=1.0, direction=degrees(30))
-    val v1at30b = vector(sqrt(3.0) / 2.0, 0.5)
-    val v2at90a = vector(magnitude=2.0, direction=degrees(90))
-    val v2at90b = vector(0.0, 2.0)
+    val v1at30 = vector(magnitude=1.0, direction=degrees(30)) to vector(sqrt(3.0) / 2.0, 0.5)
+    val v2at90 = vector(magnitude=2.0, direction=degrees(90)) to vector(0.0, 2.0)
 
-    assertThat(dot(v1at30a, v1at30b, v1at30a, v1at30b)).isWithin(1e-14).of(1.0)
+    assertThat(dot(v1at30, v1at30)).isWithin(1e-14).of(1.0)
+    assertThat(cross(v1at30, v1at30)).isWithin(1e-14).of(0.0)
+    assertThat(dot(v2at90, v2at90)).isWithin(1e-14).of(4.0)
+    assertThat(cross(v2at90, v2at90)).isWithin(1e-14).of(0.0)
 
-    assertThat(v1at30a.cross(v1at30a)).isWithin(1e-14).of(0.0)
-    assertThat(v1at30a.cross(v1at30b)).isWithin(1e-14).of(0.0)
-    assertThat(v1at30b.cross(v1at30a)).isWithin(1e-14).of(0.0)
-    assertThat(v1at30b.cross(v1at30b)).isWithin(1e-14).of(0.0)
-
-    assertThat(v2at90a.dot(v2at90a)).isWithin(1e-14).of(4.0)
-    assertThat(v2at90a.dot(v2at90b)).isWithin(1e-14).of(4.0)
-    assertThat(v2at90b.dot(v2at90a)).isWithin(1e-14).of(4.0)
-    assertThat(v2at90b.dot(v2at90b)).isWithin(1e-14).of(4.0)
-
-    assertThat(v2at90a.cross(v2at90a)).isWithin(1e-14).of(0.0)
-    assertThat(v2at90a.cross(v2at90b)).isWithin(1e-14).of(0.0)
-    assertThat(v2at90b.cross(v2at90a)).isWithin(1e-14).of(0.0)
-    assertThat(v2at90b.cross(v2at90b)).isWithin(1e-14).of(0.0)
-
-    assertThat(v1at30a.dot(v2at90a)).isWithin(1e-14).of(1.0)
-    assertThat(v1at30a.dot(v2at90b)).isWithin(1e-14).of(1.0)
-    assertThat(v1at30b.dot(v2at90a)).isWithin(1e-14).of(1.0)
-    assertThat(v1at30b.dot(v2at90b)).isWithin(1e-14).of(1.0)
-
-    assertThat(v2at90a.dot(v1at30a)).isWithin(1e-14).of(1.0)
-    assertThat(v2at90a.dot(v1at30b)).isWithin(1e-14).of(1.0)
-    assertThat(v2at90b.dot(v1at30a)).isWithin(1e-14).of(1.0)
-    assertThat(v2at90b.dot(v1at30b)).isWithin(1e-14).of(1.0)
-
-    assertThat(v1at30a.cross(v2at90a)).isWithin(1e-14).of(sqrt(3.0))
-    assertThat(v1at30a.cross(v2at90b)).isWithin(1e-14).of(sqrt(3.0))
-    assertThat(v1at30b.cross(v2at90a)).isWithin(1e-14).of(sqrt(3.0))
-    assertThat(v1at30b.cross(v2at90b)).isWithin(1e-14).of(sqrt(3.0))
-
-    assertThat(v2at90a.cross(v1at30a)).isWithin(1e-14).of(-sqrt(3.0))
-    assertThat(v2at90a.cross(v1at30b)).isWithin(1e-14).of(-sqrt(3.0))
-    assertThat(v2at90b.cross(v1at30a)).isWithin(1e-14).of(-sqrt(3.0))
-    assertThat(v2at90b.cross(v1at30b)).isWithin(1e-14).of(-sqrt(3.0))
+    assertThat(dot(v1at30, v2at90)).isWithin(1e-14).of(1.0)
+    assertThat(dot(v2at90, v1at30)).isWithin(1e-14).of(1.0)
+    assertThat(cross(v1at30, v2at90)).isWithin(1e-14).of(sqrt(3.0))
+    assertThat(cross(v2at90, v1at30)).isWithin(1e-14).of(-sqrt(3.0))
   }
 }

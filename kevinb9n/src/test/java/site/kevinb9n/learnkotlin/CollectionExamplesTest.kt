@@ -11,32 +11,29 @@ class CollectionExamplesTest {
     assertThat(c.all { it > 0 }).isTrue();
     assertThat(c.all { it > 1 }).isFalse();
 
-    val holder1 = object { var touched = false }
-    assertThat(c.also { holder1.touched = true }).containsExactlyElementsIn(c).inOrder()
-
     assertThat(c.any()).isTrue()
     assertThat(listOf<Int>().any()).isFalse()
 
     assertThat(c.any { it <= 1 }).isTrue();
     assertThat(c.any { it <= 0 }).isFalse();
 
-    c.apply { forEach(::println) } as List<Int>
     c.asIterable() as Iterable<Int>
     c.asSequence() as Sequence<Int>
 
     // key expr "to" val expr
     c.associate(transform = { "foo $it" to it + 0.1 }) as Map<String, Double>
     c.associateBy(keySelector = { "foo $it" }, valueTransform = { it + 0.1 }) as Map<String, Double>
-
     // key expr to actual value, last wins
     c.associateBy(keySelector = { "foo $it" }) as Map<String, Int>
     // actual key to value expr
     c.associateWith(valueSelector = { it + 0.1 }) as Map<Int, Double>
 
+    // those again but writing into a mutable map
     c.associateTo(destination = mutableMapOf(), transform = { "foo $it" to it + 0.1 }) as MutableMap<String, Double>
     c.associateByTo(destination = mutableMapOf(), keySelector = { "foo $it" }, valueTransform = { it + 0.1 }) as MutableMap<String, Double>
     c.associateByTo(destination = mutableMapOf(), keySelector = { "foo $it" }) as MutableMap<String, Int>
     c.associateWithTo(destination = mutableMapOf(), valueSelector = { it + 0.1 }) as MutableMap<Int, Double>
+
     c.average() as Double // numeric types only
     c.chunked(size = 5) as List<List<Int>>
     c.chunked(size = 5, transform = { it.average() }) as List<Double>

@@ -70,9 +70,10 @@ interface Vector2D : AffineVector<Point2D, Vector2D> {
   override fun plus(other: Vector2D) = CartesianVector2D(x + other.x, y + other.y)
   override fun plus(point: Point2D) = Point2D(x + point.x, y + point.y)
 
+  fun reflect(): Vector2D
   fun rotate(angle: Angle) = PolarVector(magnitude, direction + angle)
-  fun dot(other: Vector2D): Double
-  fun cross(other: Vector2D): Double
+  infix fun dot(other: Vector2D): Double
+  infix fun cross(other: Vector2D): Double
   fun isLeftTurn(other: Vector2D): Boolean
   fun collinear(other: Vector2D): Boolean
   fun isHorizontal(): Boolean
