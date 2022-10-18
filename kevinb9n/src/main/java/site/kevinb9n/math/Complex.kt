@@ -52,6 +52,8 @@ data class Complex(val v: Vector2D) {
   fun cos() = Complex(cos(re) * cosh(im), sin(re) * sinh(im))
   fun tan() = Complex(tan(re), tanh(im)) / Complex(1.0, -tan(re) * tanh(im))
 
+  override fun toString() = "$re + ${im}i"
+
   companion object {
     val ZERO = fromRe(0.0)
     val I = fromIm(1.0)

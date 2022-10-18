@@ -1,11 +1,16 @@
 package site.kevinb9n.math
 
+import java.lang.Math.pow
 import kotlin.math.abs
 import kotlin.math.round
+import kotlin.math.sqrt
 
 fun gcd(a: Int, b: Int): Int =
   if (b == 0) abs(a)
   else gcd(b, a.mod(b))
+
+val PHI = mean(1.0, sqrt(5.0))
+fun fib(n: Int) = round(pow(PHI, n.toDouble()) / sqrt(5.0))
 
 fun closeEnough(d1: Number, d2: Number) = distance(d1.toDouble(), d2.toDouble()) < 1e-15
 
