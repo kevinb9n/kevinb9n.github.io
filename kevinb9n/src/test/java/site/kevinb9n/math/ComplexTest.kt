@@ -26,6 +26,8 @@ class ComplexTest {
   }
 
   private fun checkEverything(a: Complex, b: Complex) {
+    checkEqual(a * 1, a)
+    checkEqual(a / 1, a)
     checkEqual(-a, a * -1)
     checkEqual(a + a, a * 2)
     checkEqual(a + a - a, a)
@@ -33,10 +35,10 @@ class ComplexTest {
     checkEqual(a + b, b + a)
     checkEqual(a + b, b + a)
     checkEqual(a * b, b * a)
-    checkEqual(a * 1, a)
     checkEqual(a / a, Complex(1.0, 0.0))
     checkEqual(a * b / b, a)
     checkEqual(a * b / a, b)
+    checkEqual(a, a * 274 - a * 273)
     checkEqual(a / 5.0, a * 0.2)
     checkEqual(a + (b + a), (a + b) + a)
     checkEqual(a * (b + a), a * b + a * a)
