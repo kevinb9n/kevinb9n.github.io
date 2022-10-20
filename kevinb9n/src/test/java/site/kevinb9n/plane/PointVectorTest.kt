@@ -19,9 +19,9 @@ class PointVectorTest {
     assertThat(Vector2D.ZERO + Point2D(3, 4)).isEqualTo(Point2D(3, 4))
     assertThat(CartesianVector2D(3, 4) - Vector2D.ZERO).isEqualTo(CartesianVector2D(3, 4))
     assertThat(-CartesianVector2D(3, 4)).isEqualTo(CartesianVector2D(-3, -4))
-    assertThat(CartesianVector2D(3, 4) * 2).isEqualTo(CartesianVector2D(6, 8))
-    assertThat(2 * CartesianVector2D(3, 4)).isEqualTo(CartesianVector2D(6, 8))
-    assertThat(CartesianVector2D(3, 4) / 2).isEqualTo(CartesianVector2D(1.5, 2))
+    assertThat(CartesianVector2D(3, 4) * 2.0).isEqualTo(CartesianVector2D(6, 8))
+    assertThat(2.0 * CartesianVector2D(3, 4)).isEqualTo(CartesianVector2D(6, 8))
+    assertThat(CartesianVector2D(3, 4) / 2.0).isEqualTo(CartesianVector2D(1.5, 2))
   }
 
   @Test fun testMagnitude() {

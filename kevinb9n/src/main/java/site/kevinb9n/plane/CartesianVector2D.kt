@@ -11,33 +11,32 @@ Vector2D {
   internal constructor(x: Number, y: Number) : this(x.toDouble(), y.toDouble())
 
   override val magnitude = hypot(x, y)
-  override val magsq = x * x + y * y
+  override val magnitudeSquared = x * x + y * y
 
   override val direction = radians(atan2(y, x))
   override val slope = y / x
 
   override fun reflect() = vector(x, -y)
-  override operator fun unaryMinus() = this * -1
+  override operator fun unaryMinus() = this * -1.0
 
-  override operator fun plus(other: Vector2D) = CartesianVector2D(x + other.x, y + other.y)
+  override operator fun plus(that: Vector2D) = copy(this.x + that.x, this.y + that.y)
   override operator fun plus(point: Point2D) = point + this
 
   override operator fun minus(other: Vector2D) = this + -other
 
-  override operator fun times(scalar: Number) = CartesianVector2D(x * scalar.toDouble(), y * scalar
-    .toDouble())
+  override operator fun times(scalar: Double) = copy(x * scalar, y * scalar)
 
   /** dot product */
-  override fun dot(other: Vector2D) = x * other.x + y * other.y
-  override fun cross(other: Vector2D) = x * other.y - y * other.x
-  override fun isLeftTurn(other: Vector2D) = x * other.y > y * other.x
-  override fun collinear(other: Vector2D) = x * other.y == y * other.x // toler?
+  override fun dot(that: Vector2D)        = this.x * that.x + this.y * that.y
+  override fun cross(that: Vector2D)      = this.x * that.y - this.y * that.x
+  override fun isLeftTurn(that: Vector2D) = this.x * that.y > this.y * that.x
+  override fun collinear(that: Vector2D)  = this.x * that.y == this.y * that.x // toler?
 
-  override operator fun div(scalar: Number) = CartesianVector2D(x / scalar.toDouble(), y / scalar.toDouble())
+  override operator fun div(scalar: Double) = copy(x / scalar, y / scalar)
 
   override fun isHorizontal() = y == 0.0
 
-  override fun equals(other: Any?) = other is Vector2D && closeEnough(x, other.x) && closeEnough(y, other.y)
+  override fun equals(that: Any?) = that is Vector2D && closeEnough(x, that.x) && closeEnough(y, that.y)
 
   override fun toString(): String {
     return "CartesianVector2D(x=$x, y=$y, magnitude=$magnitude, direction=$direction)"

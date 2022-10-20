@@ -15,7 +15,7 @@ interface Vector2D : AffineVector<Point2D, Vector2D> {
       val yd = y?.toDouble()
       val md = magnitude?.toDouble()
 
-      require(md == null || md >= 0.0)
+      require(md == null || md >= 0.0) { "x $x y $y mag $md dir $direction" }
 
       val v = if (md == 0.0) {
         PolarVector(0.0, Angle.ZERO)
@@ -56,26 +56,26 @@ interface Vector2D : AffineVector<Point2D, Vector2D> {
     }
     val ZERO = CartesianVector2D(0, 0)
 
-    fun mean(vararg vectors: Vector2D) = vectors.reduce(Vector2D::plus) / vectors.size
+    fun mean(vararg vectors: Vector2D) = vectors.reduce(Vector2D::plus) / vectors.size.toDouble()
   }
 
   override val magnitude: Double
 
   val x: Double
   val y: Double
-  val magsq: Double
+  val magnitudeSquared: Double
   val direction: Angle
   val slope: Double
 
-  override fun plus(other: Vector2D) = CartesianVector2D(x + other.x, y + other.y)
+  override fun plus(that: Vector2D) = CartesianVector2D(x + that.x, y + that.y)
   override fun plus(point: Point2D) = Point2D(x + point.x, y + point.y)
 
   fun reflect(): Vector2D
   fun rotate(angle: Angle) = PolarVector(magnitude, direction + angle)
-  infix fun dot(other: Vector2D): Double
-  infix fun cross(other: Vector2D): Double
-  fun isLeftTurn(other: Vector2D): Boolean
-  fun collinear(other: Vector2D): Boolean
+  infix fun dot(that: Vector2D): Double
+  infix fun cross(that: Vector2D): Double
+  fun isLeftTurn(that: Vector2D): Boolean
+  fun collinear(that: Vector2D): Boolean
   fun isHorizontal(): Boolean
-  fun angleWith(other: Vector2D) = other.direction - direction
+  fun angleWith(that: Vector2D) = that.direction - this.direction
 }

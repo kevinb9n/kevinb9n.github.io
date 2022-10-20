@@ -2,6 +2,7 @@ package site.kevinb9n.music
 
 import com.google.common.math.IntMath.mod
 import site.kevinb9n.math.modWithMinimum
+import site.kevinb9n.music.Accidental.NATURAL
 import site.kevinb9n.music.PitchClass.PC00
 import site.kevinb9n.music.PitchClass.PC02
 import site.kevinb9n.music.PitchClass.PC03
@@ -13,6 +14,7 @@ import site.kevinb9n.music.SimpleIntervalSize.FIFTH
 import site.kevinb9n.music.SimpleIntervalSize.FOURTH
 import site.kevinb9n.music.SimpleIntervalSize.SECOND
 import site.kevinb9n.music.SimpleIntervalSize.SEVENTH
+import site.kevinb9n.music.SimpleIntervalSize.SIXTH
 import site.kevinb9n.music.SimpleIntervalSize.THIRD
 
 /**
@@ -98,7 +100,7 @@ enum class SimpleIntervalSize(val semitonesLower: Int, val semitonesHigher: Int)
     }
 }
 
-enum class IntervalQuality {
+enum class Quality {
   TWICE_DIMINISHED {
     override fun semitones(size: SimpleIntervalSize) = size.semitonesLower - 2
   },
@@ -122,23 +124,23 @@ enum class IntervalQuality {
   },
   ;
 
-  operator fun unaryMinus() = enumValues<IntervalQuality>()[6 - ordinal]
-  operator fun plus(size: SimpleIntervalSize) = SimpleInterval(size, this)
+  operator fun unaryMinus() = enumValues<Quality>()[6 - ordinal]
+  operator fun plus(size: SimpleIntervalSize) = SimpleInterval(this, size)
   abstract fun semitones(size: SimpleIntervalSize): Int
 }
 
-data class SimpleInterval(val size: SimpleIntervalSize, val quality: IntervalQuality = IntervalQuality.PERFECT) {
+data class SimpleInterval(val quality: Quality = Quality.PERFECT, val size: SimpleIntervalSize) {
   init {
     require(semitones in 0..12)
   }
 
   val semitones: Int get() = quality.semitones(size)
-  operator fun unaryMinus() = SimpleInterval(-size, -quality)
+  operator fun unaryMinus() = SimpleInterval(-quality, -size)
 }
 
 data class PitchClassSpelling(
   val name: PitchName,
-  val modifier: Accidental = Accidental.NATURAL) {
+  val modifier: Accidental = NATURAL) {
   fun pitchClass() = name.pc + modifier.offsetSemitones
   override fun toString() = "$name$modifier"
 
@@ -156,31 +158,55 @@ interface ChordFlavor {
 
 // names conflict with interval qualities
 enum class TriadFlavor(override val intervals: List<SimpleInterval>) : ChordFlavor {
-  DIMINISHED(listOf(IntervalQuality.MINOR + THIRD, IntervalQuality.DIMINISHED + FIFTH)),
-  MINOR(listOf(IntervalQuality.MINOR + THIRD, IntervalQuality.PERFECT + FIFTH)),
-  MAJOR(listOf(IntervalQuality.MAJOR + THIRD, IntervalQuality.PERFECT + FIFTH)),
-  AUGMENTED(listOf(IntervalQuality.MAJOR + THIRD, IntervalQuality.AUGMENTED + FIFTH)),
-  NO_THIRD(listOf(IntervalQuality.PERFECT + FIFTH)),
-  SUS2(listOf(IntervalQuality.MAJOR + SECOND, IntervalQuality.PERFECT + FIFTH)),
-  SUS4(listOf(IntervalQuality.PERFECT + FOURTH, IntervalQuality.PERFECT + FIFTH)),
+  DIMINISHED(Quality.MINOR + THIRD, Quality.DIMINISHED + FIFTH),
+  MINOR(Quality.MINOR + THIRD, Quality.PERFECT + FIFTH),
+  MAJOR(Quality.MAJOR + THIRD, Quality.PERFECT + FIFTH),
+  AUGMENTED(Quality.MAJOR + THIRD, Quality.AUGMENTED + FIFTH),
+  NO_THIRD(Quality.PERFECT + FIFTH),
+  SUS2(Quality.MAJOR + SECOND, Quality.PERFECT + FIFTH),
+  SUS4(Quality.PERFECT + FOURTH, Quality.PERFECT + FIFTH);
+
+  constructor(a: SimpleInterval) : this(listOf(a))
+  constructor(a: SimpleInterval, b: SimpleInterval) : this(listOf(a, b))
+}
+
+enum class TetradFlavor(val triad: TriadFlavor, val seventh: Quality) : ChordFlavor {
+  DOMINANT7(TriadFlavor.MAJOR, Quality.MINOR),
+  MAJOR7(TriadFlavor.MAJOR, Quality.MAJOR),
+  MINOR7(TriadFlavor.MINOR, Quality.MINOR),
+  MINOR_MAJOR7(TriadFlavor.MINOR, Quality.MAJOR),
+  DIMINISHED7(TriadFlavor.DIMINISHED, Quality.DIMINISHED),
+  HALF_DIMINISHED7(TriadFlavor.DIMINISHED, Quality.MINOR),
+  SEVENTH_SUS4(TriadFlavor.SUS4, Quality.MINOR),
+  ;
+
+  override val intervals = triad.intervals + SimpleInterval(seventh, SEVENTH)
+}
+
+enum class AddOn(val interval: SimpleInterval) {
+  ADD_FLAT6(Quality.MINOR + SIXTH),
+  ADD6(Quality.MAJOR + SIXTH),
+  ADD_FLAT9(Quality.MINOR + SECOND),
+  ADD9(Quality.MAJOR + SECOND),
+  ADD_SHARP9(Quality.AUGMENTED + SECOND),
+  ADD11(Quality.PERFECT + FOURTH)
   ;
 }
 
-enum class TetradFlavor(val triad: TriadFlavor, val seventh: IntervalQuality) : ChordFlavor {
-  DOMINANT7(TriadFlavor.MAJOR, IntervalQuality.MINOR),
-  MAJOR7(TriadFlavor.MAJOR, IntervalQuality.MAJOR),
-  MINOR7(TriadFlavor.MINOR, IntervalQuality.MINOR),
-  MINOR_MAJOR7(TriadFlavor.MINOR, IntervalQuality.MAJOR),
-  DIMINISHED7(TriadFlavor.DIMINISHED, IntervalQuality.DIMINISHED),
-  HALF_DIMINISHED7(TriadFlavor.DIMINISHED, IntervalQuality.MINOR),
-  SEVENTH_SUS4(TriadFlavor.SUS4, IntervalQuality.MINOR),
-  ;
-
-  override val intervals get() = triad.intervals + SimpleInterval(SEVENTH, seventh)
+data class AddOnFlavor(val base: ChordFlavor, val added: AddOn): ChordFlavor {
+  override val intervals = base.intervals + added.interval
 }
 
-data class ChordSpelling(val flavor: ChordFlavor, val root: PitchClassSpelling) {
+data class ChordSpelling(val root: PitchClassSpelling, val flavor: ChordFlavor) {
+  constructor(
+    name: PitchName,
+    modifier: Accidental = NATURAL,
+    flavor: ChordFlavor = TriadFlavor.MAJOR) :
+      this(PitchClassSpelling(name, modifier), flavor)
+  constructor(name: PitchName, flavor: ChordFlavor) : this(name, NATURAL, flavor)
   fun pitchClasses(): List<PitchClassSpelling> = listOf(root) + flavor.intervals.map { root + it }
+  fun transpose(interval: SimpleInterval) = copy(root + interval)
+  fun transpose(quality: Quality, size: SimpleIntervalSize) = transpose(SimpleInterval(quality, size))
 }
 
 inline fun <reified T : Enum<T>> cyclicPlus(start: T, distance: Int): T {

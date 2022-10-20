@@ -1,52 +1,65 @@
 package site.kevinb9n.math
 
-import site.kevinb9n.plane.Angle
 import site.kevinb9n.plane.Angle.Companion.radians
 import site.kevinb9n.plane.Vector2D
 import site.kevinb9n.plane.Vector2D.Companion.vector
-import kotlin.math.cos
-import kotlin.math.cosh
-import kotlin.math.sin
-import kotlin.math.sinh
-import kotlin.math.tan
-import kotlin.math.tanh
+import kotlin.math.*
 
-data class Complex(val v: Vector2D) {
-  constructor(re: Number, im: Number) : this(vector(re, im))
+interface Field<F : Field<F>> {
+  operator fun plus(that: F): F
+  operator fun minus(that: F): F
+  operator fun times(that: F): F
+  operator fun div(that: F): F
+}
 
-  /** Representing this number as `(a + bi)`, returns `a`. */
-  val re = v.x
+data class Complex private constructor(private val asVector: Vector2D) : Field<Complex> {
+  constructor(re: Double, im: Double) : this(vector(x=re, y=im))
 
-  /** Representing this number as `(a + bi)`, returns `b`. */
-  val im = v.y
+  /** Representing this complex number as `a+bi`, returns `a`. */
+  val re = asVector.x
 
-  /** Representing this number as `re^(ix)`, returns `r`. */
-  fun abs() = v.magnitude
+  /** Representing this complex number as `a+bi`, returns `b`. */
+  val im = asVector.y
 
-  /** Representing this number as `re^(ix)`, returns `x`. */
-  fun theta() = v.direction
+  /** Representing this complex number as `re^(ix)`, returns `r`. */
+  fun abs() = asVector.magnitude
 
-  /** Returns `a-bi`, or `re^(-ix)` */
-  fun conjugate() = Complex(v.reflect())
+  /** Representing this complex number as `re^(ix)`, returns `x`. */
+  fun theta() = asVector.direction.radians
+
+  /**
+   * There are two numbers that satisfy `i^2 = -1`, and we *arbitrarily* call one of them `i` and
+   * the other one `-i`. What if we'd picked the other way around? A number's "conjugate" is formed
+   * by replacing `i` with `-i` and vice versa; that is, `a-bi`, or in polar form `re^(-ix)`. The
+   * sum or product of any number with its conjugate is always a real number.
+   */
+  fun conjugate() = copy(asVector.reflect())
 
   operator fun plus(x: Number) = this + fromRe(x)
-  operator fun plus(that: Complex) = Complex(this.v + that.v)
+  override fun plus(that: Complex) = copy(this.asVector + that.asVector)
 
   operator fun minus(x: Number) = this - fromRe(x)
-  operator fun minus(that: Complex) = Complex(this.v - that.v)
+  override fun minus(that: Complex) = copy(this.asVector - that.asVector)
 
   operator fun unaryMinus() = this * -1.0
 
-  operator fun times(x: Number) = Complex(v * x)
-  operator fun times(that: Complex): Complex {
-    val conv = conjugate().v
-    return Complex(conv dot that.v, conv cross that.v)
+  operator fun times(x: Number) = copy(asVector * x.toDouble())
+  override fun times(that: Complex): Complex {
+    val conv = conjugate().asVector
+    return Complex(conv dot that.asVector, conv cross that.asVector)
   }
 
-  operator fun div(x: Number) = Complex(v / x)
-  operator fun div(that: Complex): Complex {
-    return Complex(that.v dot this.v, that.v cross this.v) / that.v.magsq
-  }
+  operator fun div(x: Number) = Complex(asVector / x.toDouble())
+  override fun div(that: Complex) =
+    // not sure why this approach ends up trying to make a negative magnitude
+    // return this * fromPolar(abs = 1.0 / that.abs(), theta = -(that.theta()))
+    Complex(that.asVector dot this.asVector, that.asVector cross this.asVector) /
+      that.asVector.magnitudeSquared
+
+  fun distance(that: Complex): Double = (this - that).abs()
+  fun nearlyEquals(that: Complex, tolerance: Double) = distance(that) <= tolerance
+
+  fun pow(exponent: Double) = fromPolar(abs().pow(exponent), theta() * exponent)
 
   fun sin() = Complex(sin(re) * cosh(im), cos(re) * sinh(im))
   fun cos() = Complex(cos(re) * cosh(im), sin(re) * sinh(im))
@@ -61,7 +74,7 @@ data class Complex(val v: Vector2D) {
     fun fromRe(re: Number) = Complex(re.toDouble(), 0.0)
     fun fromIm(im: Number) = Complex(0.0, im.toDouble())
 
-    fun fromPolar(mag: Number, theta: Number) =
-      Complex(vector(magnitude=mag, direction=radians(theta)))
+    fun fromPolar(abs: Number, theta: Number) =
+      Complex(vector(magnitude=abs, direction=radians(theta)))
   }
 }

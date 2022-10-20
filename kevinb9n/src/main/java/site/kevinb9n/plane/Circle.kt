@@ -29,8 +29,8 @@ data class Circle(val center: Point2D, val radius: Double) : PosClosedShape {
       //if (denom == 0.0) return null // collinear, I guess?
 
       val center = boxCenter + Vector2D.vector(
-        sumProduct(relToBoxCenter.map { it.magsq }, edges.map { it.y }) / denom,
-        sumProduct(relToBoxCenter.map { it.magsq }, edges.map { it.x }) / -denom,
+        sumProduct(relToBoxCenter.map { it.magnitudeSquared }, edges.map { it.y }) / denom,
+        sumProduct(relToBoxCenter.map { it.magnitudeSquared }, edges.map { it.x }) / -denom,
       )
       val radius = listOf(a, b, c).maxOf { center.distance(it) }
       return Circle(center, radius)

@@ -1,31 +1,36 @@
 package site.kevinb9n.plane
 
 data class PolarVector(override val magnitude: Double, override val direction: Angle) : Vector2D {
+  init {
+    require(magnitude >= 0.0) { magnitude }
+  }
   override val x = magnitude * direction.cos()
   override val y = magnitude * direction.sin()
-  override val magsq = magnitude * magnitude
+  override val magnitudeSquared = magnitude * magnitude
   override val slope = direction.tan()
 
-  override fun reflect() = Vector2D.vector(magnitude=magnitude, direction=-direction)
+  override fun reflect() = copy(direction = -direction)
 
-  override fun unaryMinus() = PolarVector(magnitude, direction + Angle.HALF_TURN)
+  override fun unaryMinus() = rotate(Angle.HALF_TURN)
 
-  override fun times(scalar: Number) = PolarVector(magnitude * scalar.toDouble(), direction)
+  override fun times(scalar: Double): PolarVector {
+    return if (scalar >= 0.0) copy(magnitude * scalar) else -copy(magnitude * -scalar)
+  }
 
-  override fun div(scalar: Number) = PolarVector(magnitude / scalar.toDouble(), direction)
+  override fun div(scalar: Double) = 1.0 / scalar * this
 
-  override fun dot(other: Vector2D) = magnitude * other.magnitude * angleWith(other).cos()
+  override fun dot(that: Vector2D) = this.magnitude * that.magnitude * this.angleWith(that).cos()
 
-  override fun cross(other: Vector2D) = magnitude * other.magnitude * angleWith(other).sin()
+  override fun cross(that: Vector2D) = this.magnitude * that.magnitude * this.angleWith(that).sin()
 
-  override fun isLeftTurn(other: Vector2D) = angleWith(other).degrees >= 0.0
+  override fun isLeftTurn(that: Vector2D) = this.angleWith(that).degrees >= 0.0
 
-  override fun collinear(other: Vector2D) = direction == other.direction
+  override fun collinear(that: Vector2D) = this.direction == that.direction
 
   override fun isHorizontal() = direction == Angle.ZERO || direction == Angle.HALF_TURN
 
-  override fun equals(other: Any?): Boolean {
-    return other is Vector2D && magnitude == other.magnitude && direction == other.direction
+  override fun equals(that: Any?): Boolean {
+    return that is Vector2D && this.magnitude == that.magnitude && this.direction == that.direction
   }
 
   override fun toString(): String {

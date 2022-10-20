@@ -2,6 +2,7 @@ import com.google.common.collect.Collections2
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.SetMultimap
+import site.kevinb9n.math.roundToBinaryDecimalPlaces
 import java.util.*
 
 fun main() {
@@ -21,8 +22,6 @@ fun main() {
       }
     }
   }
-  // (a^2 b / (bd-cd)(d-ac))
-  // bd^2-abcd-cd^2+ac^2d / a^2 b
   println(multimap.keySet().size)
   val smallestGap = doubleArrayOf(Double.POSITIVE_INFINITY)
   val last = doubleArrayOf(-Double.MAX_VALUE)
@@ -43,9 +42,6 @@ fun main() {
   println(smallestGap[0])
   println(closest[0])
 }
-
-private fun roundToBinaryDecimalPlaces(result: Double) =
-  Math.scalb(Math.rint(Math.scalb(result, 30)), -30)
 
 private enum class Num(val value: Double) {
   a(1 + Math.random()),

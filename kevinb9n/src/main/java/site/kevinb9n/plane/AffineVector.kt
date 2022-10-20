@@ -12,8 +12,8 @@ interface AffineVector<P: AffinePoint<P, V>, V : AffineVector<P, V>> {
 
   operator fun plus(other: V): V
   operator fun plus(point: P): P
-  operator fun times(scalar: Number): V
-  operator fun div(scalar: Number): V
+  operator fun times(scalar: Double): V
+  operator fun div(scalar: Double): V
 
   // times(V) would be ambiguous between dot/cross product...
 
@@ -22,4 +22,4 @@ interface AffineVector<P: AffinePoint<P, V>, V : AffineVector<P, V>> {
 }
 
 // Make scalar multiplication commutative or whatever
-operator fun <P: AffinePoint<P, V>, V: AffineVector<P, V>> Number.times(v: V): V = v * this
+operator fun <P: AffinePoint<P, V>, V: AffineVector<P, V>> Double.times(v: V): V = v * this
