@@ -41,7 +41,7 @@ data class Complex private constructor(private val asVector: Vector2D) : Field<C
   operator fun minus(x: Number) = this - fromRe(x)
   override fun minus(that: Complex) = copy(this.asVector - that.asVector)
 
-  operator fun unaryMinus() = this * -1.0
+  operator fun unaryMinus() = copy(-asVector)
 
   operator fun times(x: Number) = copy(asVector * x.toDouble())
   override fun times(that: Complex): Complex {
