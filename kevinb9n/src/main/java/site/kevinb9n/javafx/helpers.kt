@@ -1,5 +1,6 @@
 package site.kevinb9n.javafx
 
+import com.google.common.base.Stopwatch
 import javafx.beans.Observable
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.Bindings.min
@@ -277,3 +278,37 @@ fun lookupByIndexBinding(source: ObservableNumberValue, array: IntArray): Intege
     override fun dispose() = unbind(source)
   }
 }
+
+fun findBestRotation(polygons: List<Polygon>): Double {
+  val stopwatch = Stopwatch.createStarted()
+  val neverShown = Group()
+  neverShown.children += polygons.map(::clone)
+
+  // It would be fun to find a better algorithm for this
+  var best = findBestOf(0 until 180 step 30, neverShown) // 6
+  best = findBestOf(best - 25..best + 25 step 10, neverShown) // 6
+  best = findBestOf(best - 7..best + 8 step 3, neverShown) // 6
+  best = findBestOf(best - 2..best + 2, neverShown) // 5
+  println(stopwatch)
+  println("angle: $best")
+  return best.toDouble()
+}
+
+fun clone(it: Polygon) = Polygon().apply {
+  this.points.addAll(it.points)
+  translateX = it.translateX
+  translateY = it.translateY
+  rotate = it.rotate
+  scaleX = it.scaleX
+  scaleY = it.scaleY
+//  strokeWidth = it.strokeWidth
+//  strokeLineJoin = it.strokeLineJoin
+//  strokeType = it.strokeType
+//  stroke = it.stroke
+//  require(boundsInLocal == it.boundsInLocal) { "\n$boundsInLocal\n${it.boundsInLocal}" }
+}
+
+fun findBestOf(anglesToTry: IntProgression, neverShown: Group) = anglesToTry.minByOrNull {
+  neverShown.rotate = it.toDouble()
+  neverShown.boundsInParent.height
+}!!

@@ -29,8 +29,8 @@ fun Double.modWithMinimum(modulus: Double, minimum: Double) = minimum + (this - 
 fun Int.modWithMinimum(modulus: Int, minimum: Int) = minimum + (this - minimum).mod(modulus)
 
 fun sumProduct(list1: List<Double>, list2: List<Double>) = list1.zip(list2) { a, b -> a * b }.sum()
-fun factors(value: Int): IntArray = (1 .. value).filter { value % it == 0 }.toIntArray()
-fun mean(a: Double, b: Double) = (a + b) / 2.0
+fun factors(value: Int): List<Int> = (1 .. value).filter { value % it == 0 }
+fun mean(a: Double, b: Double) = a + (b - a) / 2.0
 
-fun roundToBinaryDecimalPlaces(result: Double, places: Int = 30) =
+fun roundToBinaryDecimalPlaces(result: Double, places: Int) =
   Math.scalb(Math.rint(Math.scalb(result, places)), -places)

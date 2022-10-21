@@ -1,17 +1,12 @@
 package site.kevinb9n.javafx
 
-import com.google.common.base.Stopwatch
 import javafx.application.Application
-import javafx.beans.binding.Bindings.format
-import javafx.beans.property.SimpleDoubleProperty
 import javafx.geometry.BoundingBox
 import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.Button
-import javafx.scene.control.Label
 import javafx.scene.control.Slider
-import javafx.scene.control.Tooltip
 import javafx.scene.layout.Background
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
@@ -87,7 +82,7 @@ class Triangles : Application() {
       get bunchy
     """).also { controlPanel.children += it }
 
-    val overallXControl = SliderWithReadout(Slider(0.0, 2000.0, 800.0),
+    val overallXControl = SliderWithReadout(Slider(0.0, 2000.0, 1200.0),
       "Overall Translate X", 1.0, "%.0f", "Horizontally position the diagram").also {
       controlPanel.children += it }
 
@@ -98,13 +93,16 @@ class Triangles : Application() {
     val overallRotControl = SliderWithReadout(Slider(-225.0, 225.0, 0.0),
       "Overall rotation", 0.5, "%.0f", "Rotate the entire diagram").also { controlPanel.children += it }
 
-    val overallScaleControl = SliderWithReadout(Slider(0.1, 20.0, 3.0),
+    val overallScaleControl = SliderWithReadout(Slider(0.1, 20.0, 4.0),
       "Overall scale", 0.1, "%.2f", "Scale the entire diagram").also { controlPanel.children += it }
 
-    val opacityControl = SliderWithReadout(Slider(0.2, 5.0, 1.7), "Opacity", 0.05, "%.1f", """
+    val opacityControl = SliderWithReadout(Slider(0.2, 5.0, 1.6), "Opacity", 0.05, "%.1f", """
       You'll want to make the shapes more transparent when they are highly overlapping.
     """).also { controlPanel.children += it }
 
+    val thicknessControl = SliderWithReadout(Slider(30.0, 500.0, 125.0), "Thickness", 1.0, "%.0f", """
+      Overall thickness of lines
+    """).also { controlPanel.children += it }
 
     val rotator = Group()
     val shapeList = (0..MAX_SHAPE_INDEX).map { shapeIndex ->
@@ -115,8 +113,12 @@ class Triangles : Application() {
 
         visibleProperty().bind(shapeVisibleProperty(countControl.valueProperty, shapeIndex))
 
-        strokeWidthProperty().bindDouble(rotator.localToSceneTransformProperty(), countControl.valueProperty) {
-          180 / (50 + countControl.valueProperty.get()) / (5 + rotator.scaleY)
+        strokeWidthProperty().bindDouble(
+          rotator.localToSceneTransformProperty(),
+          rotator.scaleYProperty(),
+          countControl.valueProperty,
+          thicknessControl.valueProperty) {
+          thicknessControl.valueProperty.get() / (20 + countControl.valueProperty.get()) / (10 + rotator.scaleY)
         }
 
         val opacityProperty = opacityControl.valueProperty
@@ -221,66 +223,6 @@ class Triangles : Application() {
     color.deriveColor(0.0, 10.0, 0.4, 200.0).opacityFactor(0.66)
 
 }
-
-fun findBestRotation(polygons: List<Polygon>): Double {
-  val stopwatch = Stopwatch.createStarted()
-  val neverShown = Group()
-  neverShown.children += polygons.map(::clone)
-
-  // It would be fun to find a better algorithm for this
-  var best = findBestOf(0 until 180 step 30, neverShown) // 6
-  best = findBestOf(best - 25 .. best + 25 step 10, neverShown) // 6
-  best = findBestOf(best - 7 .. best + 8 step 3, neverShown) // 6
-  best = findBestOf(best - 2 .. best + 2, neverShown) // 5
-  println(stopwatch)
-  println("angle: $best")
-  return best.toDouble()
-}
-
-private fun clone(it: Polygon) = Polygon().apply {
-  this.points.addAll(it.points)
-  translateX = it.translateX
-  translateY = it.translateY
-  rotate = it.rotate
-  scaleX = it.scaleX
-  scaleY = it.scaleY
-//  strokeWidth = it.strokeWidth
-//  strokeLineJoin = it.strokeLineJoin
-//  strokeType = it.strokeType
-//  stroke = it.stroke
-//  require(boundsInLocal == it.boundsInLocal) { "\n$boundsInLocal\n${it.boundsInLocal}" }
-}
-
-fun findBestOf(anglesToTry: IntProgression, neverShown: Group) = anglesToTry.minByOrNull {
-  neverShown.rotate = it.toDouble()
-  neverShown.boundsInParent.height
-}!!
-
-class SliderWithReadout(
-    val slider: Slider,
-    name: String,
-    fineTune: Double,
-    format: String,
-    tooltip: String = "") : VBox(6.0) {
-  val valueProperty = SimpleDoubleProperty()
-  val label = Label().also {
-    it.textProperty().bind(format("$name = $format", valueProperty))
-    it.tooltip = Tooltip(tooltip)
-  }
-  init {
-    style = ("-fx-background-color: white;"
-      + "-fx-border-color: black;"
-      + "-fx-border-width: 1;"
-      + "-fx-border-radius: 6;"
-      + "-fx-padding: 8;")
-    children += label
-    children += slider
-
-    slider.tooltip = Tooltip(tooltip)
-    slider.blockIncrement = fineTune
-    valueProperty.bind(slider.valueProperty())
-  }
-    }
 
 enum class ShapeType(val points: List<Point2D>) {
   ISOS_TRI(listOf(Point2D(0, 1), Point2D(1, 1), Point2D(0.5, 0))),

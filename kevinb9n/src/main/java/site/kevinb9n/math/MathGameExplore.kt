@@ -14,7 +14,7 @@ fun main() {
         for (op2 in Op.values()) {
           for (op3 in Op.values()) {
             val result = roundToBinaryDecimalPlaces(
-              c.combine(inputs[0], inputs[1], inputs[2], inputs[3], op1, op2, op3))
+              c.combine(inputs[0], inputs[1], inputs[2], inputs[3], op1, op2, op3), 30)
             val desc = String.format(c.fmt, inputs[0], op1, inputs[1], op2, inputs[2], op3, inputs[3])
             multimap.put(result, desc)
           }
