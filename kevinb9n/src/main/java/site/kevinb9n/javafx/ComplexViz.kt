@@ -1,201 +1,104 @@
 package site.kevinb9n.javafx
 
 import javafx.application.Application
-import javafx.beans.property.SimpleObjectProperty
-import javafx.scene.Group
+import javafx.beans.binding.Bindings.divide
+import javafx.beans.property.SimpleDoubleProperty
+import javafx.geometry.VPos
 import javafx.scene.Scene
+import javafx.scene.layout.Background
 import javafx.scene.layout.Pane
+import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
+import javafx.scene.text.Font.font
+import javafx.scene.text.FontWeight.EXTRA_BOLD
 import javafx.scene.text.Text
 import javafx.scene.text.TextAlignment
 import javafx.stage.Stage
-import site.kevinb9n.math.Complex
-import site.kevinb9n.math.Complex.Companion.fromRe
 
 fun main() = Application.launch(ComplexViz::class.java)
 
-val STROKE_WIDTH = 3.0
+val STROKE_WIDTH = 2.0
+val DOT_WIDTH = 18.0
+val scaleProperty = SimpleDoubleProperty(120.0)
 
 class ComplexViz : Application() {
   override fun start(stage: Stage) {
 
-    val aProp = SimpleObjectProperty<Complex>()
-    val bProp = SimpleObjectProperty<Complex>()
-
-    val root = Pane(
-      Line(100.0, 400.0, 700.0, 400.0).also {
-        it.stroke = Color.DARKGRAY
-        it.strokeWidth = STROKE_WIDTH
+    val backgroundShapeList = listOf(
+      // X-axis
+      Line(-3.0, 0.0, 3.0, 0.0).apply {
+        stroke = Color.DARKGRAY
       },
-      Line(400.0, 100.0, 400.0, 700.0).also {
-        it.stroke = Color.DARKGRAY
-        it.strokeWidth = STROKE_WIDTH
+      // Y-axis
+      Line(0.0, -3.0, 0.0, 3.0).apply {
+        stroke = Color.DARKGRAY
       },
-      Circle(400.0, 400.0, 80.0). also {
-        it.stroke = Color.LIGHTGRAY
-        it.strokeWidth = STROKE_WIDTH * 2 / 3
-        it.fill = Color.TRANSPARENT
+      // Unit circle
+      Circle(0.0, 0.0, 1.0).apply {
+        stroke = Color.LIGHTGRAY
+        fill = Color.TRANSPARENT
       },
-      Line().also {
-        it.startX = 400.0
-        it.startY = 400.0
-        it.stroke = Color.DARKBLUE
-        it.strokeWidth = STROKE_WIDTH
-        it.endXProperty().bindDouble(aProp, bProp) {
-          complexToCoord(aProp.value + bProp.value).first
-        }
-        it.endYProperty().bindDouble(aProp, bProp) {
-          complexToCoord(aProp.value + bProp.value).second
-        }
-      },
-      Line().also {
-        it.startX = 400.0
-        it.startY = 400.0
-        it.stroke = Color.DARKORANGE
-        it.strokeWidth = STROKE_WIDTH
-        it.endXProperty().bindDouble(aProp, bProp) {
-          complexToCoord(aProp.value * bProp.value).first
-        }
-        it.endYProperty().bindDouble(aProp, bProp) {
-          complexToCoord(aProp.value * bProp.value).second
-        }
-      },
-      Line().also {
-        it.startX = 400.0
-        it.startY = 400.0
-        it.stroke = Color.PURPLE
-        it.strokeWidth = STROKE_WIDTH
-        it.endXProperty().bindDouble(aProp, bProp) {
-          val b = if (bProp.value?.abs() ?: 0.0 < 1e-7) fromRe(1e-7) else bProp.value
-          complexToCoord(aProp.value / b).first
-        }
-        it.endYProperty().bindDouble(aProp, bProp) {
-          val b = if (bProp.value?.abs() ?: 0.0 < 1e-7) fromRe(1e-7) else bProp.value
-          complexToCoord(aProp.value / b).second
-        }
-      },
-      Group(
-        Circle(0.0, 0.0, 11.0).also {
-          it.fill = Color.DARKBLUE
-        },
-        Text("+").also {
-          it.stroke = Color.WHITE
-          it.fill = Color.WHITE
-          it.textAlignment = TextAlignment.CENTER
-          it.translateX = -4.0
-          it.translateY = 4.0
-        }
-      ).also {
-        it.translateXProperty().bindDouble(aProp, bProp) {
-          complexToCoord(aProp.value + bProp.value).first
-        }
-        it.translateYProperty().bindDouble(aProp, bProp) {
-          complexToCoord(aProp.value + bProp.value).second
-        }
-      },
-      Group(
-        Circle(0.0, 0.0, 11.0).also {
-          it.fill = Color.DARKORANGE
-        },
-        Text("X").also {
-          it.stroke = Color.WHITE
-          it.fill = Color.WHITE
-          it.textAlignment = TextAlignment.CENTER
-          it.translateX = -4.0
-          it.translateY = 4.0
-        }
-      ).also {
-        it.translateXProperty().bindDouble(aProp, bProp) {
-          complexToCoord(aProp.value * bProp.value).first
-        }
-        it.translateYProperty().bindDouble(aProp, bProp) {
-          complexToCoord(aProp.value * bProp.value).second
-        }
-      },
-      Group(
-        Circle(0.0, 0.0, 11.0).also {
-          it.fill = Color.PURPLE
-        },
-        Text("/").also {
-          it.stroke = Color.WHITE
-          it.fill = Color.WHITE
-          it.textAlignment = TextAlignment.CENTER
-          it.translateX = -4.0
-          it.translateY = 4.0
-        }
-      ).also {
-        it.translateXProperty().bindDouble(aProp, bProp) {
-          val b = if (bProp.value?.abs() ?: 0.0 < 1e-7) fromRe(1e-7) else bProp.value
-          complexToCoord(aProp.value / b).first
-        }
-        it.translateYProperty().bindDouble(aProp, bProp) {
-          val b = if (bProp.value?.abs() ?: 0.0 < 1e-7) fromRe(1e-7) else bProp.value
-          complexToCoord(aProp.value / b).second
-        }
-      },
-      DragToTranslate(
-        Group(
-          Circle(0.0, 0.0, 11.0).also {
-            it.fill = Color.DARKRED
-          },
-          Text("A").also {
-            it.stroke = Color.WHITE
-            it.fill = Color.WHITE
-            it.textAlignment = TextAlignment.CENTER
-            it.translateX = -4.0
-            it.translateY = 4.0
-          }
-        ).also {
-          it.translateX = 500.0
-          it.translateY = 300.0
-          aProp.bindObject(it.translateXProperty(), it.translateYProperty()) {
-            coordToComplex(it.translateX, it.translateY)
-          }
-        }
-      ),
-      DragToTranslate(
-        Group(
-          Circle(0.0, 0.0, 11.0).also {
-            it.fill = Color.DARKGREEN
-          },
-          Text("B").also {
-            it.stroke = Color.WHITE
-            it.fill = Color.WHITE
-            it.textAlignment = TextAlignment.CENTER
-            it.translateX = -4.0
-            it.translateY = 4.0
-          }
-        ).also {
-          it.translateX = 550.0
-          it.translateY = 350.0
-          bProp.bindObject(it.translateXProperty(), it.translateYProperty()) {
-            coordToComplex(it.translateX, it.translateY)
-          }
-        }
-      ),
     )
+    backgroundShapeList.forEach {
+      it.strokeWidthProperty().bind(divide(STROKE_WIDTH, scaleProperty))
+    }
+    val coordPlane = StackPane().also {
+      it.children += backgroundShapeList
+      it.scaleXProperty().bind(scaleProperty)
+      it.scaleYProperty().bind(scaleProperty)
+    }
+
+    val a = ScalableLabeledDot("A", Color.DARKGREEN)
+    val dotScale = divide(DOT_WIDTH, scaleProperty)
+    a.scaleXProperty().bind(dotScale)
+    a.scaleYProperty().bind(dotScale)
+//    a.translateX = sqrt(3.0)/2.0
+//    a.translateY = 0.5
+    coordPlane.children += a
+
+    val root = StackPane()
+    root.children += coordPlane
 
     with(stage) {
-      scene = Scene(root, 800.0, 800.0)
+      scene = Scene(root, 1200.0, 900.0)
       title = "Complex visualizer"
       show()
     }
   }
 
-  fun coordToComplex(x: Double, y: Double): Complex {
-    val re = (x - 400.0) / 80.0
-    val im = (400.0 - y) / 80.0
-    val c = Complex(re, im)
-//    println("x $x y $y --> c $c")
-    return c
-  }
+  class ScalableLabeledDot(label: String, color: Color) : Pane() {
+    init {
+      setDimensions(1.0, 1.0)
+      background = Background.fill(Color.LIGHTCORAL)
+      val dot = Circle().also {
+        it.centerX = 0.5
+        it.centerY = 0.5
+        it.radius = 0.5
+        it.strokeWidth = 0.0
+        it.fill = color
+      }
+      children += dot
 
-  fun complexToCoord(c: Complex): Pair<Double, Double> {
-    val x = 400.0 + c.re * 80.0
-    val y = 400.0 - c.im * 80.0
-//    println("c $c --> x $x y $y")
-    return x to y
+      val text = Text(0.5, 0.5, label).also {
+        it.textOrigin = VPos.CENTER
+        it.font = font("", EXTRA_BOLD, 0.7)
+        it.fill = Color.LIGHTGRAY
+        it.stroke = Color.LIGHTGRAY
+        it.strokeWidth = 0.01
+        it.textAlignment = TextAlignment.CENTER
+      }
+      children += text
+    }
   }
+}
+
+fun Pane.setDimensions(width: Double, height: Double) {
+  minWidth = width
+  prefWidth = width
+  maxWidth = width
+  minHeight = height
+  prefHeight = height
+  maxHeight = height
 }

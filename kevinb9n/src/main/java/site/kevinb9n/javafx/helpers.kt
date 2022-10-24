@@ -170,6 +170,10 @@ fun dump(node: Node) {
     println("node $id")
     println("type ${javaClass.simpleName}")
 
+    println()
+    println("${properties}")
+    println()
+
     println("rotation ${r(rotate)} axis ${pt(rotationAxis)}")
     println("scale ${r(scaleX)} x ${r(scaleY)}")
     println("translate ${r(translateX)} x ${r(translateY)}")

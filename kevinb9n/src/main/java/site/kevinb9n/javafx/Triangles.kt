@@ -212,6 +212,7 @@ class Triangles : Application() {
 
     stage.scene = scene
     stage.show()
+    println("shewn")
   }
 
   private fun selectableCounts() = factors(MAX_SHAPE_INDEX)

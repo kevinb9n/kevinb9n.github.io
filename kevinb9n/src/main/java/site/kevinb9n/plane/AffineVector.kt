@@ -10,7 +10,7 @@ interface AffineVector<P: AffinePoint<P, V>, V : AffineVector<P, V>> {
   // Might make sense for n-dimensional vector: get
   // Automatically handled: *Assign
 
-  operator fun plus(other: V): V
+  operator fun plus(that: V): V
   operator fun plus(point: P): P
   operator fun times(scalar: Double): V
   operator fun div(scalar: Double): V

@@ -26,7 +26,6 @@ Vector2D {
 
   override operator fun times(scalar: Double) = copy(x * scalar, y * scalar)
 
-  /** dot product */
   override fun dot(that: Vector2D)        = this.x * that.x + this.y * that.y
   override fun cross(that: Vector2D)      = this.x * that.y - this.y * that.x
   override fun isLeftTurn(that: Vector2D) = this.x * that.y > this.y * that.x
@@ -34,11 +33,6 @@ Vector2D {
 
   override operator fun div(scalar: Double) = copy(x / scalar, y / scalar)
 
-  override fun isHorizontal() = y == 0.0
-
-  override fun equals(that: Any?) = that is Vector2D && closeEnough(x, that.x) && closeEnough(y, that.y)
-
-  override fun toString(): String {
-    return "CartesianVector2D(x=$x, y=$y, magnitude=$magnitude, direction=$direction)"
-  }
+  override fun equals(other: Any?) = equalsImpl(other)
+  override fun hashCode() = hashCodeImpl()
 }

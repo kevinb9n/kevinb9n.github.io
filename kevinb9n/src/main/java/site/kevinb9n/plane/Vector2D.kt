@@ -1,16 +1,58 @@
 package site.kevinb9n.plane
 
 import site.kevinb9n.math.closeEnough
+import java.util.Objects.hash
 import kotlin.math.sqrt
 
 interface Vector2D : AffineVector<Point2D, Vector2D> {
+  override val magnitude: Double
+
+  val x: Double
+  val y: Double
+  val magnitudeSquared: Double
+  val direction: Angle
+  val slope: Double
+
+  override fun plus(that: Vector2D) = CartesianVector2D(x + that.x, y + that.y)
+  override fun plus(point: Point2D) = Point2D(x + point.x, y + point.y)
+
+  /** Returns the dot product of this vector with `that`. */
+  infix fun dot(that: Vector2D): Double
+
+  /**
+   * Returns the `z` component of the cross product of this vector with `that`. Zero if
+   * `collinear(that)`; positive if `isLeftTurn(that)`.
+   */
+  infix fun cross(that: Vector2D): Double
+  fun reflect(): Vector2D
+  fun rotate(angle: Angle) = PolarVector(magnitude, direction + angle)
+  fun isLeftTurn(that: Vector2D): Boolean
+  fun collinear(that: Vector2D): Boolean
+  fun isHorizontal() = y == 0.0
+  fun isVertical() = x == 0.0
+
+  /**
+   * Returns the angle that must be added to this vector's direction to equal the other vector's
+   * direction.
+   */
+  fun angleWith(that: Vector2D) = that.direction - this.direction
+
+  fun equalsImpl(that: Any?) =
+    that is Vector2D &&
+      this.x == that.x &&
+      this.y == that.y &&
+      this.magnitude == that.magnitude &&
+      this.direction == that.direction
+
+  fun hashCodeImpl() = hash(x, y, magnitude, direction)
+
   companion object {
     private val TOLER = 1e-14
     fun vector(
-        x: Number? = null,
-        y: Number? = null,
-        magnitude: Number? = null,
-        direction: Angle? = null): Vector2D {
+      x: Number? = null,
+      y: Number? = null,
+      magnitude: Number? = null,
+      direction: Angle? = null): Vector2D {
       val xd = x?.toDouble()
       val yd = y?.toDouble()
       val md = magnitude?.toDouble()
@@ -58,24 +100,4 @@ interface Vector2D : AffineVector<Point2D, Vector2D> {
 
     fun mean(vararg vectors: Vector2D) = vectors.reduce(Vector2D::plus) / vectors.size.toDouble()
   }
-
-  override val magnitude: Double
-
-  val x: Double
-  val y: Double
-  val magnitudeSquared: Double
-  val direction: Angle
-  val slope: Double
-
-  override fun plus(that: Vector2D) = CartesianVector2D(x + that.x, y + that.y)
-  override fun plus(point: Point2D) = Point2D(x + point.x, y + point.y)
-
-  fun reflect(): Vector2D
-  fun rotate(angle: Angle) = PolarVector(magnitude, direction + angle)
-  infix fun dot(that: Vector2D): Double
-  infix fun cross(that: Vector2D): Double
-  fun isLeftTurn(that: Vector2D): Boolean
-  fun collinear(that: Vector2D): Boolean
-  fun isHorizontal(): Boolean
-  fun angleWith(that: Vector2D) = that.direction - this.direction
 }

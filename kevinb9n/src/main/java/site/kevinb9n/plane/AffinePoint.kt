@@ -12,9 +12,9 @@ interface AffinePoint<P : AffinePoint<P, V>, V : AffineVector<P, V>> {
   // Might make sense for n-dimensional point/vector: get
   // Automatically handled: *Assign
 
-  operator fun plus(v: V): P
-  operator fun minus(p: P): V
-  operator fun minus(v: V): P = this + -v
+  operator fun plus(that: V): P
+  operator fun minus(that: P): V
+  operator fun minus(that: V): P = this + -that
 
   /** Returns the point `m` for which `other - m == m - this` (as nearly as possible). */
   fun midpoint(other: P): P = this - (this - other) / 2.0

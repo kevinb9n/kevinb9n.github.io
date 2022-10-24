@@ -1,11 +1,16 @@
 package site.kevinb9n.plane
 
-import com.google.common.math.DoubleMath.mean
+import com.google.common.collect.Iterables
 import com.google.common.math.Stats
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
+import site.kevinb9n.javafx.random
+import site.kevinb9n.math.mean
 import site.kevinb9n.plane.Angle.Companion.degrees
+import site.kevinb9n.plane.Vector2D.Companion.mean
 import site.kevinb9n.plane.Vector2D.Companion.vector
+import java.util.*
+import kotlin.math.absoluteValue
 import kotlin.math.sqrt
 
 class PointVectorTest {
@@ -130,4 +135,36 @@ class PointVectorTest {
     assertThat(cross(v1at30, v2at90)).isWithin(1e-14).of(sqrt(3.0))
     assertThat(cross(v2at90, v1at30)).isWithin(1e-14).of(-sqrt(3.0))
   }
+
+  @Test fun drift() {
+    var worst: Vector2D = vector(0.0, 0.0)
+    var worstDrift: Double = Double.NEGATIVE_INFINITY
+    var worstCycleLength: Int = 0
+    var worstDelay: Int = 0
+    var total = 0
+    for (i in 1..10_000_000) {
+      val set = LinkedHashSet<Vector2D>()
+      val orig = vector(magnitude=random(100.0).absoluteValue, direction=degrees(random(180.0)))
+      var latest = orig
+      while (true) {
+        if (!set.add(latest)) break
+        latest = roundTrip(latest)
+      }
+      total += set.size
+      val delay = Iterables.indexOf(set) { it == latest }
+      val cycleLength = set.size - delay
+      val cross = latest.cross(orig).absoluteValue / latest.magnitude / orig.magnitude
+      worstDelay = maxOf(worstDelay, delay)
+      worstCycleLength = maxOf(worstCycleLength, cycleLength)
+      worstDrift = maxOf(worstDrift, cross)
+    }
+    println("$worstDelay $worstCycleLength $worstDrift ${total / 10_000_000.0}")
+  }
+}
+
+fun roundTrip(v: Vector2D): Vector2D {
+  val cartes = vector(v.x, v.y)
+  val polar = vector(magnitude=cartes.magnitude, direction=cartes.direction)
+  return vector(magnitude=mean(v.magnitude, polar.magnitude), direction=Angle.seconds(mean(v
+    .direction.seconds, polar.direction.seconds)))
 }

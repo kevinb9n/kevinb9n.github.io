@@ -3,7 +3,10 @@ package site.kevinb9n.math
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import org.junit.jupiter.api.Test
-import kotlin.math.pow
+import site.kevinb9n.javafx.random
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.math.RoundingMode.HALF_EVEN
 
 class MathTest {
   val r = java.util.Random()
@@ -97,4 +100,37 @@ class MathTest {
     assertThat(gcd(4, 10)).isEqualTo(2)
     assertThat(gcd(6, 9)).isEqualTo(3)
   }
+
+  // 63 decimal places has the weird property this closest approximation for PI is 144 times
+  // the closest approximation for pi/144, so a great many common angles will work out well
+  val PI = BigDecimal("3.141592653589793238462643383279502884197169399375105820974944592")
+
+  @Test
+  fun testSine() {
+    assertThat(sineTo63Digits(BigDecimal.ZERO)).isEqualTo(BigDecimal.ZERO)
+    assertThat((sineTo63Digits(PI / 10) + BigDecimal(0.25)).pow(2).stdize())
+      .isEqualTo(BigDecimal(0.3125))
+    assertThat(sineTo63Digits(PI / 6)).isEqualTo(BigDecimal(0.5))
+    assertThat(sineTo63Digits(PI / 4).pow(2).stdize()).isEqualTo(BigDecimal(0.5))
+    assertThat(sineTo63Digits(PI / 3).pow(2).stdize()).isEqualTo(BigDecimal(0.75))
+    assertThat(sineTo63Digits(PI / 2)).isEqualTo(BigDecimal.ONE)
+    assertThat(sineTo63Digits(PI)).isEqualTo(BigDecimal.ZERO)
+    assertThat(sineTo63Digits(-PI / 6)).isEqualTo(BigDecimal(-0.5))
+  }
+
+  operator fun BigDecimal.plus(a: Int): BigDecimal = this + BigDecimal(a)
+  operator fun BigDecimal.minus(a: Int): BigDecimal = this - BigDecimal(a)
+  operator fun BigDecimal.times(a: Int): BigDecimal = this * BigDecimal(a)
+  operator fun BigDecimal.div(a: Int): BigDecimal = this / BigDecimal(a)
+
+  @Test
+  fun testCompare() {
+    for (i in 1..100_000) {
+      val d = random(kotlin.math.PI)
+      assertWithMessage("$d").that(
+        sineTo63Digits(BigDecimal(d)).toDouble()).isWithin(1.15e-16).of(kotlin.math.sin(d))
+    }
+  }
+
+  fun BigDecimal.stdize() = this.setScale(63, HALF_EVEN).stripTrailingZeros()
 }

@@ -1,6 +1,10 @@
 package site.kevinb9n.math
 
 import java.lang.Math.pow
+import java.lang.Math.rint
+import java.lang.Math.scalb
+import java.math.BigDecimal
+import java.math.RoundingMode.HALF_EVEN
 import kotlin.math.abs
 import kotlin.math.round
 import kotlin.math.sqrt
@@ -30,7 +34,26 @@ fun Int.modWithMinimum(modulus: Int, minimum: Int) = minimum + (this - minimum).
 
 fun sumProduct(list1: List<Double>, list2: List<Double>) = list1.zip(list2) { a, b -> a * b }.sum()
 fun factors(value: Int): List<Int> = (1 .. value).filter { value % it == 0 }
-fun mean(a: Double, b: Double) = a + (b - a) / 2.0
+fun mean(a: Double, b: Double) = a + (b - a) * 0.5
+fun geometricMean(a: Double, b: Double) = sqrt(a * b)
 
-fun roundToBinaryDecimalPlaces(result: Double, places: Int) =
-  Math.scalb(Math.rint(Math.scalb(result, places)), -places)
+fun roundToBinaryDecimalPlaces(unrounded: Double, places: Int) =
+  scalb(rint(scalb(unrounded, places)), -places)
+
+fun sineTo63Digits(input: BigDecimal): BigDecimal {
+  // sin(x) = x^1/1! - x^3/3! + x^5/5! - x^7/7! + ...
+
+  val xsquared = input * input
+  var counter = BigDecimal.ONE
+  var nextTerm = input
+  var result = BigDecimal.ZERO
+
+  while (nextTerm.compareTo(BigDecimal.ZERO) != 0) {
+    result += nextTerm
+    nextTerm *= -xsquared
+    var div = ++counter
+    div *= ++counter
+    nextTerm = nextTerm.divide(div, 120, HALF_EVEN)
+  }
+  return result.setScale(63, HALF_EVEN).stripTrailingZeros()
+}
