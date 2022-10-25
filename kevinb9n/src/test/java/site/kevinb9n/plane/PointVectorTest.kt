@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import site.kevinb9n.javafx.random
 import site.kevinb9n.math.mean
 import site.kevinb9n.plane.Angle.Companion.degrees
-import site.kevinb9n.plane.Vector2D.Companion.mean
 import site.kevinb9n.plane.Vector2D.Companion.vector
 import java.util.*
 import kotlin.math.absoluteValue
@@ -67,30 +66,31 @@ class PointVectorTest {
   @Test fun creation() {
     val rad3 = sqrt(3.0)
     val d60 = degrees(60.0)
+    val toler = 1e-15
 
     val cv = vector(x=1.0, y=rad3)
-    assertThat(vector(x=1.0, y=rad3, magnitude=2.0, direction=d60)).isEqualTo(cv)
-    assertThat(vector(x=1.0, y=rad3, magnitude=2.0)).isEqualTo(cv)
-    assertThat(vector(x=1.0, y=rad3, direction=d60)).isEqualTo(cv)
-    assertThat((vector(x=1.0, magnitude=2.0, direction=d60) - cv).magnitude).isWithin(1e-10).of(0.0)
-    assertThat((vector(y=rad3, magnitude=2.0, direction=d60) - cv).magnitude).isWithin(1e-10).of(0.0)
-    assertThat(vector(x=1.0, magnitude=2.0)).isEqualTo(cv)
-    assertThat(vector(x=1.0, direction=d60)).isEqualTo(cv)
-    assertThat(vector(y=rad3, magnitude=2.0)).isEqualTo(cv)
-    assertThat(vector(y=rad3, direction=d60)).isEqualTo(cv)
-    assertThat((vector(magnitude=2.0, direction=d60) - cv).magnitude).isWithin(1e-10).of(0.0)
+    assertThat(vector(x=1.0, y=rad3, magnitude=2.0, direction=d60).distance(cv)).isLessThan(toler)
+    assertThat(vector(x=1.0, y=rad3, magnitude=2.0).distance(cv)).isLessThan(toler)
+    assertThat(vector(x=1.0, y=rad3, direction=d60).distance(cv)).isLessThan(toler)
+    assertThat(vector(x=1.0, magnitude=2.0, direction=d60).distance(cv)).isLessThan(toler)
+    assertThat(vector(y=rad3, magnitude=2.0, direction=d60).distance(cv)).isLessThan(toler)
+    assertThat(vector(x=1.0, magnitude=2.0).distance(cv)).isLessThan(toler)
+    assertThat(vector(x=1.0, direction=d60).distance(cv)).isLessThan(toler)
+    assertThat(vector(y=rad3, magnitude=2.0).distance(cv)).isLessThan(toler)
+    assertThat(vector(y=rad3, direction=d60).distance(cv)).isLessThan(toler)
+    assertThat(vector(magnitude=2.0, direction=d60).distance(cv)).isLessThan(toler)
 
     val pv = vector(magnitude=2.0, direction=d60)
-    assertThat(vector(x=1.0, y=rad3, magnitude=2.0, direction=d60)).isEqualTo(pv)
-    assertThat(vector(x=1.0, y=rad3, magnitude=2.0)).isEqualTo(pv)
-    assertThat(vector(x=1.0, y=rad3, direction=d60)).isEqualTo(pv)
-    assertThat(vector(x=1.0, magnitude=2.0, direction=d60)).isEqualTo(pv)
-    assertThat(vector(y=rad3, magnitude=2.0, direction=d60)).isEqualTo(pv)
-    assertThat(vector(x=1.0, y=rad3)).isEqualTo(pv)
-    assertThat(vector(x=1.0, magnitude=2.0)).isEqualTo(pv)
-    assertThat(vector(x=1.0, direction=d60)).isEqualTo(pv)
-    assertThat(vector(y=rad3, magnitude=2.0)).isEqualTo(pv)
-    assertThat(vector(y=rad3, direction=d60)).isEqualTo(pv)
+    assertThat(vector(x=1.0, y=rad3, magnitude=2.0, direction=d60).distance(pv)).isLessThan(toler)
+    assertThat(vector(x=1.0, y=rad3, magnitude=2.0).distance(pv)).isLessThan(toler)
+    assertThat(vector(x=1.0, y=rad3, direction=d60).distance(pv)).isLessThan(toler)
+    assertThat(vector(x=1.0, magnitude=2.0, direction=d60).distance(pv)).isLessThan(toler)
+    assertThat(vector(y=rad3, magnitude=2.0, direction=d60).distance(pv)).isLessThan(toler)
+    assertThat(vector(x=1.0, y=rad3).distance(pv)).isLessThan(toler)
+    assertThat(vector(x=1.0, magnitude=2.0).distance(pv)).isLessThan(toler)
+    assertThat(vector(x=1.0, direction=d60).distance(pv)).isLessThan(toler)
+    assertThat(vector(y=rad3, magnitude=2.0).distance(pv)).isLessThan(toler)
+    assertThat(vector(y=rad3, direction=d60).distance(pv)).isLessThan(toler)
   }
 
   fun dot(a: Pair<Vector2D, Vector2D>, b: Pair<Vector2D, Vector2D>): Double {
@@ -108,14 +108,14 @@ class PointVectorTest {
   }
 
   fun cross(a: Pair<Vector2D, Vector2D>, b: Pair<Vector2D, Vector2D>): Double {
-    val x = doubleArrayOf(
-      a.first.cross(b.first),
-      a.first.cross(b.second),
-      a.second.cross(b.first),
-      a.second.cross(b.second),
+    val variations = doubleArrayOf(
+      a.first cross b.first,
+      a.first cross b.second,
+      a.second cross b.first,
+      a.second cross b.second,
     )
-    val mean = Stats.meanOf(*x)
-    for (y in x) {
+    val mean = Stats.meanOf(*variations)
+    for (y in variations) {
       assertThat(y).isWithin(1e-14).of(mean)
     }
     return mean

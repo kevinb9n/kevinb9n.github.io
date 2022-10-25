@@ -30,6 +30,7 @@ interface Vector2D : AffineVector<Point2D, Vector2D> {
   fun collinear(that: Vector2D): Boolean
   fun isHorizontal() = y == 0.0
   fun isVertical() = x == 0.0
+  fun distance(that: Vector2D) = (this - that).magnitude
 
   /**
    * Returns the angle that must be added to this vector's direction to equal the other vector's

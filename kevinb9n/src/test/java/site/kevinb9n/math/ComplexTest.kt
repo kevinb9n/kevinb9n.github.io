@@ -3,6 +3,7 @@ package site.kevinb9n.math
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
 import site.kevinb9n.javafx.random
+import site.kevinb9n.math.Complex.Companion.fromRe
 import kotlin.math.PI
 import kotlin.math.abs
 
@@ -45,6 +46,17 @@ class ComplexTest {
     checkEqual(a * (b + a), a * b + a * a)
     checkEqual(a.pow(0.4) * a.pow(0.6), a)
     checkEqual(a.pow(1.3) / a.pow(0.3), a)
+    checkEqual(a.sin() * a.sin() + a.cos() * a.cos(), fromRe(1.0))
+    checkEqual(a.tan(), a.sin() / a.cos())
+  }
+
+  @Test
+  fun testTrig() {
+    assertThat(Complex(2.0, 1.0).sin().distance(
+      Complex(1.403119250622040588, -0.4890562590412936736))).isLessThan(2e-16)
+    assertThat(Complex(2.0, 1.0).cos().distance(
+      Complex(-0.64214812471552, -1.06860742138277834))).isLessThan(2e-16)
+
   }
 
   private fun checkEverything(a: Complex, b: Number) {
@@ -58,7 +70,7 @@ class ComplexTest {
     val tolerance = 1e-9
     try {
       assertThat(a.abs()).isWithin(tolerance).of(b.abs())
-      assertThat(a.theta()).isWithin(tolerance).of(b.theta())
+      assertThat(a.phase()).isWithin(tolerance).of(b.phase())
     } catch (e: Error) {
       assertThat(a.re).isWithin(tolerance).of(b.re)
       assertThat(a.im).isWithin(tolerance).of(b.im)

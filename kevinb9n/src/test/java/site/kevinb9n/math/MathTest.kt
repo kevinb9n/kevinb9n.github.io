@@ -5,8 +5,8 @@ import com.google.common.truth.Truth.assertWithMessage
 import org.junit.jupiter.api.Test
 import site.kevinb9n.javafx.random
 import java.math.BigDecimal
-import java.math.RoundingMode
 import java.math.RoundingMode.HALF_EVEN
+import kotlin.math.sin
 
 class MathTest {
   val r = java.util.Random()
@@ -101,8 +101,8 @@ class MathTest {
     assertThat(gcd(6, 9)).isEqualTo(3)
   }
 
-  // 63 decimal places has the weird property this closest approximation for PI is 144 times
-  // the closest approximation for pi/144, so a great many common angles will work out well
+  // the best approximation for pi at 63 decimal places has an unusual property: it's 144 times the
+  // best approximation for pi/144 at 63 dps, so a great many common angles will work out well
   val PI = BigDecimal("3.141592653589793238462643383279502884197169399375105820974944592")
 
   @Test
@@ -116,19 +116,19 @@ class MathTest {
     assertThat(sineTo63Digits(PI / 2)).isEqualTo(BigDecimal.ONE)
     assertThat(sineTo63Digits(PI)).isEqualTo(BigDecimal.ZERO)
     assertThat(sineTo63Digits(-PI / 6)).isEqualTo(BigDecimal(-0.5))
-  }
 
-  operator fun BigDecimal.plus(a: Int): BigDecimal = this + BigDecimal(a)
-  operator fun BigDecimal.minus(a: Int): BigDecimal = this - BigDecimal(a)
-  operator fun BigDecimal.times(a: Int): BigDecimal = this * BigDecimal(a)
-  operator fun BigDecimal.div(a: Int): BigDecimal = this / BigDecimal(a)
+    assertThat(sineTo63Digits(BigDecimal("0.6"))).isEqualTo(BigDecimal(
+      "0.564642473395035357200945445658657907109888084994151771024265894")) // thx wolfram
+  }
 
   @Test
   fun testCompare() {
-    for (i in 1..100_000) {
-      val d = random(kotlin.math.PI)
-      assertWithMessage("$d").that(
-        sineTo63Digits(BigDecimal(d)).toDouble()).isWithin(1.15e-16).of(kotlin.math.sin(d))
+    for (i in 1..1_000_000) {
+      val angle = random(8.0)
+      val goodEstimate = sineTo63Digits(BigDecimal(angle))
+      val badEstimate = sin(angle)
+      assertThat((goodEstimate - badEstimate).abs().compareTo(BigDecimal("6e-17"))).isLessThan(0)
+      assertThat(goodEstimate.toDouble()).isWithin(12e-17).of(badEstimate)
     }
   }
 

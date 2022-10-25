@@ -6,8 +6,8 @@ import site.kevinb9n.plane.Vector2D.Companion.vector
 import kotlin.math.atan2
 import kotlin.math.hypot
 
-data class CartesianVector2D internal constructor(override val x: Double, override val y: Double) :
-Vector2D {
+data class CartesianVector2D internal constructor(
+    override val x: Double, override val y: Double) : Vector2D {
   internal constructor(x: Number, y: Number) : this(x.toDouble(), y.toDouble())
 
   override val magnitude = hypot(x, y)
