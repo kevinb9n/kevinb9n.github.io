@@ -3,41 +3,43 @@ package site.kevinb9n.math
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
-class SmallRational(private val numer: Long, private val denom: Long) {
+data class SmallRational(private val numer: Long, private val denom: Long) {
   init {
+    // make sure in canonical form, so eq/hc/ts work right
     require(denom > 0L)
     require(gcd(numer, denom) == 1L)
     if (numer == 0L) require(denom == 1L)
   }
 
-  fun reciprocal(): SmallRational {
-    require(numer != 0L)
-    return SmallRational(denom * numer.sign, numer.absoluteValue)
-  }
+  fun reciprocal() = SmallRational(denom * numer.sign, numer.absoluteValue)
 
   operator fun times(that: SmallRational): SmallRational {
-    if (this == ZERO || that == ZERO) return ZERO
-    val div1 = gcd(this.numer, that.denom)
-    val div2 = gcd(this.denom, that.numer)
-    return SmallRational(this.numer / div1 * (that.numer / div2), this.denom / div2 * (that.denom / div1))
+    val cancel1 = gcd(this.numer, that.denom)
+    val cancel2 = gcd(this.denom, that.numer)
+    return SmallRational(
+      this.numer / cancel1 * (that.numer / cancel2),
+      this.denom / cancel2 * (that.denom / cancel1))
   }
-  operator fun times(that: Long) = this * SmallRational(that, 1)
+
+  operator fun times(value: Long) = this * of(value)
+  // val cancel = gcd(denom, value)
+  // return SmallRational(numer * (value / cancel), denom / cancel)
 
   operator fun div(that: SmallRational) = times(that.reciprocal())
-  operator fun div(that: Long) = this * SmallRational(1, that)
+  operator fun div(value: Long) = this / of(value)
 
   operator fun unaryMinus() = SmallRational(-numer, denom)
 
   operator fun plus(that: SmallRational): SmallRational {
     val common = lcm(this.denom, that.denom)
-    return of(
-      common / this.denom * this.numer +
-      common / that.denom * that.numer, common)
+    return of(this._times(common) + that._times(common), common)
   }
-  operator fun plus(that: Long) = this + SmallRational(that, 1)
+  private fun _times(multipleOfDenom: Long) = numer * (multipleOfDenom / denom)
+
+  operator fun plus(value: Long) = this + of(value)
 
   operator fun minus(that: SmallRational) = this + -that
-  operator fun minus(that: Long) = this + -that
+  operator fun minus(value: Long) = this + -value
 
   fun toDouble(): Double {
     val result = numer.toDouble() / denom.toDouble()
@@ -50,13 +52,13 @@ class SmallRational(private val numer: Long, private val denom: Long) {
   }
 
   companion object {
-    val ZERO = SmallRational(0, 1)
+    fun of(numer: Int, denom: Int) = of(numer.toLong(), denom.toLong())
 
     fun of(numer: Long, denom: Long): SmallRational {
-      require(denom != 0L)
-      if (numer == 0L) return ZERO
       val divisor = gcd(numer, denom) * denom.sign
       return SmallRational(numer / divisor, denom / divisor)
     }
+
+    fun of(value: Long) = SmallRational(value, 1)
   }
 }

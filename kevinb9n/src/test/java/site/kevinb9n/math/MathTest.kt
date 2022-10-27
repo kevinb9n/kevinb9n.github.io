@@ -1,10 +1,12 @@
 package site.kevinb9n.math
 
+import com.google.common.math.LongMath
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import org.junit.jupiter.api.Test
 import site.kevinb9n.javafx.random
 import java.math.BigDecimal
+import java.math.MathContext
 import java.math.RoundingMode.HALF_EVEN
 import kotlin.math.sin
 
@@ -101,10 +103,6 @@ class MathTest {
     assertThat(gcd(6, 9)).isEqualTo(3)
   }
 
-  // the best approximation for pi at 63 decimal places has an unusual property: it's 144 times the
-  // best approximation for pi/144 at 63 dps, so a great many common angles will work out well
-  val PI = BigDecimal("3.141592653589793238462643383279502884197169399375105820974944592")
-
   @Test
   fun testSine() {
     assertThat(sineTo63Digits(BigDecimal.ZERO)).isEqualTo(BigDecimal.ZERO)
@@ -122,8 +120,27 @@ class MathTest {
   }
 
   @Test
+  fun testArcsine() {
+    assertThat(arcsineTo63Digits(BigDecimal.ONE)).isEqualTo(PI / 2)
+    assertThat(arcsineTo63Digits(-BigDecimal.ONE)).isEqualTo(-PI / 2)
+    assertThat(arcsineTo63Digits(BigDecimal.ZERO)).isEqualTo(BigDecimal.ZERO)
+    assertThat(arcsineTo63Digits(BigDecimal(0.5))).isEqualTo(PI / 6)
+    assertThat(arcsineTo63Digits(BigDecimal(0.5).sqrt())).isEqualTo(PI / 4)
+    assertThat(arcsineTo63Digits(BigDecimal(0.75).sqrt())).isEqualTo(PI / 3)
+    assertThat(arcsineTo63Digits(BigDecimal(-0.5))).isEqualTo(-PI / 6)
+
+    assertThat(arcsineTo63Digits(BigDecimal(
+      "0.564642473395035357200945445658657907109888084994151771024265894")))
+      .isEqualTo(BigDecimal("0.6"))
+
+    // But this converges horribly slowly
+//    assertThat(arcsineTo63Digits(BigDecimal(
+//      "0.999999682931834620210529923823327000194912885055433171665050688"))).isEqualTo(BigDecimal("1.57"))
+  }
+
+  @Test
   fun testCompare() {
-    for (i in 1..1_000_000) {
+    for (i in 1..100_000) {
       val angle = random(8.0)
       val goodEstimate = sineTo63Digits(BigDecimal(angle))
       val badEstimate = sin(angle)
@@ -132,5 +149,11 @@ class MathTest {
     }
   }
 
+  @Test fun binom() {
+    assertThat(LongMath.binomial(66, 33)).isEqualTo(7219428434016265740L)
+    assertThat(LongMath.binomial(68, 34)).isEqualTo(Long.MAX_VALUE)
+  }
+
   fun BigDecimal.stdize() = this.setScale(63, HALF_EVEN).stripTrailingZeros()
+  fun BigDecimal.sqrt() = this.sqrt(MathContext(65, HALF_EVEN)).stripTrailingZeros()
 }

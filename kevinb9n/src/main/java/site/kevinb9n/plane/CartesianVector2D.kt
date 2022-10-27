@@ -28,8 +28,8 @@ data class CartesianVector2D internal constructor(
 
   override fun dot(that: Vector2D)        = this.x * that.x + this.y * that.y
   override fun cross(that: Vector2D)      = this.x * that.y - this.y * that.x
-  override fun isLeftTurn(that: Vector2D) = this.x * that.y > this.y * that.x
-  override fun collinear(that: Vector2D)  = this.x * that.y == this.y * that.x // toler?
+  override fun isLeftTurn(that: Vector2D) = cross(that) > 0.0
+  override fun collinear(that: Vector2D)  = cross(that) == 0.0 // toler??
 
   override operator fun div(scalar: Double) = copy(x / scalar, y / scalar)
 
