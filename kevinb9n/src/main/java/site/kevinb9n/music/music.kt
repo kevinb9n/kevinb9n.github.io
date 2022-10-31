@@ -1,68 +1,72 @@
 package site.kevinb9n.music
 
-import com.google.common.math.IntMath.mod
 import site.kevinb9n.math.modWithMinimum
 import site.kevinb9n.music.Accidental.NATURAL
-import site.kevinb9n.music.PitchClass.PC00
-import site.kevinb9n.music.PitchClass.PC02
-import site.kevinb9n.music.PitchClass.PC03
-import site.kevinb9n.music.PitchClass.PC05
-import site.kevinb9n.music.PitchClass.PC07
-import site.kevinb9n.music.PitchClass.PC09
-import site.kevinb9n.music.PitchClass.PC10
-import site.kevinb9n.music.SimpleIntervalSize.FIFTH
-import site.kevinb9n.music.SimpleIntervalSize.FOURTH
-import site.kevinb9n.music.SimpleIntervalSize.SECOND
-import site.kevinb9n.music.SimpleIntervalSize.SEVENTH
-import site.kevinb9n.music.SimpleIntervalSize.SIXTH
-import site.kevinb9n.music.SimpleIntervalSize.THIRD
+import site.kevinb9n.music.PitchClass.*
+import site.kevinb9n.music.PitchLetter.*
+import site.kevinb9n.music.Quality.*
+import site.kevinb9n.music.SimpleIntervalSize.*
+import site.kevinb9n.music.TriadFlavor.*
 
 /**
- * One of the 12 denotable pitches (without octave) that form the basis of our "12-tone system". We
- * name them using integers from 0 to 11 because each has multiple equivalent "spellings". For
- * example, the same single pitch class could be spelled "C♯", "D♭", "B𝄪", "E𝄫♭", etc., and
- * none is more correct than the others.
+ * One of the 12 denotable pitches (without octave) that form the basis of our "12-tone system".
+ * You never actually interact with these directly and I've cheekily named them after colors. They
+ * don't really have names, since multiple enharmonic "spellings" are equally correct for each.
  *
- * Pitch class 0 is not special! They are cyclically ordered. Pitch class 03 is 2 steps (so-called
- * "half-steps") "higher" than pitch class 01, but it is 10 steps "lower" than it as well.
+ * Careful: there is absolutely no significance to our having placed ORANGE as the first. They are
+ * cyclically ordered. BLUE is 2 pitch classes greater than GREEN, but it's equally true to say
+ * it's 10 pitch classes *less* than it.
+ *
+ * This depends on nothing else and nothing very useful can be done with it by itself.
  */
 enum class PitchClass {
-  PC00, PC01, PC02, PC03, PC04, PC05, PC06, PC07, PC08, PC09, PC10, PC11;
+  ORANGE, MAC, YELLOW, SPRING, GREEN, TEAL, BLUE, INDIGO, VIOLET, MAGENTA, RED, BRICK;
 
+  /**
+   * Returns the `increment`th pitch class from this one, counting upward.
+   *
+   * * `pc + 0 == pc`
+   * * `pc + 13 == pc + 1`
+   * * `pc + 7 == pc - 5`
+   */
   operator fun plus(increment: Int) = cyclicPlus(this, increment)
+
   operator fun minus(decrement: Int) = plus(-decrement)
-  operator fun minus(other: PitchClass) = cyclicMinus(this, other)
+
+  /** Returns the unique number `d` in the range -6..5 such that `that + d == this`. */
+  operator fun minus(that: PitchClass) = (this.ordinal - that.ordinal).modWithMinimum(12, -6)
 }
 
-// Not doing anything with these yet
-// enum class Temperament { EQUAL }
-// data class AbsolutePitch(val pitchClass: PitchClass, val octave: Int)
-// data class Frequency(val hertz: Double)
-// data class Tuning(val temperament: Temperament, val ref: Reference) {}
-//  fun getFrequency(pitchSpelling: PitchClassSpelling): Frequency
-//
-// data class Reference(val absPitch: AbsolutePitch, val frequency: Frequency)
-//
-// val CONCERT = Reference(AbsolutePitch(PitchName.A.pc, 4), Frequency(440.0))
+/**
+ * One of the 7 letters we form pitch spellings out of (A-G).
+ */
+enum class PitchLetter {
+  A, B, C, D, E, F, G;
 
-enum class PitchName(val pc: PitchClass) {
-  A(PC07), B(PC09), C(PC10), D(PC00), E(PC02), F(PC03), G(PC05);
-
+  /** C + 3 == C + 10 == F */
   operator fun plus(offset: Int) = cyclicPlus(this, offset)
+
+  /** C + FOURTH == F */
   operator fun plus(size: SimpleIntervalSize) = plus(size.ordinal)
+
+  /** C - 4 == F */
   operator fun minus(offset: Int) = plus(-offset)
+
+  /** C - FIFTH == F */
   operator fun minus(size: SimpleIntervalSize) = minus(size.ordinal)
-  operator fun minus(pitchName: PitchName) = cyclicMinus(this, pitchName)
+
+  /** C - F == FIFTH */
+  operator fun minus(that: PitchLetter) = cyclicMinus(this, that)
 }
 
 enum class Accidental(val suffix: String, val offsetSemitones: Int) {
-  TRIPLE_FLAT("♭𝄫", -3),
-  DOUBLE_FLAT("𝄫", -2),
+  TRIPLE_FLAT("♭♭♭", -3),
+  DOUBLE_FLAT("♭♭", -2),
   FLAT("♭", -1),
   NATURAL("", 0),
   SHARP("♯", 1),
-  DOUBLE_SHARP("𝄪", 2),
-  TRIPLE_SHARP("♯𝄪", 3);
+  DOUBLE_SHARP("♯♯", 2),
+  TRIPLE_SHARP("♯♯♯", 3);
 
   companion object {
     fun flats(flats: Int) = enumValues<Accidental>()[3 - flats]
@@ -74,81 +78,108 @@ enum class Accidental(val suffix: String, val offsetSemitones: Int) {
   operator fun minus(flats: Int) = plus(-flats)
 }
 
-enum class SimpleIntervalSize(val semitonesLower: Int, val semitonesHigher: Int) {
-  UNISON(0, 0), SECOND(1, 2), THIRD(3, 4), FOURTH(5, 5),
-  FIFTH(7, 7), SIXTH(8, 9), SEVENTH(10, 11), OCTAVE(12, 12);
-
-  operator fun unaryMinus() = enumValues<SimpleIntervalSize>()[7 - ordinal]
-  val isPerfect: Boolean get() = (semitonesLower == semitonesHigher)
-
-  val semitonesMinor: Int
-    get() {
-      require(!isPerfect)
-      return semitonesLower
-    }
-
-  val semitonesMajor: Int
-    get() {
-      require(!isPerfect)
-      return semitonesHigher
-    }
-
-  val semitonesPerfect: Int
-    get() {
-      require(isPerfect)
-      return semitonesLower
-    }
+interface IntervalKind {
+  fun semitonesLower(): Int
+  fun semitonesHigher(): Int
 }
 
-enum class Quality {
-  TWICE_DIMINISHED {
-    override fun semitones(size: SimpleIntervalSize) = size.semitonesLower - 2
-  },
-  DIMINISHED {
-    override fun semitones(size: SimpleIntervalSize) = size.semitonesLower - 1
-  },
-  MINOR {
-    override fun semitones(size: SimpleIntervalSize) = size.semitonesMinor
-  },
-  PERFECT {
-    override fun semitones(size: SimpleIntervalSize) = size.semitonesPerfect
-  },
-  MAJOR {
-    override fun semitones(size: SimpleIntervalSize) = size.semitonesMajor
-  },
-  AUGMENTED {
-    override fun semitones(size: SimpleIntervalSize) = size.semitonesHigher + 1
-  },
-  TWICE_AUGMENTED {
-    override fun semitones(size: SimpleIntervalSize) = size.semitonesHigher + 2
-  },
+data class Perfect(val semitones: Int) : IntervalKind {
+  override fun semitonesLower() = semitones
+  override fun semitonesHigher() = semitones
+}
+
+data class Imperfect (val semitonesMajor: Int) : IntervalKind {
+  val semitonesMinor = semitonesMajor - 1
+  override fun semitonesLower() = semitonesMinor
+  override fun semitonesHigher() = semitonesMajor
+}
+
+/**
+ * The "size" of an interval is only the "number part", without the "quality" (like "major").
+ * There are intervals of "ninth" and above, but *simple* intervals are octave or less.
+ */
+enum class SimpleIntervalSize(val kind: IntervalKind) {
+  UNISON(Perfect(0)), SECOND(Imperfect(2)), THIRD(Imperfect(4)), FOURTH(Perfect(5)),
+  FIFTH(Perfect(7)), SIXTH(Imperfect(9)), SEVENTH(Imperfect(11)), OCTAVE(Perfect(12));
+
+  /**
+   * Inverse of this interval. `-THIRD == SIXTH`; `-OCTAVE = UNISON`.
+   */
+  operator fun unaryMinus() = enumValues<SimpleIntervalSize>().reversed()[ordinal]
+
+  operator fun plus(that: SimpleIntervalSize) = cyclicPlus(this, that.ordinal)
+  operator fun minus(that: SimpleIntervalSize) = this + -that
+  override fun toString() = name.lowercase()
+}
+
+enum class Quality(private val semitonesFn: (SimpleIntervalSize) -> Int) {
+  DIMINISHED({ it.kind.semitonesLower() - 1 }),
+  MINOR({ (it.kind as Imperfect).semitonesMinor }),
+  PERFECT({ (it.kind as Perfect).semitones }),
+  MAJOR({ (it.kind as Imperfect).semitonesMajor }),
+  AUGMENTED({ it.kind.semitonesHigher() + 1 }),
   ;
 
-  operator fun unaryMinus() = enumValues<Quality>()[6 - ordinal]
-  operator fun plus(size: SimpleIntervalSize) = SimpleInterval(this, size)
-  abstract fun semitones(size: SimpleIntervalSize): Int
-}
+  /** The inverse of this quality. `-DIMINISHED == AUGMENTED, -MAJOR == MINOR, -PERFECT = PERFECT`. */
+  operator fun unaryMinus() = enumValues<Quality>().reversed()[ordinal]
 
-data class SimpleInterval(val quality: Quality = Quality.PERFECT, val size: SimpleIntervalSize) {
-  init {
-    require(semitones in 0..12)
+  fun semitones(size: SimpleIntervalSize): Int {
+    val semitones = semitonesFn(size)
+    require(semitones in 0..12) { "$this $size $semitones" }
+    return semitones
   }
 
-  val semitones: Int get() = quality.semitones(size)
-  operator fun unaryMinus() = SimpleInterval(-quality, -size)
+  override fun toString() = name.lowercase().replace('_', ' ')
 }
 
+data class SimpleInterval(val quality: Quality = PERFECT, val size: SimpleIntervalSize) {
+  init { require(semitones in 0..12) }
+
+  val semitones: Int get() = quality.semitones(size)
+
+  /** Returns the simple interval `inverse` such that `this + inverse == OCTAVE`. */
+  operator fun unaryMinus() = interval(-quality, -size)
+
+  override fun toString() = "$quality $size"
+}
+
+fun allSimpleIntervals(): List<SimpleInterval> {
+  return SimpleIntervalSize.values().flatMap { s->
+    Quality.values().flatMap { q ->
+      try {
+        listOf(interval(q, s))
+      } catch (e: Exception) {
+        listOf()
+      }
+    }
+  }.toList()
+}
+
+val TRITONE = interval(AUGMENTED, FOURTH)
+
+fun interval(quality: Quality = PERFECT, size: SimpleIntervalSize) = SimpleInterval(quality, size)
+
+// Why not use boomwhacker colors
+val letterToClass = mapOf(
+  A to INDIGO, B to MAGENTA, C to RED, D to ORANGE, E to YELLOW, F to SPRING, G to TEAL);
+
+/**
+ * A "spelling" of a pitch class is *one* of the ("enharmonic") ways to identify that pitch class.
+ * For example, "G𝄫", "F", and "E♯" are all spellings for the same pitch class.
+ */
 data class PitchClassSpelling(
-  val name: PitchName,
+  val letter: PitchLetter,
   val modifier: Accidental = NATURAL) {
-  fun pitchClass() = name.pc + modifier.offsetSemitones
-  override fun toString() = "$name$modifier"
+  fun pitchClass() = letterToClass[letter]!! + modifier.offsetSemitones
+  override fun toString() = "$letter$modifier"
 
   operator fun plus(interval: SimpleInterval): PitchClassSpelling {
-    // roundabout?
-    val newPc = pitchClass() + interval.semitones
-    val newMod = Accidental.sharps((newPc - (name + interval.size).pc).modWithMinimum(12, -6))
-    return PitchClassSpelling(name + interval.size, newMod)
+    // Easiest way is to do the math in semitones then reverse-engineer the modifier
+    val newPitchClass = pitchClass() + interval.semitones
+    val newLetter = letter + interval.size
+    val pitchClassIfNatural = letterToClass[newLetter]!!
+    val newAccidental = Accidental.sharps(newPitchClass - pitchClassIfNatural)
+    return PitchClassSpelling(newLetter, newAccidental)
   }
 }
 
@@ -158,39 +189,45 @@ interface ChordFlavor {
 
 // names conflict with interval qualities
 enum class TriadFlavor(override val intervals: List<SimpleInterval>) : ChordFlavor {
-  DIMINISHED(Quality.MINOR + THIRD, Quality.DIMINISHED + FIFTH),
-  MINOR(Quality.MINOR + THIRD, Quality.PERFECT + FIFTH),
-  MAJOR(Quality.MAJOR + THIRD, Quality.PERFECT + FIFTH),
-  AUGMENTED(Quality.MAJOR + THIRD, Quality.AUGMENTED + FIFTH),
-  NO_THIRD(Quality.PERFECT + FIFTH),
-  SUS2(Quality.MAJOR + SECOND, Quality.PERFECT + FIFTH),
-  SUS4(Quality.PERFECT + FOURTH, Quality.PERFECT + FIFTH);
-
-  constructor(a: SimpleInterval) : this(listOf(a))
-  constructor(a: SimpleInterval, b: SimpleInterval) : this(listOf(a, b))
-}
-
-enum class TetradFlavor(val triad: TriadFlavor, val seventh: Quality) : ChordFlavor {
-  DOMINANT7(TriadFlavor.MAJOR, Quality.MINOR),
-  MAJOR7(TriadFlavor.MAJOR, Quality.MAJOR),
-  MINOR7(TriadFlavor.MINOR, Quality.MINOR),
-  MINOR_MAJOR7(TriadFlavor.MINOR, Quality.MAJOR),
-  DIMINISHED7(TriadFlavor.DIMINISHED, Quality.DIMINISHED),
-  HALF_DIMINISHED7(TriadFlavor.DIMINISHED, Quality.MINOR),
-  SEVENTH_SUS4(TriadFlavor.SUS4, Quality.MINOR),
+  TRIAD_DIMINISHED(MINOR, THIRD, DIMINISHED, FIFTH),
+  TRIAD_MINOR(MINOR, THIRD, PERFECT, FIFTH),
+  TRIAD_MAJOR(MAJOR, THIRD, PERFECT, FIFTH),
+  TRIAD_AUGMENTED(MAJOR, THIRD, AUGMENTED, FIFTH),
+  TRIAD_NO_THIRD(PERFECT, FIFTH),
+  TRIAD_SUS2(MAJOR, SECOND, PERFECT, FIFTH),
+  TRIAD_SUS4(PERFECT, FOURTH, PERFECT, FIFTH),
   ;
 
-  override val intervals = triad.intervals + SimpleInterval(seventh, SEVENTH)
+  constructor(a: SimpleInterval) : this(listOf(a))
+  constructor(q: Quality, s: SimpleIntervalSize) : this(interval(q, s))
+  constructor(a: SimpleInterval, b: SimpleInterval) : this(listOf(a, b))
+  constructor(q: Quality, s: SimpleIntervalSize, q2: Quality, s2: SimpleIntervalSize)
+    : this(interval(q, s), interval(q2, s2))
+}
+
+enum class TetradFlavor(triad: TriadFlavor, seventhQuality: Quality) : ChordFlavor {
+  DOMINANT7(TRIAD_MAJOR, MINOR),
+  MAJOR7(TRIAD_MAJOR, MAJOR),
+  MINOR7(TRIAD_MINOR, MINOR),
+  MINOR_MAJOR7(TRIAD_MINOR, MAJOR),
+  DIMINISHED7(TRIAD_DIMINISHED, DIMINISHED),
+  HALF_DIMINISHED7(TRIAD_DIMINISHED, MINOR),
+  SEVENTH_SUS4(TRIAD_SUS4, MINOR),
+  ;
+
+  override val intervals = triad.intervals + interval(seventhQuality, SEVENTH)
 }
 
 enum class AddOn(val interval: SimpleInterval) {
-  ADD_FLAT6(Quality.MINOR + SIXTH),
-  ADD6(Quality.MAJOR + SIXTH),
-  ADD_FLAT9(Quality.MINOR + SECOND),
-  ADD9(Quality.MAJOR + SECOND),
-  ADD_SHARP9(Quality.AUGMENTED + SECOND),
-  ADD11(Quality.PERFECT + FOURTH)
+  ADD_FLAT6(MINOR, SIXTH),
+  ADD6(MAJOR, SIXTH),
+  ADD_FLAT9(MINOR, SECOND),
+  ADD9(MAJOR, SECOND),
+  ADD_SHARP9(AUGMENTED, SECOND),
+  ADD11(PERFECT, FOURTH),
   ;
+
+  constructor(quality: Quality, size: SimpleIntervalSize) : this(interval(quality, size))
 }
 
 data class AddOnFlavor(val base: ChordFlavor, val added: AddOn): ChordFlavor {
@@ -199,20 +236,23 @@ data class AddOnFlavor(val base: ChordFlavor, val added: AddOn): ChordFlavor {
 
 data class ChordSpelling(val root: PitchClassSpelling, val flavor: ChordFlavor) {
   constructor(
-    name: PitchName,
+    letter: PitchLetter,
     modifier: Accidental = NATURAL,
-    flavor: ChordFlavor = TriadFlavor.MAJOR) :
-      this(PitchClassSpelling(name, modifier), flavor)
-  constructor(name: PitchName, flavor: ChordFlavor) : this(name, NATURAL, flavor)
+    flavor: ChordFlavor = TRIAD_MAJOR) :
+      this(PitchClassSpelling(letter, modifier), flavor)
+  constructor(letter: PitchLetter, flavor: ChordFlavor) : this(letter, NATURAL, flavor)
   fun pitchClasses(): List<PitchClassSpelling> = listOf(root) + flavor.intervals.map { root + it }
   fun transpose(interval: SimpleInterval) = copy(root + interval)
-  fun transpose(quality: Quality, size: SimpleIntervalSize) = transpose(SimpleInterval(quality, size))
+  fun transpose(quality: Quality, size: SimpleIntervalSize) = transpose(interval(quality, size))
 }
 
-inline fun <reified T : Enum<T>> cyclicPlus(start: T, distance: Int): T {
-  val enumValues = enumValues<T>()
-  return enumValues[mod(start.ordinal + distance, enumValues.size)]
-}
-
-inline fun <reified T : Enum<T>> cyclicMinus(start: T, end: T) =
-  mod(start.ordinal - end.ordinal, enumValues<T>().size)
+// Not doing anything with these yet
+// enum class Temperament { EQUAL }
+// data class AbsolutePitch(val pitchClass: PitchClass, val octave: Int)
+// data class Frequency(val hertz: Double)
+// data class Tuning(val temperament: Temperament, val ref: Reference) {}
+//  fun getFrequency(pitchSpelling: PitchClassSpelling): Frequency
+//
+// data class Reference(val absPitch: AbsolutePitch, val frequency: Frequency)
+//
+// val CONCERT = Reference(AbsolutePitch(PitchLetter.A.pc, 4), Frequency(440.0))

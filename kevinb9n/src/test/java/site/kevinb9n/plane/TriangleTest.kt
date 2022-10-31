@@ -52,7 +52,8 @@ class TriangleTest {
   fun testCentroid() {
     val t = triangle(vector(12, 0), vector(0, 9))
     assertThat(t.leg1).isEqualTo(vector(12, 0))
-    assertThat(t.leg2).isEqualTo(vector(0, 9))
+    assertThat(t.leg2.x).isWithin(1e-14).of(0.0)
+    assertThat(t.leg2.y).isWithin(1e-14).of(9.0)
     assertThat(t.leg3).isEqualTo(vector(-12, -9))
     assertThat(t.centroid()).isEqualTo(vector(8.0, 3.0))
 

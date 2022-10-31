@@ -24,7 +24,7 @@ data class PolarVector(override val magnitude: Double, override val direction: A
   override fun div(scalar: Double) = 1.0 / scalar * this
 
   override fun dot(that: Vector2D) = this.magnitude * that.magnitude * this.angleWith(that).cos()
-  override fun cross(that: Vector2D) = this.magnitude * that.magnitude * this.angleWith(that).sin()
+  override fun crossZ(that: Vector2D) = this.magnitude * that.magnitude * this.angleWith(that).sin()
 
   override fun collinear(that: Vector2D) = this.direction == that.direction
   override fun isLeftTurn(that: Vector2D) = this.angleWith(that).degrees >= 0.0

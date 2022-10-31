@@ -23,7 +23,7 @@ interface Vector2D : AffineVector<Point2D, Vector2D> {
    * Returns the `z` component of the cross product of this vector with `that`. Zero if
    * `collinear(that)`; positive if `isLeftTurn(that)`.
    */
-  infix fun cross(that: Vector2D): Double
+  infix fun crossZ(that: Vector2D): Double
   fun reflect(): Vector2D
   fun rotate(angle: Angle) = PolarVector(magnitude, direction + angle)
   fun isLeftTurn(that: Vector2D): Boolean

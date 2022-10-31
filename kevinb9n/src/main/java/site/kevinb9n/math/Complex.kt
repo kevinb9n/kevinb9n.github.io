@@ -45,8 +45,8 @@ data class Complex private constructor(private val asVector: Vector2D) : Field<C
 
   operator fun times(x: Number) = copy(asVector * x.toDouble())
   override fun times(that: Complex): Complex {
-    val conv = conjugate().asVector
-    return Complex(conv dot that.asVector, conv cross that.asVector)
+    val otherVector = that.conjugate().asVector
+    return Complex(otherVector dot asVector, otherVector crossZ asVector)
   }
 
   operator fun div(x: Number) = Complex(asVector / x.toDouble())

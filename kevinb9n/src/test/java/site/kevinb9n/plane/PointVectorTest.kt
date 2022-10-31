@@ -109,10 +109,10 @@ class PointVectorTest {
 
   fun cross(a: Pair<Vector2D, Vector2D>, b: Pair<Vector2D, Vector2D>): Double {
     val variations = doubleArrayOf(
-      a.first cross b.first,
-      a.first cross b.second,
-      a.second cross b.first,
-      a.second cross b.second,
+      a.first crossZ b.first,
+      a.first crossZ b.second,
+      a.second crossZ b.first,
+      a.second crossZ b.second,
     )
     val mean = Stats.meanOf(*variations)
     for (y in variations) {
@@ -153,7 +153,7 @@ class PointVectorTest {
       total += set.size
       val delay = Iterables.indexOf(set) { it == latest }
       val cycleLength = set.size - delay
-      val cross = latest.cross(orig).absoluteValue / latest.magnitude / orig.magnitude
+      val cross = latest.crossZ(orig).absoluteValue / latest.magnitude / orig.magnitude
       worstDelay = maxOf(worstDelay, delay)
       worstCycleLength = maxOf(worstCycleLength, cycleLength)
       worstDrift = maxOf(worstDrift, cross)

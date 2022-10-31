@@ -1,6 +1,5 @@
 package site.kevinb9n.plane
 
-import site.kevinb9n.math.closeEnough
 import site.kevinb9n.plane.Angle.Companion.radians
 import site.kevinb9n.plane.Vector2D.Companion.vector
 import kotlin.math.atan2
@@ -27,9 +26,9 @@ data class CartesianVector2D internal constructor(
   override operator fun times(scalar: Double) = copy(x * scalar, y * scalar)
 
   override fun dot(that: Vector2D)        = this.x * that.x + this.y * that.y
-  override fun cross(that: Vector2D)      = this.x * that.y - this.y * that.x
-  override fun isLeftTurn(that: Vector2D) = cross(that) > 0.0
-  override fun collinear(that: Vector2D)  = cross(that) == 0.0 // toler??
+  override fun crossZ(that: Vector2D)      = this.x * that.y - this.y * that.x
+  override fun isLeftTurn(that: Vector2D) = crossZ(that) > 0.0
+  override fun collinear(that: Vector2D)  = crossZ(that) == 0.0 // toler??
 
   override operator fun div(scalar: Double) = copy(x / scalar, y / scalar)
 

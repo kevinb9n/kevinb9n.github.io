@@ -66,11 +66,11 @@ data class Circle(val center: Point2D, val radius: Double) : PosClosedShape {
       val vector = q - p
       for (r in points) {
         if (pqCircle.contains(r)) continue
-        val crossMag = vector.cross(r - p)
+        val crossMag = vector.crossZ(r - p)
         val circle = enclosingCircle(p, q, r)
-        if (crossMag > 0 && (left == null || vector.cross(circle.center - p) > vector.cross(left.center - p))) {
+        if (crossMag > 0 && (left == null || vector.crossZ(circle.center - p) > vector.crossZ(left.center - p))) {
           left = circle
-        } else if (crossMag < 0 && (right == null || vector.cross(circle.center - p) < vector.cross(right.center - p))) {
+        } else if (crossMag < 0 && (right == null || vector.crossZ(circle.center - p) < vector.crossZ(right.center - p))) {
           right = circle
         }
       }

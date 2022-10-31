@@ -29,7 +29,7 @@ data class UnTriangle(val leg1: Vector2D, val leg2: Vector2D): ConvexPolygon {
     }
   }
 
-  override fun area() = leg1.cross(leg2) / 2.0
+  override fun area() = leg1.crossZ(leg2) / 2.0
 
   val leg3 = -(leg1 + leg2)
 
