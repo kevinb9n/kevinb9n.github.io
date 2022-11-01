@@ -3,20 +3,18 @@ package site.kevinb9n.music
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import site.kevinb9n.music.Accidental.FLAT
-import site.kevinb9n.music.Accidental.NATURAL
-import site.kevinb9n.music.Accidental.SHARP
 import site.kevinb9n.music.PitchLetter.*
 import site.kevinb9n.music.Quality.*
+import site.kevinb9n.music.SimpleInterval.Companion.allSimpleIntervals
 import site.kevinb9n.music.SimpleIntervalSize.*
 
 class IntervalsTest {
   @Test fun all() {
     val ints = listOf(
-      interval(PERFECT, UNISON), interval(AUGMENTED, UNISON),
-      interval(DIMINISHED, SECOND), interval(MINOR, SECOND), interval(MAJOR, SECOND), interval(AUGMENTED, SECOND),
-      interval(DIMINISHED, THIRD), interval(MINOR, THIRD), interval(MAJOR, THIRD), interval(AUGMENTED, THIRD),
-      interval(DIMINISHED, FOURTH), interval(PERFECT, FOURTH), interval(AUGMENTED, FOURTH),
+      PERFECT[UNISON], AUGMENTED[UNISON],
+      DIMINISHED[SECOND], MINOR[SECOND], MAJOR[SECOND], AUGMENTED[SECOND],
+      DIMINISHED[THIRD], MINOR[THIRD], MAJOR[THIRD], AUGMENTED[THIRD],
+      DIMINISHED[FOURTH], PERFECT[FOURTH], AUGMENTED[FOURTH],
     )
     val theRest = ints.map { -it }.reversed()
     assertThat(allSimpleIntervals()).containsExactlyElementsIn(ints + theRest).inOrder()
@@ -24,7 +22,7 @@ class IntervalsTest {
 
   @Test fun fuckup () {
     val c = PitchClassSpelling(C)
-    val i3 = interval(MAJOR, THIRD)
+    val i3 = MAJOR[THIRD]
     val pcss = listOf(
       c,
       c + i3, // E
@@ -44,91 +42,96 @@ class IntervalsTest {
     }
   }
 
-  @Test fun testUnison() {
-    assertThrows<Exception> { interval(DIMINISHED, UNISON) }
-    assertThrows<Exception> { interval(MINOR, UNISON) }
-    assertThrows<Exception> { interval(MAJOR, UNISON) }
+  @Test
+  fun testUnison() {
+    assertThrows<Exception> { DIMINISHED[UNISON] }
+    assertThrows<Exception> { MINOR[UNISON] }
+    assertThrows<Exception> { MAJOR[UNISON] }
 
-    val pu = interval(PERFECT, UNISON)
+    val pu = PERFECT[UNISON]
     assertThat(pu.semitones).isEqualTo(0)
-    assertThat(-pu).isEqualTo(interval(PERFECT, OCTAVE))
+    assertThat(-pu).isEqualTo(PERFECT[OCTAVE])
 
-    val au = interval(AUGMENTED, UNISON)
+    val au = AUGMENTED[UNISON]
     assertThat(au.semitones).isEqualTo(1)
-    assertThat(-au).isEqualTo(interval(DIMINISHED, OCTAVE))
+    assertThat(-au).isEqualTo(DIMINISHED[OCTAVE])
   }
 
-  @Test fun testSecond() {
-    assertThrows<Exception> { interval(PERFECT, SECOND) }
+  @Test
+  fun testSecond() {
+    assertThrows<Exception> { PERFECT[SECOND] }
 
-    val ds = interval(DIMINISHED, SECOND)
+    val ds = DIMINISHED[SECOND]
     assertThat(ds.semitones).isEqualTo(0)
-    assertThat(-ds).isEqualTo(interval(AUGMENTED, SEVENTH))
+    assertThat(-ds).isEqualTo(AUGMENTED[SEVENTH])
 
-    val mis = interval(MINOR, SECOND)
+    val mis = MINOR[SECOND]
     assertThat(mis.semitones).isEqualTo(1)
-    assertThat(-mis).isEqualTo(interval(MAJOR, SEVENTH))
+    assertThat(-mis).isEqualTo(MAJOR[SEVENTH])
 
-    val mas = interval(MAJOR, SECOND)
+    val mas = MAJOR[SECOND]
     assertThat(mas.semitones).isEqualTo(2)
-    assertThat(-mas).isEqualTo(interval(MINOR, SEVENTH))
+    assertThat(-mas).isEqualTo(MINOR[SEVENTH])
 
-    val aus = interval(AUGMENTED, SECOND)
+    val aus = AUGMENTED[SECOND]
     assertThat(aus.semitones).isEqualTo(3)
-    assertThat(-aus).isEqualTo(interval(DIMINISHED, SEVENTH))
+    assertThat(-aus).isEqualTo(DIMINISHED[SEVENTH])
   }
 
-  @Test fun testThird() {
-    assertThrows<Exception> { interval(PERFECT, THIRD) }
+  @Test
+  fun testThird() {
+    assertThrows<Exception> { PERFECT[THIRD] }
 
-    val dt = interval(DIMINISHED, THIRD)
+    val dt = DIMINISHED[THIRD]
     assertThat(dt.semitones).isEqualTo(2)
-    assertThat(-dt).isEqualTo(interval(AUGMENTED, SIXTH))
+    assertThat(-dt).isEqualTo(AUGMENTED[SIXTH])
 
-    val mit = interval(MINOR, THIRD)
+    val mit = MINOR[THIRD]
     assertThat(mit.semitones).isEqualTo(3)
-    assertThat(-mit).isEqualTo(interval(MAJOR, SIXTH))
+    assertThat(-mit).isEqualTo(MAJOR[SIXTH])
 
-    val mat = interval(MAJOR, THIRD)
+    val mat = MAJOR[THIRD]
     assertThat(mat.semitones).isEqualTo(4)
-    assertThat(-mat).isEqualTo(interval(MINOR, SIXTH))
+    assertThat(-mat).isEqualTo(MINOR[SIXTH])
 
-    val at = interval(AUGMENTED, THIRD)
+    val at = AUGMENTED[THIRD]
     assertThat(at.semitones).isEqualTo(5)
-    assertThat(-at).isEqualTo(interval(DIMINISHED, SIXTH))
+    assertThat(-at).isEqualTo(DIMINISHED[SIXTH])
   }
 
-  @Test fun testFourth() {
-    assertThrows<Exception> { interval(MINOR, FOURTH) }
-    assertThrows<Exception> { interval(MAJOR, FOURTH) }
+  @Test
+  fun testFourth() {
+    assertThrows<Exception> { MINOR[FOURTH] }
+    assertThrows<Exception> { MAJOR[FOURTH] }
 
-    val df = interval(DIMINISHED, FOURTH)
+    val df = DIMINISHED[FOURTH]
     assertThat(df.semitones).isEqualTo(4)
-    assertThat(-df).isEqualTo(interval(AUGMENTED, FIFTH))
+    assertThat(-df).isEqualTo(AUGMENTED[FIFTH])
 
-    val pf = interval(PERFECT, FOURTH)
+    val pf = PERFECT[FOURTH]
     assertThat(pf.semitones).isEqualTo(5)
-    assertThat(-pf).isEqualTo(interval(PERFECT, FIFTH))
+    assertThat(-pf).isEqualTo(PERFECT[FIFTH])
 
-    val af = interval(AUGMENTED, FOURTH)
+    val af = AUGMENTED[FOURTH]
     assertThat(af.semitones).isEqualTo(6)
-    assertThat(-af).isEqualTo(interval(DIMINISHED, FIFTH))
+    assertThat(-af).isEqualTo(DIMINISHED[FIFTH])
   }
 
-  @Test fun testFifth() {
-    assertThrows<Exception> { interval(MINOR, FIFTH) }
-    assertThrows<Exception> { interval(MAJOR, FIFTH) }
+  @Test
+  fun testFifth() {
+    assertThrows<Exception> { MINOR[FIFTH] }
+    assertThrows<Exception> { MAJOR[FIFTH] }
 
-    val df = interval(DIMINISHED, FIFTH)
+    val df = DIMINISHED[FIFTH]
     assertThat(df.semitones).isEqualTo(6)
-    assertThat(-df).isEqualTo(interval(AUGMENTED, FOURTH))
+    assertThat(-df).isEqualTo(AUGMENTED[FOURTH])
 
-    val pf = interval(PERFECT, FIFTH)
+    val pf = PERFECT[FIFTH]
     assertThat(pf.semitones).isEqualTo(7)
-    assertThat(-pf).isEqualTo(interval(PERFECT, FOURTH))
+    assertThat(-pf).isEqualTo(PERFECT[FOURTH])
 
-    val af = interval(AUGMENTED, FIFTH)
+    val af = AUGMENTED[FIFTH]
     assertThat(af.semitones).isEqualTo(8)
-    assertThat(-af).isEqualTo(interval(DIMINISHED, FOURTH))
+    assertThat(-af).isEqualTo(DIMINISHED[FOURTH])
   }
 }
