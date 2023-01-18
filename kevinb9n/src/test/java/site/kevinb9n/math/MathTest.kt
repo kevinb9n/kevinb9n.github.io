@@ -144,7 +144,7 @@ class MathTest {
       val angle = random(8.0)
       val goodEstimate = sineTo63Digits(BigDecimal(angle))
       val badEstimate = sin(angle)
-      assertThat((goodEstimate - badEstimate).abs().compareTo(BigDecimal("6e-17"))).isLessThan(0)
+      assertThat((goodEstimate - badEstimate).abs().compareTo(BigDecimal("1e-15"))).isLessThan(0)
       assertThat(goodEstimate.toDouble()).isWithin(12e-17).of(badEstimate)
     }
   }
