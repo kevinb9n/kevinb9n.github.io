@@ -43,7 +43,7 @@ I'm generally still connected to these projects but (frustratingly to many, I'm 
 * Representative to [Project Valhalla](https://openjdk.java.net/projects/valhalla/) working group
 * I work in groups
 
-### Play
+## Play
 
 I am one of those board game nuts. My favorite game is Terraforming Mars. I have some stuff [here](http://github.com/MartianZoo) fans might be interested in, including a game engine library that's kicking my ass. But I have something like 300 other games too. Board games are neato. Video games not so much, unless it's BioWare.
 
@@ -53,9 +53,9 @@ I (and my family) love road trips. I've been to 43 U.S. states (I think), but ha
 
 In a good year I'm into cycling and might ride about 4K road miles. In a bad year I'm into sitting on the couch.
 
-#### Music
+### Music
 
-I play guitar decently, sing decently, play drums less than decently, play keyboards badly, and (like every guitar player) I think I can play the bass too but actually can't. I love music. I put some stuff up on YouTube, some I feel good about, some I really don't.
+I play guitar decently, sing pretty good, play drums less than decently, play keyboards badly, and -- like every guitar player -- I think I can play the bass too but actually can't. I love music. I put some stuff up on YouTube, some I feel good about, some I really don't.
 
 I'm very into The Beatles, Radiohead, Belle & Sebastian, Elliott Smith, Paul Simon, Vampire Weekend, Aimee Mann, The Shins, Neutral Milk Hotel, and stuff like that. Music means everything to me. Oh and musicals. I love musicals, but I'm a poseur who mostly just likes the modern ones: Book of Mormon, Waitress, Hamilton, Something Rotten, Come From Away, Band's Visit, Hadestown...
 
