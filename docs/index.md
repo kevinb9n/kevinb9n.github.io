@@ -8,15 +8,15 @@ Hello! Nice to meet you.
  
 ## Work
 
-I graduated in 1997, had about 6 jobs and the joined Google in 2004. In 2007 I founded the Java Core Libraries team, and I'm still there today! (We are now named Java And Kotlin Ecosystems.)
+I graduated in 1997, and after about 6 middlin' jobs I joined Google in 2004. In 2007 I founded the Java Core Libraries (now Java And Kotlin Ecosystem) team... and I'm still doing it today!
 
 If you're very curious, you could learn a bit about what I do from the [start of this video](https://www.youtube.com/watch?v=sPW2Pz2dI9E) until you get bored.
 
-My mission is basically to do whatever I can make the world's Java/Kotlin code more readable, bug-resistant, adaptable, and reusable. And... I love it!
+My mission is basically to make the world's Java/Kotlin code more readable, bug-proof, and adaptable. Any way I can. And... I love it!
 
 ### Things I did
 
-I've played some important part in creating these things. Clearly I love to collaborate. Often it sounds like I didn't do that much, but listen man.
+I've played some important part in creating these things. Clearly I love to collaborate. Often it sounds (below) like I didn't do that much, but listen man.
 
 I'm generally still connected to these projects but (frustratingly to many, I'm sure), not able to pay much active attention to them nowadays.
 
@@ -45,18 +45,18 @@ I'm generally still connected to these projects but (frustratingly to many, I'm 
 
 ### Play
 
-I like board games. My favorite game is Terraforming Mars. I have some stuff [here](http://github.com/MartianZoo) fans might be interested in, including a game engine library that's kicking my ass. But I have something like 300 other games too. Board games are neato. Video games not so much, unless it's BioWare.
+I am one of those board game nuts. My favorite game is Terraforming Mars. I have some stuff [here](http://github.com/MartianZoo) fans might be interested in, including a game engine library that's kicking my ass. But I have something like 300 other games too. Board games are neato. Video games not so much, unless it's BioWare.
 
-I like math a lot and used to coach a Math Olympiad team for 10-year-olds before covid. I was really good at it too, aside from the ways in which I was bad at it.
+I like math a lot and used to coach a Math Olympiad team for 10-year-olds before covid. I was really good at it too, aside from the ways in which I was bad at it. My daughter and I play a game where we race to prime-factorize a 4-digit number in our heads. It's a really stupid game but we like it.
 
-I'm from Ohio and I like going to Cedar Point.
+I (and my family) love road trips. I've been to 43 U.S. states (I think), but have only left the country like three times (Canada does not count).
 
-I like road trips. I've been to 43 U.S. states (I think), but have only left the country like three times (Canada does not count).
+In a good year I'm into cycling and might ride about 4K road miles. In a bad year I'm into sitting on the couch.
 
 #### Music
 
-I play guitar decently, sing decently, play drums not that decently, am a bad keyboard player, and like every guitar player I think I can play the bass too but actually can't. I love music. I put some stuff up on YouTube, some I feel good about, some I really don't.
+I play guitar decently, sing decently, play drums less than decently, play keyboards badly, and (like every guitar player) I think I can play the bass too but actually can't. I love music. I put some stuff up on YouTube, some I feel good about, some I really don't.
 
-I'm very into The Beatles, Radiohead, Belle & Sebastian, Elliott Smith, Paul Simon, Vampire Weekend, Aimee Mann, The Shins, Neutral Milk Hotel, and stuff like that. Music means everything to me. Oh and musicals. I love musicals, but I'm a poseur who mostly just likes the modern ones: Book of Mormon, Waitress, Hamilton, Something Rotten, Come From Away...
+I'm very into The Beatles, Radiohead, Belle & Sebastian, Elliott Smith, Paul Simon, Vampire Weekend, Aimee Mann, The Shins, Neutral Milk Hotel, and stuff like that. Music means everything to me. Oh and musicals. I love musicals, but I'm a poseur who mostly just likes the modern ones: Book of Mormon, Waitress, Hamilton, Something Rotten, Come From Away, Band's Visit, Hadestown...
 
-However, an artist who is very very special to me and my family is Melissa Kaplan aka Universal Hall Pass, formerly of Splashdown. Her singing, lyrics, vocal arrangements, and overall sensibilities are jaw-dropping out of this world amazing. And like no one knows about her, which makes me sad. Really, [try out this playlist](https://www.youtube.com/watch?v=jGbvfaO4ht4&list=PLLkghk8DC6eb-eMh8syfH1UfGDs55B8Da) and if you don't like one song just try another. I can't imagine someone finding nothing to love in it.
+However, a musical artist who is very very special to me and my family is **Melissa Kaplan aka Universal Hall Pass**, formerly of Splashdown. If you've played the Assassin's Creed games you've actually heard her voice a lot. Her singing, lyrics, vocal arrangements, and overall musicality are jaw-dropping out of this world incredible. She's also an amazing person who answers emails and tweets with such kindness and love. Sadly, like no one knows about her, which breaks my heart. Really, [try out this playlist](https://www.youtube.com/watch?v=jGbvfaO4ht4&list=PLLkghk8DC6eb-eMh8syfH1UfGDs55B8Da), and if you don't like one song just try another. I can't imagine anyone not finding something to love in it. Her collaborations with Kasson Crooker (including the Splashdown era, and his work as Symbion Project) are THE BEST.
