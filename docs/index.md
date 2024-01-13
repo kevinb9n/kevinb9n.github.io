@@ -2,7 +2,9 @@
 
 Hello! Nice to meet you.
 
-## All the other me's
+## The other me's
+
+Mostly in disuse of course.
 
 [Github](https://github.com/kevinb9n) [Mastodon](https://hachyderm.io/@kevinb9n) [Twitter](https://twitter.com/kevinb9n) [Reddit](http://www.reddit.com/u/kevinb9n) [Facebook](https://www.facebook.com/kevinb9n) [LinkedIn](www.linkedin.com/in/kevinbourrillion) [YouTube](https://www.youtube.com/playlist?list=PLLkghk8DC6eamJkaw2SBtWYv66aLWHLec) [BoardGameGeek](https://boardgamegeek.com/user/kevinb9n) [BoardGameArena](https://boardgamearena.com/player?id=85142127)
  
