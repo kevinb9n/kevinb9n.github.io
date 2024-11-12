@@ -6,7 +6,7 @@ Hello! Nice to meet you.
 
 I'm `kevinb9n` most places.
 
-[Gmail](mailto:kevinb9n@gmail.com) [Github](https://github.com/kevinb9n) [Twitter](https://twitter.com/kevinb9n) [Mastodon](https://hachyderm.io/@kevinb9n) [Reddit](http://www.reddit.com/u/kevinb9n) [Facebook](https://www.facebook.com/kevinb9n) [LinkedIn](www.linkedin.com/in/kevinbourrillion) [YouTube](https://www.youtube.com/playlist?list=PLLkghk8DC6eamJkaw2SBtWYv66aLWHLec) [BoardGameGeek](https://boardgamegeek.com/user/kevinb9n) [BoardGameArena](https://boardgamearena.com/player?id=85142127)
+[Gmail](mailto:kevinb9n@gmail.com) [Github](https://github.com/kevinb9n) [Twitter](https://twitter.com/kevinb9n) [BlueSky](https://bsky.app/profile/kevinb9n.bsky.social) [Mastodon](https://hachyderm.io/@kevinb9n) [Reddit](http://www.reddit.com/u/kevinb9n) [Facebook](https://www.facebook.com/kevinb9n) [LinkedIn](www.linkedin.com/in/kevinbourrillion) [YouTube](https://www.youtube.com/playlist?list=PLLkghk8DC6eamJkaw2SBtWYv66aLWHLec) [BoardGameGeek](https://boardgamegeek.com/user/kevinb9n) [BoardGameArena](https://boardgamearena.com/player?id=85142127)
  
 ## Work
 
