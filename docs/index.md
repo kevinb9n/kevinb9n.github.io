@@ -10,7 +10,7 @@ I'm `kevinb9n` most places.
  
 ## Work
 
-After a few startups I worked at Google for two decades (2004 to 2024). In 2007 I founded the Java Core Libraries (now Java And Kotlin Ecosystem) team and stayed with it rest of my time there. Then I was introduced to the [layoff hammer](https://twitter.com/kevinb9n/status/1745890746350321818).
+After a few startups I worked at Google for two decades (2004 to 2024). In 2007 I founded the Java Core Libraries team and stayed with them the rest of my time there. Then I was introduced to the [layoff hammer](https://twitter.com/kevinb9n/status/1745890746350321818) which I guess was my brief viral moment.
 
 I went to Oracle in the Java Platform Group working on the language team (Amber and Valhalla) for about two years and am now self-unemployed.
 
@@ -26,3 +26,4 @@ I was Google's representative to [JSR 330](https://jcp.org/en/jsr/detail?id=330)
 
 * [JSpecify](http://jspecify.org) working group
 * Not having a job
+* My fun [Terraforming Mars-related projects](http://github.com/MartianZoo)
